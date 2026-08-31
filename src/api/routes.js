@@ -5,6 +5,10 @@ import { CodeParser } from '../core/parser.js';
 import { GitAnalyzer } from '../core/git-analyzer.js';
 import { DependencyAnalyzer } from '../core/dependency-graph.js';
 import { SearchIndex } from '../core/search-index.js';
+import { CircularDependencyDetector } from '../core/circular-detector.js';
+import { CodeMetrics } from '../core/metrics.js';
+import { HotspotAnalyzer } from '../core/hotspot-analyzer.js';
+import { MermaidGenerator } from '../core/mermaid-generator.js';
 import { AIContextPackager } from '../ai/context-packager.js';
 import { LocalQueryEngine } from '../ai/query-engine.js';
 
@@ -67,7 +71,50 @@ export class ApiRouter {
       return this.handleExport(res, format);
     }
 
-    // 6. AI Query
+    // 6. Code Metrics
+    if (req.method === 'GET' && pathname === '/api/metrics') {
+      const totalLoc = this.activeRepoState.files.reduce((acc, f) => acc + (f.metrics?.loc || f.lineCount || 0), 0);
+      const totalSloc = this.activeRepoState.files.reduce((acc, f) => acc + (f.metrics?.sloc || 0), 0);
+      const avgMaintainability = this.activeRepoState.files.length > 0
+        ? Math.round(this.activeRepoState.files.reduce((acc, f) => acc + (f.metrics?.maintainabilityIndex || 100), 0) / this.activeRepoState.files.length)
+        : 100;
+      const fileMetrics = this.activeRepoState.files.map(f => ({
+        relativePath: f.relativePath,
+        language: f.language,
+        metrics: f.metrics
+      }));
+      return this.sendJson(res, 200, {
+        totalLoc,
+        totalSloc,
+        avgMaintainability,
+        files: fileMetrics
+      });
+    }
+
+    // 7. Hotspot & Churn Analysis
+    if (req.method === 'GET' && pathname === '/api/hotspots') {
+      return this.sendJson(res, 200, {
+        hotspots: this.activeRepoState.hotspots || []
+      });
+    }
+
+    // 8. Circular Dependency Detection
+    if (req.method === 'GET' && pathname === '/api/cycles') {
+      return this.sendJson(res, 200, {
+        cycles: this.activeRepoState.cycles || []
+      });
+    }
+
+    // 9. Architecture & Class Mermaid Diagrams
+    if (req.method === 'GET' && pathname === '/api/diagram') {
+      const type = parsedUrl.searchParams.get('type') || 'module';
+      const diagram = type === 'class'
+        ? MermaidGenerator.generateClassDiagram(this.activeRepoState.files)
+        : MermaidGenerator.generateModuleFlowchart(this.activeRepoState.dependencyGraph);
+      return this.sendJson(res, 200, { type, diagram });
+    }
+
+    // 10. AI Query
     if (req.method === 'POST' && pathname === '/api/ai/query') {
       const body = await this.parseRequestBody(req);
       const engine = new LocalQueryEngine(this.activeRepoState);
@@ -75,7 +122,7 @@ export class ApiRouter {
       return this.sendJson(res, 200, response);
     }
 
-    // 7. AI Context Package
+    // 11. AI Context Package
     if (req.method === 'GET' && pathname === '/api/ai/context') {
       const targetFile = parsedUrl.searchParams.get('file');
       if (targetFile) {
@@ -86,7 +133,7 @@ export class ApiRouter {
       return this.sendJson(res, 200, pkg);
     }
 
-    // 8. Serve UI Dashboard
+    // 12. Serve UI Dashboard
     if (req.method === 'GET' && (pathname === '/' || pathname === '/index.html')) {
       const htmlPath = path.join(this.rootDir, 'index.html');
       try {
@@ -118,9 +165,11 @@ export class ApiRouter {
       file.symbols = parsed.symbols;
       file.imports = parsed.imports;
       file.exports = parsed.exports;
+      file.metrics = CodeMetrics.calculateFileMetrics(file.content, file.language);
     }
 
     const dependencyGraph = DependencyAnalyzer.buildGraph(scanResult.files);
+    const cycles = CircularDependencyDetector.detectCycles(dependencyGraph.edges);
     const gitAnalyzer = new GitAnalyzer(targetPath);
 
     let branch = 'unknown';
@@ -136,6 +185,8 @@ export class ApiRouter {
       commits = await gitAnalyzer.getCommitHistory(100);
       contributors = await gitAnalyzer.getContributors(commits);
     }
+
+    const hotspots = HotspotAnalyzer.analyzeHotspots(scanResult.files, commits);
 
     const summary = {
       path: scanResult.path,
@@ -159,7 +210,9 @@ export class ApiRouter {
       commits,
       contributors,
       dependencyGraph,
-      searchIndex
+      searchIndex,
+      cycles,
+      hotspots
     };
 
     return this.sendJson(res, 200, {
@@ -170,6 +223,9 @@ export class ApiRouter {
       contributorsCount: contributors.length,
       modulesCount: dependencyGraph.modules.length,
       dependencyGraph,
+      cyclesCount: cycles.length,
+      cycles,
+      hotspots: hotspots.slice(0, 10),
       contributors,
       commits: commits.slice(0, 50),
       files: scanResult.files.map(f => ({
@@ -180,7 +236,8 @@ export class ApiRouter {
         sizeBytes: f.sizeBytes,
         symbolsCount: f.symbols.length,
         importsCount: f.imports.length,
-        exportsCount: f.exports.length
+        exportsCount: f.exports.length,
+        metrics: f.metrics
       }))
     });
   }
