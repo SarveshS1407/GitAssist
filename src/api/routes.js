@@ -1,0 +1,265 @@
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import { RepositoryScanner } from '../core/scanner.js';
+import { CodeParser } from '../core/parser.js';
+import { GitAnalyzer } from '../core/git-analyzer.js';
+import { DependencyAnalyzer } from '../core/dependency-graph.js';
+import { SearchIndex } from '../core/search-index.js';
+import { AIContextPackager } from '../ai/context-packager.js';
+import { LocalQueryEngine } from '../ai/query-engine.js';
+
+export class ApiRouter {
+  constructor(rootDir) {
+    this.rootDir = rootDir;
+    this.activeRepoState = {
+      summary: null,
+      files: [],
+      commits: [],
+      contributors: [],
+      dependencyGraph: { nodes: [], edges: [], modules: [] },
+      searchIndex: new SearchIndex([])
+    };
+    this.contextPackager = new AIContextPackager();
+  }
+
+  async handleRequest(req, res, parsedUrl) {
+    const pathname = parsedUrl.pathname;
+
+    // 1. Ingest / Scan
+    if (req.method === 'POST' && pathname === '/api/scan') {
+      return this.handleScan(req, res);
+    }
+
+    // 2. Status
+    if (req.method === 'GET' && pathname === '/api/status') {
+      return this.sendJson(res, 200, {
+        status: 'online',
+        activeRepo: this.activeRepoState.summary ? this.activeRepoState.summary.name : null,
+        totalFiles: this.activeRepoState.files.length,
+        version: '0.1.0'
+      });
+    }
+
+    // 3. Search
+    if (req.method === 'GET' && pathname === '/api/search') {
+      const q = parsedUrl.searchParams.get('q') || '';
+      const type = parsedUrl.searchParams.get('type') || 'all';
+      const language = parsedUrl.searchParams.get('language') || null;
+
+      const results = this.activeRepoState.searchIndex.search({ query: q, type, language });
+      return this.sendJson(res, 200, { query: q, results });
+    }
+
+    // 4. File Detail
+    if (req.method === 'GET' && pathname === '/api/file') {
+      const relPath = parsedUrl.searchParams.get('path');
+      const file = this.activeRepoState.files.find(f => f.relativePath === relPath);
+
+      if (!file) {
+        return this.sendJson(res, 404, { error: 'File not found in active repository' });
+      }
+      return this.sendJson(res, 200, file);
+    }
+
+    // 5. Export Report
+    if (req.method === 'GET' && pathname === '/api/export') {
+      const format = parsedUrl.searchParams.get('format') || 'json';
+      return this.handleExport(res, format);
+    }
+
+    // 6. AI Query
+    if (req.method === 'POST' && pathname === '/api/ai/query') {
+      const body = await this.parseRequestBody(req);
+      const engine = new LocalQueryEngine(this.activeRepoState);
+      const response = engine.evaluateQuery(body.query);
+      return this.sendJson(res, 200, response);
+    }
+
+    // 7. AI Context Package
+    if (req.method === 'GET' && pathname === '/api/ai/context') {
+      const targetFile = parsedUrl.searchParams.get('file');
+      if (targetFile) {
+        const pkg = this.contextPackager.packageFileBlastRadius(targetFile, this.activeRepoState);
+        return this.sendJson(res, 200, pkg);
+      }
+      const pkg = this.contextPackager.packageArchitectureContext(this.activeRepoState);
+      return this.sendJson(res, 200, pkg);
+    }
+
+    // 8. Serve UI Dashboard
+    if (req.method === 'GET' && (pathname === '/' || pathname === '/index.html')) {
+      const htmlPath = path.join(this.rootDir, 'index.html');
+      try {
+        const html = await fs.readFile(htmlPath, 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(html);
+        return;
+      } catch (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('index.html not found.');
+        return;
+      }
+    }
+
+    return this.sendJson(res, 404, { error: 'Not Found' });
+  }
+
+  async handleScan(req, res) {
+    const { repoPath } = await this.parseRequestBody(req);
+    const targetPath = repoPath ? path.resolve(repoPath) : this.rootDir;
+
+    console.log(`[Server] Scanning repository at: ${targetPath}`);
+
+    const scanner = new RepositoryScanner();
+    const scanResult = await scanner.scan(targetPath);
+
+    for (const file of scanResult.files) {
+      const parsed = CodeParser.parseFile(file);
+      file.symbols = parsed.symbols;
+      file.imports = parsed.imports;
+      file.exports = parsed.exports;
+    }
+
+    const dependencyGraph = DependencyAnalyzer.buildGraph(scanResult.files);
+    const gitAnalyzer = new GitAnalyzer(targetPath);
+
+    let branch = 'unknown';
+    let headCommit = '';
+    let workingTreeStatus = { clean: true, modified: [], added: [], deleted: [], untracked: [] };
+    let commits = [];
+    let contributors = [];
+
+    if (scanResult.isValidGit) {
+      branch = await gitAnalyzer.getCurrentBranch();
+      headCommit = await gitAnalyzer.getHeadCommit();
+      workingTreeStatus = await gitAnalyzer.getWorkingTreeStatus();
+      commits = await gitAnalyzer.getCommitHistory(100);
+      contributors = await gitAnalyzer.getContributors(commits);
+    }
+
+    const summary = {
+      path: scanResult.path,
+      name: scanResult.name,
+      isValidGit: scanResult.isValidGit,
+      branch,
+      headCommit,
+      totalFiles: scanResult.totalFiles,
+      totalDirectories: scanResult.totalDirectories,
+      totalLines: scanResult.totalLines,
+      totalSizeBytes: scanResult.totalSizeBytes,
+      languages: scanResult.languages,
+      workingTreeStatus
+    };
+
+    const searchIndex = new SearchIndex(scanResult.files);
+
+    this.activeRepoState = {
+      summary,
+      files: scanResult.files,
+      commits,
+      contributors,
+      dependencyGraph,
+      searchIndex
+    };
+
+    return this.sendJson(res, 200, {
+      success: true,
+      summary,
+      filesCount: scanResult.files.length,
+      commitsCount: commits.length,
+      contributorsCount: contributors.length,
+      modulesCount: dependencyGraph.modules.length,
+      dependencyGraph,
+      contributors,
+      commits: commits.slice(0, 50),
+      files: scanResult.files.map(f => ({
+        name: f.name,
+        relativePath: f.relativePath,
+        language: f.language,
+        lineCount: f.lineCount,
+        sizeBytes: f.sizeBytes,
+        symbolsCount: f.symbols.length,
+        importsCount: f.imports.length,
+        exportsCount: f.exports.length
+      }))
+    });
+  }
+
+  handleExport(res, format) {
+    const { summary, files, contributors, dependencyGraph } = this.activeRepoState;
+    if (!summary) {
+      return this.sendJson(res, 400, { error: 'No repository is currently scanned to export' });
+    }
+
+    if (format === 'markdown') {
+      const langRows = Object.entries(summary.languages || {})
+        .map(([l, s]) => `| ${l} | ${s.percentage}% | ${s.lines.toLocaleString()} | ${s.files} |`)
+        .join('\n');
+
+      const topContrib = contributors.slice(0, 5)
+        .map(c => `- **${c.name}**: ${c.commitCount} commits (${c.email})`)
+        .join('\n');
+
+      const markdown = `# Architecture Summary: ${summary.name}
+
+> Generated by GitAssist on ${new Date().toISOString()}
+
+## Repository Overview
+- **Branch**: \`${summary.branch}\`
+- **Total Files**: ${summary.totalFiles}
+- **Total LOC**: ${summary.totalLines.toLocaleString()} lines
+- **Total Size**: ${(summary.totalSizeBytes / 1024).toFixed(1)} KB
+
+## Language Breakdown
+| Language | % Share | Lines | Files |
+| :--- | :--- | :--- | :--- |
+${langRows}
+
+## Top Contributors
+${topContrib || 'None identified'}
+
+## Module Architecture
+- **Identified Modules**: ${dependencyGraph.modules.map(m => `\`${m.name}\``).join(', ') || 'None'}
+- **Total Dependency Edges**: ${dependencyGraph.edges.length}
+`;
+      res.writeHead(200, {
+        'Content-Type': 'text/markdown; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${summary.name}-report.md"`
+      });
+      res.end(markdown);
+      return;
+    }
+
+    return this.sendJson(res, 200, {
+      summary,
+      filesCount: files.length,
+      contributors,
+      dependencyGraph
+    });
+  }
+
+  async parseRequestBody(req) {
+    return new Promise((resolve, reject) => {
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', () => {
+        try {
+          resolve(body ? JSON.parse(body) : {});
+        } catch (err) {
+          reject(err);
+        }
+      });
+      req.on('error', reject);
+    });
+  }
+
+  sendJson(res, statusCode, data) {
+    res.writeHead(statusCode, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    res.end(JSON.stringify(data));
+  }
+}
