@@ -1,64 +1,95 @@
-# 🏛️ Codebase Archaeologist
+# ⚡ GitAssist
 
-> Intelligent codebase and Git repository analysis platform for understanding unfamiliar, large, or complex software repositories.
+> **Intelligent local-first codebase intelligence & Git archaeology platform** for developers, architects, and engineering teams to quickly navigate, analyze, and understand unfamiliar or complex software repositories.
+
+---
+
+## ✨ Features
+
+- 🔍 **Instant Repository Scanning**: Recursively scans and analyzes files, compute LOC, language breakdown, and directory topologies while honoring standard `.gitignore` rules.
+- 🌳 **Multi-Language AST & Symbol Extraction**: Extracts classes, functions, interfaces, type aliases, imports, and exports from JavaScript, TypeScript, Python, Rust, Go, Java, and C/C++.
+- 🕸️ **Interactive Dependency Graph**: Builds visual topologies showing module relationships, import couplings, and circular dependencies.
+- 🏛️ **Git Archaeology & Churn Analysis**: Non-destructive, read-only inspection of commit history, top contributors, active branches, and working tree churn.
+- ⚡ **Multi-Modal Code Search**: Fast in-memory search across file paths, symbol declarations, and text content.
+- 🤖 **AI-Ready Context Packaging**: Formats extracted repo architecture and symbol relationships into structured context windows optimized for LLMs.
+- 📊 **Export Reports**: Generate comprehensive Markdown and JSON architecture reports for documentation and onboarding.
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. View in Antigravity IDE / Browser
-Open [`index.html`](file:///Users/kingpin/.gemini/antigravity/scratch/codebase-archaeologist/index.html) directly in Antigravity IDE's preview or in any browser.
+### 1. Installation & Setup
+Clone the repository and install (no heavy external dependencies required; runs natively on Node.js 18+):
 
-### 2. Start the Local Intelligence Service
 ```bash
-cd /Users/kingpin/.gemini/antigravity/scratch/codebase-archaeologist
-node src/server.js
+git clone https://github.com/SarveshS1407/GitAssist.git
+cd GitAssist
 ```
-Then visit `http://localhost:3333` to analyze any local Git repository interactively.
+
+### 2. Start the Local Intelligence Dashboard
+```bash
+npm run dev
+# or: node src/server.js
+```
+Open your browser at **`http://localhost:3333`** to access the interactive web dashboard.
+
+### 3. Run via CLI
+```bash
+# Run standalone scan from terminal
+node bin/gitassist.js scan .
+
+# Start server on custom port
+PORT=4000 node bin/gitassist.js server
+```
 
 ---
 
-## 🧱 Architecture Overview (Phase 1 Foundation)
+## 🧱 Architecture Overview
 
 ```text
-Repository Path
-      │
-      ▼
-[RepositoryScanner] ──► Recursively filters ignores, computes LOC & byte sizes
-      │
-      ├─► [LanguageDetector] ──► Language mapping & stats
-      │
-      ├─► [CodeParser] ────────► AST & regex symbol, import, export extractor
-      │
-      ├─► [GitAnalyzer] ───────► Read-only Git history, churn, & contributor metrics
-      │
-      ├─► [DependencyAnalyzer] ─► File & module dependency graph
-      │
-      └─► [SearchIndex] ───────► Multi-modal file, symbol, & text search
-            │
-            ▼
-[AI Context Packager & UI Dashboard]
+Target Repository Path
+          │
+          ▼
+    [RepositoryScanner] ──► Recursively filters ignores, computes LOC & byte sizes
+          │
+          ├─► [LanguageDetector] ──► Multi-language mapping & distribution stats
+          │
+          ├─► [CodeParser] ────────► AST & Regex symbol, import, and export extractor
+          │
+          ├─► [GitAnalyzer] ───────► Read-only Git history, churn, & contributor metrics
+          │
+          ├─► [DependencyAnalyzer] ─► File & module dependency graph topology
+          │
+          └─► [SearchIndex] ───────► Multi-modal file, symbol, & text search
+                │
+                ▼
+  [AI Context Packager & Web UI Dashboard]
 ```
 
 ---
 
-## 📁 Project Structure
+## 📡 REST API Reference
 
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/scan` | Ingest and scan a local repository path (`{ "repoPath": "/path/to/repo" }`) |
+| `GET` | `/api/status` | Health check and current active repository status |
+| `GET` | `/api/search?q=query&type=all` | Query search index (types: `all`, `file`, `symbol`, `text`) |
+| `GET` | `/api/file?path=relativePath` | Get detailed AST symbols and metadata for a specific file |
+| `GET` | `/api/export?format=markdown` | Export comprehensive repository report as Markdown or JSON |
+
+---
+
+## 🧪 Testing
+
+Run the built-in automated test suite:
+
+```bash
+npm test
 ```
-codebase-archaeologist/
-├── index.html                 # Interactive Developer Intelligence Dashboard
-├── package.json               # Package manifest
-├── README.md                  # Documentation
-└── src/
-    ├── types.ts               # Core TypeScript data definitions
-    ├── server.js              # Native lightweight HTTP API service
-    ├── core/
-    │   ├── scanner.js         # Recursive repository scanner & ignore engine
-    │   ├── language-detector.js# Extension & syntax language classifier
-    │   ├── parser.js          # AST/regex symbol, import, & export extractor
-    │   ├── git-analyzer.js    # Non-destructive read-only Git archaeologist
-    │   ├── dependency-graph.js# Module & import topology graph builder
-    │   └── search-index.js    # Multi-modal search index
-    └── ai/
-        └── interfaces.js      # Future AI layer context packager & abstraction
-```
+
+---
+
+## 📄 License
+
+MIT License © 2026 GitAssist Contributors
