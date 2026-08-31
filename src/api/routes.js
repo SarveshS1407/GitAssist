@@ -133,17 +133,36 @@ export class ApiRouter {
       return this.sendJson(res, 200, pkg);
     }
 
-    // 12. Serve UI Dashboard
-    if (req.method === 'GET' && (pathname === '/' || pathname === '/index.html')) {
-      const htmlPath = path.join(this.rootDir, 'index.html');
+    // 12. Serve UI Dashboard and Static Assets
+    if (req.method === 'GET' && (pathname.startsWith('/src/ui/') || pathname.startsWith('/ui/') || pathname === '/' || pathname === '/index.html')) {
+      const targetRelPath = pathname === '/' || pathname === '/index.html'
+        ? 'index.html'
+        : pathname.startsWith('/ui/')
+          ? pathname.replace(/^\/ui\//, 'src/ui/')
+          : pathname.replace(/^\//, '');
+
+      const safePath = path.resolve(this.rootDir, targetRelPath);
+      if (!safePath.startsWith(this.rootDir)) {
+        return this.sendJson(res, 403, { error: 'Forbidden' });
+      }
+
       try {
-        const html = await fs.readFile(htmlPath, 'utf-8');
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(html);
+        const ext = path.extname(safePath).toLowerCase();
+        const content = await fs.readFile(safePath);
+        const mimeTypes = {
+          '.html': 'text/html; charset=utf-8',
+          '.css': 'text/css; charset=utf-8',
+          '.js': 'application/javascript; charset=utf-8',
+          '.json': 'application/json',
+          '.svg': 'image/svg+xml',
+          '.png': 'image/png'
+        };
+        res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' });
+        res.end(content);
         return;
       } catch (err) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('index.html not found.');
+        res.end('Asset not found.');
         return;
       }
     }
