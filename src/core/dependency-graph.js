@@ -14,8 +14,8 @@ export class DependencyAnalyzer {
     // Index all relative paths and module groups
     for (const file of files) {
       fileMap.set(file.relativePath, file);
-      const moduleName = file.relativePath.includes(path.sep) 
-        ? file.relativePath.split(path.sep)[0] 
+      const moduleName = file.relativePath.includes('/') || file.relativePath.includes('\\')
+        ? file.relativePath.split(/[/\\]/)[0]
         : 'root';
       
       modulesSet.add(moduleName);
@@ -59,13 +59,14 @@ export class DependencyAnalyzer {
         }
 
         if (targetPath && targetPath !== file.relativePath) {
-          // Check if edge already exists
-          const existingEdge = edges.find(e => e.source === file.relativePath && e.target === targetPath);
+          const existingEdge = edges.find(e => (e.source === file.relativePath && e.target === targetPath));
           if (existingEdge) {
             existingEdge.importCount += 1;
             existingEdge.imports.push(...imp.specifiers);
           } else {
             edges.push({
+              from: file.relativePath,
+              to: targetPath,
               source: file.relativePath,
               target: targetPath,
               importCount: 1,
@@ -79,7 +80,14 @@ export class DependencyAnalyzer {
     return {
       nodes,
       edges,
-      modules: Array.from(modulesSet)
+      modules: Array.from(modulesSet).map(name => {
+        const moduleFiles = files.filter(f => f.relativePath.startsWith(name + '/') || (name === 'root' && !f.relativePath.includes('/')));
+        return {
+          name,
+          fileCount: moduleFiles.length,
+          totalLines: moduleFiles.reduce((acc, f) => acc + (f.lineCount || 0), 0)
+        };
+      })
     };
   }
 }

@@ -75,6 +75,10 @@ export class LanguageDetector {
     return LANGUAGE_MAP[ext] || 'Text';
   }
 
+  static detectLanguage(filePath) {
+    return this.detect(filePath);
+  }
+
   static getColor(language) {
     return LANGUAGE_COLORS[language] || LANGUAGE_COLORS['Other'];
   }
