@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 
 import path from 'node:path';
+import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { RepositoryScanner } from '../src/core/scanner.js';
 import { CodeParser } from '../src/core/parser.js';
 import { GitAnalyzer } from '../src/core/git-analyzer.js';
 import { DependencyAnalyzer } from '../src/core/dependency-graph.js';
+import { HotspotAnalyzer } from '../src/core/hotspot-analyzer.js';
+import { CodeMetrics } from '../src/core/metrics.js';
+import { MermaidGenerator } from '../src/core/mermaid-generator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,12 +26,17 @@ Usage:
 
 Commands:
   scan [path]                 Scan and analyze a repository folder (default: current directory)
+  hotspots [path]             Identify high-churn & high-risk architectural hotspots
+  complexity [path]           Calculate cyclomatic complexity & maintainability scores
+  diagram [path]              Generate Mermaid.js dependency diagram markdown
   server [--port <port>]      Start the GitAssist local web dashboard (default port: 3333)
   help                        Show this help message
 
 Examples:
   gitassist scan .
-  gitassist scan /path/to/project
+  gitassist hotspots .
+  gitassist complexity .
+  gitassist diagram .
   gitassist server --port 4000
 `);
 }
@@ -82,6 +91,67 @@ async function runScan(targetArg) {
   console.log(`\n✅ Scan complete. Launch the UI with: npx gitassist server\n`);
 }
 
+async function runHotspots(targetArg) {
+  const targetPath = path.resolve(targetArg || process.cwd());
+  const scanner = new RepositoryScanner();
+  const scanResult = await scanner.scan(targetPath);
+  const gitAnalyzer = new GitAnalyzer(targetPath);
+  const commits = scanResult.isValidGit ? await gitAnalyzer.getCommitHistory(100) : [];
+
+  const hotspots = HotspotAnalyzer.analyzeHotspots(scanResult.files, commits);
+  console.log(`\n🔥 Top Architectural Hotspots for ${scanResult.name}:\n`);
+  for (const h of hotspots.slice(0, 10)) {
+    const badge = h.riskLevel === 'High' ? '🔴 HIGH' : (h.riskLevel === 'Medium' ? '🟡 MED' : '🟢 LOW');
+    console.log(`  ${badge.padEnd(8)} [Score: ${String(h.score).padStart(4)}] ${h.relativePath} (${h.lineCount} lines, touched ${h.churnCount} times)`);
+  }
+  console.log('');
+}
+
+async function runComplexity(targetArg) {
+  const targetPath = path.resolve(targetArg || process.cwd());
+  const scanner = new RepositoryScanner();
+  const scanResult = await scanner.scan(targetPath);
+
+  console.log(`\n📈 Code Complexity & Maintainability Breakdown:\n`);
+  let totalMi = 0;
+  let count = 0;
+
+  for (const f of scanResult.files.slice(0, 15)) {
+    try {
+      const content = await fs.readFile(path.join(targetPath, f.relativePath), 'utf-8');
+      const m = CodeMetrics.calculateFileMetrics(content, f.language);
+      totalMi += m.maintainabilityIndex;
+      count++;
+      console.log(`  - ${f.relativePath.padEnd(35)} MI: ${String(m.maintainabilityIndex).padStart(3)}/100 | Complexity: ${String(m.complexity).padStart(3)} | SLOC: ${m.sloc}`);
+    } catch (e) {
+      // binary or unreadable file
+    }
+  }
+
+  if (count > 0) {
+    const avgMi = Math.round(totalMi / count);
+    console.log(`\n📊 Average Repository Maintainability Index: ${avgMi}/100\n`);
+  }
+}
+
+async function runDiagram(targetArg) {
+  const targetPath = path.resolve(targetArg || process.cwd());
+  const scanner = new RepositoryScanner();
+  const scanResult = await scanner.scan(targetPath);
+
+  for (const file of scanResult.files) {
+    const parsed = CodeParser.parseFile(file);
+    file.symbols = parsed.symbols;
+    file.imports = parsed.imports;
+    file.exports = parsed.exports;
+  }
+
+  const dependencyGraph = DependencyAnalyzer.buildGraph(scanResult.files);
+  const diagram = MermaidGenerator.generateModuleFlowchart(dependencyGraph);
+
+  console.log(`\n\`\`\`mermaid\n${diagram}\n\`\`\`\n`);
+}
+
 async function startServer(portArg) {
   let port = 3333;
   const portIdx = args.indexOf('--port');
@@ -99,6 +169,18 @@ async function main() {
   switch (command) {
     case 'scan':
       await runScan(args[1]);
+      break;
+    case 'hotspots':
+    case 'churn':
+      await runHotspots(args[1]);
+      break;
+    case 'complexity':
+    case 'metrics':
+      await runComplexity(args[1]);
+      break;
+    case 'diagram':
+    case 'mermaid':
+      await runDiagram(args[1]);
       break;
     case 'server':
     case 'start':
