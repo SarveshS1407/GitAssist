@@ -1,0 +1,21 @@
+{
+  "name": "codebase-archaeologist",
+  "version": "0.1.0",
+  "description": "Local-first codebase intelligence and Git archaeology platform",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "git",
+    "codebase-analysis",
+    "ast",
+    "developer-tools",
+    "dependency-graph",
+    "archaeology"
+  ],
+  "author": "Codebase Archaeologist Team",
+  "license": "MIT"
+}
