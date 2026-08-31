@@ -1,5 +1,10 @@
 # ⚡ GitAssist
 
+[![CI](https://github.com/SarveshS1407/GitAssist/actions/workflows/ci.yml/badge.svg)](https://github.com/SarveshS1407/GitAssist/actions)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Tests](https://img.shields.io/badge/tests-16%20passed-brightgreen.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-orange.svg)
+
 > **Intelligent local-first codebase intelligence & Git archaeology platform** for developers, architects, and engineering teams to quickly navigate, analyze, and understand unfamiliar or complex software repositories.
 
 ---
