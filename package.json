@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "description": "Local-first codebase intelligence and Git archaeology platform",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "src/server.js",
+  "bin": {
+    "gitassist": "./bin/gitassist.js"
+  },
   "scripts": {
     "dev": "node src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "node --test tests/**/*.test.js"
   },
   "keywords": [
     "git",
@@ -16,6 +20,6 @@
     "dependency-graph",
     "archaeology"
   ],
-  "author": "Codebase Archaeologist Team",
+  "author": "GitAssist Team",
   "license": "MIT"
 }
