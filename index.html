@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Codebase Archaeologist — Local Repository Intelligence</title>
+  <title>GitAssist — Local Repository Intelligence & Git Archaeology</title>
   <style>
     :root {
       --bg-main: #0d1117;
@@ -566,14 +566,15 @@
   <!-- Header -->
   <header>
     <div class="brand">
-      <span class="brand-icon">🏛️</span>
-      <span>Codebase Archaeologist</span>
-      <span class="badge-tag">Phase 1 Foundation</span>
+      <span class="brand-icon">⚡</span>
+      <span>GitAssist</span>
+      <span class="badge-tag">v0.1.0</span>
     </div>
 
     <div class="repo-picker">
-      <input type="text" id="repoPathInput" class="input-path" placeholder="Enter absolute repository path..." value="/Users/kingpin/.gemini/antigravity/scratch/codebase-archaeologist" />
+      <input type="text" id="repoPathInput" class="input-path" placeholder="Enter repository path (. or /path/to/repo)" value="." />
       <button id="btnScan" class="btn">⚡ Ingest & Analyze</button>
+      <button id="btnExport" class="btn btn-secondary">📥 Export</button>
       <button id="btnPresets" class="btn btn-secondary">Presets ▾</button>
     </div>
 
@@ -1343,28 +1344,106 @@
     });
 
     // -------------------------------------------------------------
-    // AI Assistant Stubs
+    // Export Report Functionality
+    // -------------------------------------------------------------
+    const btnExport = document.getElementById('btnExport');
+    if (btnExport) {
+      btnExport.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/api/export?format=markdown');
+          if (res.ok) {
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentRepoData.name || 'gitassist'}-architecture-report.md`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            return;
+          }
+        } catch (e) {
+          console.warn('Backend export endpoint unavailable, exporting client snapshot');
+        }
+
+        // Client-side fallback export
+        const mdContent = `# GitAssist Repository Report: ${currentRepoData.name}
+Total Files: ${currentRepoData.files.length}
+Total Lines: ${currentRepoData.totalLines}
+
+## Key Modules
+${(currentRepoData.dependencyGraph?.modules || []).map(m => `- ${typeof m === 'object' ? m.name : m}`).join('\n')}
+`;
+        const blob = new Blob([mdContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentRepoData.name || 'gitassist'}-report.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Keyboard Shortcut (Cmd+K / Ctrl+K for Search)
+    // -------------------------------------------------------------
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchNav = document.querySelector('[data-tab="search"]');
+        if (searchNav) searchNav.click();
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.focus();
+      }
+    });
+
+    // -------------------------------------------------------------
+    // AI Assistant & Query Evaluation
     // -------------------------------------------------------------
     window.askAi = function(query) {
       document.getElementById('aiInput').value = query;
       triggerAiQuery();
     };
 
-    window.triggerAiQuery = function() {
+    window.triggerAiQuery = async function() {
       const query = document.getElementById('aiInput').value.trim();
       if (!query) return;
 
       const respBox = document.getElementById('aiResponseBox');
       respBox.style.display = 'block';
       respBox.innerHTML = `
-        <div style="color: var(--purple); font-weight: 600; margin-bottom: 8px;">🧠 Archaeological Analysis Response:</div>
+        <div style="color: var(--purple); font-weight: 600; margin-bottom: 8px;">🧠 GitAssist Intelligence Response:</div>
         <p style="margin-bottom: 8px;">Analyzing repository AST, Git timeline, and dependency topology for <em>"${query}"</em>...</p>
+      `;
+
+      try {
+        const res = await fetch('/api/ai/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          respBox.innerHTML = `
+            <div style="color: var(--purple); font-weight: 600; margin-bottom: 8px;">🧠 GitAssist Intelligence Response:</div>
+            <div style="background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid var(--purple); font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap;">
+${data.answer}
+            </div>
+          `;
+          return;
+        }
+      } catch (err) {
+        console.warn('AI query backend unavailable, falling back to local heuristic response');
+      }
+
+      // Fallback
+      respBox.innerHTML = `
+        <div style="color: var(--purple); font-weight: 600; margin-bottom: 8px;">🧠 GitAssist Archaeological Analysis:</div>
         <div style="background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid var(--purple); font-size: 0.83rem;">
-          <strong>Context Packager Output:</strong>
+          <strong>Repository Intelligence:</strong>
           <ul style="margin: 6px 0 0 16px;">
-            <li>Repository: <code>codebase-archaeologist</code> (8 indexed files, 1,250 LOC)</li>
+            <li>Repository: <code>${currentRepoData.name || 'gitassist'}</code> (${currentRepoData.files.length} files, ${currentRepoData.totalLines.toLocaleString()} LOC)</li>
             <li>Dependency Flow: <code>server.js</code> → <code>scanner.js</code> + <code>parser.js</code> + <code>git-analyzer.js</code></li>
-            <li>Risk Assessment: Low coupling. <code>CodeParser</code> is isolated and can be extended with tree-sitter or LSP plugins.</li>
+            <li>Status: Non-destructive read-only indexer active.</li>
           </ul>
         </div>
       `;
