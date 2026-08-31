@@ -1,5 +1,5 @@
 {
-  "name": "codebase-archaeologist",
+  "name": "gitassist",
   "version": "0.1.0",
   "description": "Local-first codebase intelligence and Git archaeology platform",
   "type": "module",
