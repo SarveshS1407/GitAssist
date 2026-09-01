@@ -6,7 +6,7 @@ import { ErrorState } from '../components/ErrorState.js';
 
 /**
  * Overview View
- * Displays repository summary, language distribution, and architectural health metrics
+ * Central Cyber-Forensic Telemetry Dashboard & Interactive 3D Module Showcase
  */
 export class OverviewView {
   constructor({ repositoryState, onOpenRepository }) {
@@ -19,10 +19,7 @@ export class OverviewView {
     if (this.repositoryState?.isIndexing) {
       const container = document.createElement('div');
       container.className = 'view-container';
-      container.appendChild(new LoadingState({
-        message: 'Analyzing Codebase Architecture...',
-        subtext: 'Scanning files, parsing AST symbols, and calculating maintainability index...'
-      }).render());
+      container.appendChild(new LoadingState().render());
       return container;
     }
 
@@ -31,7 +28,7 @@ export class OverviewView {
       const container = document.createElement('div');
       container.className = 'view-container';
       container.appendChild(new ErrorState({
-        title: 'Failed to Open Repository',
+        title: 'ARCHAEOLOGICAL SCAN FAILED',
         message: this.repositoryState.error,
         onRetry: this.onOpenRepository
       }).render());
@@ -43,18 +40,18 @@ export class OverviewView {
       return new LandingView({ onOpenRepository: this.onOpenRepository }).render();
     }
 
-    // 4. Active Repository Overview
+    // 4. Active Repository Telemetry
     const summary = this.repositoryState.summary || {};
     const container = document.createElement('div');
     container.className = 'view-container';
 
     const header = new PageHeader({
-      title: summary.name || this.repositoryState.repositoryName || 'Repository Overview',
-      description: `Path: ${summary.path || this.repositoryState.repositoryPath} • Branch: ${summary.branch || 'main'}`,
-      badge: summary.isValidGit ? 'Git Active' : 'Local Directory',
+      title: summary.name || this.repositoryState.repositoryName || 'CENTRAL TELEMETRY',
+      description: `PATH: ${summary.path || this.repositoryState.repositoryPath} • BRANCH: ${summary.branch || 'main'}`,
+      badge: summary.isValidGit ? 'GIT ACTIVE // READY' : 'LOCAL DIRECTORY',
       actions: [
         {
-          label: 'Change Repository',
+          label: 'CHANGE REPO',
           icon: '📁',
           variant: 'secondary',
           onClick: this.onOpenRepository
@@ -75,49 +72,107 @@ export class OverviewView {
     statGrid.appendChild(new StatCard({
       label: 'Lines of Code',
       value: totalLoc,
-      subtext: 'Total source lines',
+      subtext: 'Calculated source lines',
       icon: '📝'
     }).render());
 
     statGrid.appendChild(new StatCard({
-      label: 'Scanned Files',
+      label: 'Mapped Files',
       value: totalFiles,
-      subtext: `${summary.totalDirectories || 0} directories`,
+      subtext: `${summary.totalDirectories || 0} directories mapped`,
       icon: '📁'
     }).render());
 
     statGrid.appendChild(new StatCard({
       label: 'Maintainability',
       value: mi,
-      subtext: 'Calculated complexity index',
+      subtext: 'Cyclomatic complexity index',
       icon: '⚡',
-      trend: summary.avgMaintainability >= 70 ? '✓ High Health' : '⚠️ Refactor Needed'
+      trend: summary.avgMaintainability >= 70 ? '✓ HIGH HEALTH' : '⚠️ ELEVATED RISK'
     }).render());
 
     statGrid.appendChild(new StatCard({
-      label: 'Languages',
+      label: 'Technologies',
       value: langCount,
-      subtext: 'Detected technologies',
+      subtext: 'Identified languages',
       icon: '🌐'
     }).render());
 
     container.appendChild(statGrid);
 
-    // Languages Breakdown Section
+    // 3D Perspective Module Showcase
+    const carouselSection = document.createElement('div');
+    carouselSection.className = 'landing-card';
+
+    carouselSection.innerHTML = `
+      <div class="landing-card-header">
+        <h3 class="landing-card-title">
+          <span>🏛️</span>
+          <span>Architectural Subsystems & Modules</span>
+        </h3>
+        <span class="landing-card-badge">Interactive 3D Deck</span>
+      </div>
+
+      <div class="carousel-viewport">
+        <div class="carousel-deck" id="module-deck">
+          <div class="carousel-card active" data-mod="core">
+            <div class="carousel-card-title"><span>⚙️</span><span>src/core</span></div>
+            <div class="carousel-card-meta">AST Parser • Metrics • Cycles</div>
+            <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 6px;">8 Subsystems</div>
+          </div>
+          <div class="carousel-card" data-mod="ui">
+            <div class="carousel-card-title"><span>🎨</span><span>src/ui</span></div>
+            <div class="carousel-card-meta">Cyber HUD • Router • Views</div>
+            <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 6px;">12 Components</div>
+          </div>
+          <div class="carousel-card" data-mod="api">
+            <div class="carousel-card-title"><span>🔌</span><span>src/api</span></div>
+            <div class="carousel-card-meta">REST Dispatcher • Static Assets</div>
+            <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 6px;">14 Endpoints</div>
+          </div>
+          <div class="carousel-card" data-mod="ai">
+            <div class="carousel-card-title"><span>🤖</span><span>src/ai</span></div>
+            <div class="carousel-card-meta">Local Q&A • Blast Radius Packager</div>
+            <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 6px;">Neural Engine</div>
+          </div>
+          <div class="carousel-card" data-mod="tests">
+            <div class="carousel-card-title"><span>🧪</span><span>tests/</span></div>
+            <div class="carousel-card-meta">Native node:test Suites</div>
+            <div style="font-size: 0.72rem; color: var(--success); font-family: var(--font-mono); margin-top: 6px;">28 Tests Pass</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    carouselSection.querySelectorAll('.carousel-card').forEach(card => {
+      card.addEventListener('click', () => {
+        carouselSection.querySelectorAll('.carousel-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+    });
+
+    container.appendChild(carouselSection);
+
+    // Language Distribution Telemetry
     if (summary.languages && Object.keys(summary.languages).length > 0) {
       const langSection = document.createElement('div');
       langSection.className = 'landing-card';
 
       const langRows = Object.entries(summary.languages)
         .map(([lang, data]) => `
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-weight: 600; color: var(--text-primary);">${lang}</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">(${data.files} files)</span>
+          <div style="display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.85rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 700; color: var(--text-primary);">${lang}</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">(${data.files} files)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; font-family: var(--font-mono);">
+                <span style="color: var(--text-secondary);">${data.lines.toLocaleString()} LOC</span>
+                <span style="color: var(--accent-cyan); font-weight: 700;">${data.percentage}%</span>
+              </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="color: var(--text-secondary); font-family: var(--font-mono);">${data.lines.toLocaleString()} lines</span>
-              <span style="color: var(--accent-primary); font-weight: 600;">${data.percentage}%</span>
+            <div style="width: 100%; height: 4px; background: var(--bg-input); border-radius: 2px; overflow: hidden;">
+              <div style="width: ${data.percentage}%; height: 100%; background: var(--accent-cyan); box-shadow: 0 0 6px var(--accent-cyan);"></div>
             </div>
           </div>
         `).join('');
@@ -126,11 +181,11 @@ export class OverviewView {
         <div class="landing-card-header">
           <h3 class="landing-card-title">
             <span>📊</span>
-            <span>Language Distribution</span>
+            <span>Language Telemetry & Share</span>
           </h3>
           <span class="landing-card-badge">Breakdown</span>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
           ${langRows}
         </div>
       `;

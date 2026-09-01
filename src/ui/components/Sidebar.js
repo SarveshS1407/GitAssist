@@ -1,6 +1,6 @@
 /**
  * Sidebar Navigation Component
- * Provides navigation between the 8 primary architectural views
+ * Provides structured tactical investigation console navigation
  */
 export class Sidebar {
   constructor({ activePage = 'overview', onNavigate }) {
@@ -8,15 +8,30 @@ export class Sidebar {
     this.onNavigate = onNavigate;
     this.element = null;
 
-    this.navItems = [
-      { id: 'overview', label: 'Overview', icon: '📊' },
-      { id: 'explorer', label: 'Explorer', icon: '📁' },
-      { id: 'architecture', label: 'Architecture', icon: '🏛️' },
-      { id: 'git', label: 'Git', icon: '📜' },
-      { id: 'search', label: 'Search', icon: '🔍' },
-      { id: 'contributors', label: 'Contributors', icon: '👥' },
-      { id: 'analysis', label: 'Analysis', icon: '⚡' },
-      { id: 'ai', label: 'AI', icon: '🤖' }
+    this.sections = [
+      {
+        title: 'Central Telemetry',
+        items: [
+          { id: 'overview', label: 'Overview', icon: '◈' }
+        ]
+      },
+      {
+        title: 'Explore',
+        items: [
+          { id: 'explorer', label: 'Codebase Explorer', icon: '📁' },
+          { id: 'architecture', label: 'Architecture Graph', icon: '🕸️' },
+          { id: 'git', label: 'Git Archaeology', icon: '📜' }
+        ]
+      },
+      {
+        title: 'Investigate',
+        items: [
+          { id: 'search', label: 'Forensic Search', icon: '🔍' },
+          { id: 'analysis', label: 'Quality & Hotspots', icon: '⚡' },
+          { id: 'contributors', label: 'Contributors', icon: '👥' },
+          { id: 'ai', label: 'AI Archaeologist', icon: '🤖' }
+        ]
+      }
     ];
   }
 
@@ -38,27 +53,31 @@ export class Sidebar {
     const sidebar = document.createElement('aside');
     sidebar.className = 'app-sidebar';
 
-    const navListHtml = this.navItems.map(item => `
-      <li>
-        <a class="nav-item ${item.id === this.activePage ? 'active' : ''}" data-page="${item.id}">
-          <span class="nav-icon">${item.icon}</span>
-          <span>${item.label}</span>
-        </a>
-      </li>
+    const sectionsHtml = this.sections.map(sec => `
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">${sec.title}</div>
+        <ul class="sidebar-nav-list">
+          ${sec.items.map(item => `
+            <li>
+              <a class="nav-item ${item.id === this.activePage ? 'active' : ''}" data-page="${item.id}">
+                <span class="nav-icon">${item.icon}</span>
+                <span>${item.label}</span>
+              </a>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
     `).join('');
 
     sidebar.innerHTML = `
       <div class="sidebar-nav-container">
-        <div class="sidebar-section-title">Navigation</div>
-        <ul class="sidebar-nav-list">
-          ${navListHtml}
-        </ul>
+        ${sectionsHtml}
       </div>
 
       <div class="sidebar-footer">
         <span class="system-status-indicator">
           <span class="status-dot"></span>
-          <span>Local Engine</span>
+          <span>TELEMETRY ONLINE</span>
         </span>
         <span>v0.1.0</span>
       </div>
