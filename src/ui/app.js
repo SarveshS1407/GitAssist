@@ -67,7 +67,17 @@ class App {
   async openRepository(selectedPath) {
     if (!selectedPath) return;
 
+    // Check if user entered a remote URL instead of a local filesystem path
+    if (selectedPath.startsWith('http://') || selectedPath.startsWith('https://') || selectedPath.startsWith('git@')) {
+      this.repositoryState.setError(
+        `Codebase Archaeologist is a local-first offline tool that inspects files on your computer. To analyze "${selectedPath}", please enter the local folder path where you cloned it (e.g. /Users/kingpin/Desktop/gitassist).`
+      );
+      this.router.navigate('overview');
+      return;
+    }
+
     this.repositoryState.setIndexing(true, 10);
+    this.router.navigate('overview');
 
     try {
       const res = await fetch('/api/repository/open', {
@@ -98,16 +108,29 @@ class App {
     const content = document.createElement('div');
     content.innerHTML = `
       <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-primary);">
-        Local Repository Path:
+        Local Filesystem Path:
       </label>
       <input type="text" id="repo-path-input" 
         placeholder="/Users/username/projects/my-repo" 
         value="/Users/kingpin/Desktop/gitassist"
         style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;" />
-      <p style="margin-top: 8px; font-size: 0.78rem; color: var(--text-muted);">
-        Enter the absolute filesystem path to any local Git repository or directory.
+      
+      <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Quick preset:</span>
+        <button type="button" id="btn-preset-current" class="btn-secondary" style="padding: 3px 8px; font-size: 0.75rem;">
+          ⚡ Current GitAssist Repo
+        </button>
+      </div>
+
+      <p style="margin-top: 12px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">
+        💡 <strong>Local-first tool:</strong> Enter the absolute directory path to any folder on your machine (e.g. <code>/Users/kingpin/Desktop/gitassist</code>).
       </p>
     `;
+
+    content.querySelector('#btn-preset-current').addEventListener('click', () => {
+      const input = content.querySelector('#repo-path-input');
+      if (input) input.value = '/Users/kingpin/Desktop/gitassist';
+    });
 
     const dialog = new Dialog({
       title: 'Open Local Repository',
