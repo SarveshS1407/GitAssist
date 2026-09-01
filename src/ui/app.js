@@ -60,8 +60,41 @@ class App {
       this.renderView(this.router.getCurrentRoute());
     });
 
+    // Register global archaeological keyboard navigation shortcuts
+    this.setupKeyboardShortcuts();
+
     // Render Initial View
     this.renderView(this.router.getCurrentRoute());
+  }
+
+  setupKeyboardShortcuts() {
+    window.addEventListener('keydown', (e) => {
+      // ⌘K or Ctrl+K triggers Forensic Code Search
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        this.router.navigate('search');
+        return;
+      }
+
+      // Ignore digit hotkeys if currently typing in an input or textarea
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+        return;
+      }
+
+      // 1-6 Tactical Lens Switching
+      const lensMap = {
+        '1': 'overview',
+        '2': 'explorer',
+        '3': 'architecture',
+        '4': 'git',
+        '5': 'search',
+        '6': 'ai'
+      };
+
+      if (lensMap[e.key]) {
+        this.router.navigate(lensMap[e.key]);
+      }
+    });
   }
 
   async openRepository(selectedPath) {
