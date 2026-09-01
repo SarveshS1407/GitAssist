@@ -1,13 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { RepositoryScanner } from '../core/scanner.js';
-import { CodeParser } from '../core/parser.js';
-import { GitAnalyzer } from '../core/git-analyzer.js';
-import { DependencyAnalyzer } from '../core/dependency-graph.js';
-import { SearchIndex } from '../core/search-index.js';
-import { CircularDependencyDetector } from '../core/circular-detector.js';
-import { CodeMetrics } from '../core/metrics.js';
-import { HotspotAnalyzer } from '../core/hotspot-analyzer.js';
+import { RepositoryService } from '../services/repository-service.js';
+import { GitService } from '../services/git-service.js';
 import { MermaidGenerator } from '../core/mermaid-generator.js';
 import { AIContextPackager } from '../ai/context-packager.js';
 import { LocalQueryEngine } from '../ai/query-engine.js';
@@ -21,7 +15,9 @@ export class ApiRouter {
       commits: [],
       contributors: [],
       dependencyGraph: { nodes: [], edges: [], modules: [] },
-      searchIndex: new SearchIndex([])
+      searchIndex: null,
+      cycles: [],
+      hotspots: []
     };
     this.contextPackager = new AIContextPackager();
   }
@@ -29,32 +25,92 @@ export class ApiRouter {
   async handleRequest(req, res, parsedUrl) {
     const pathname = parsedUrl.pathname;
 
-    // 1. Ingest / Scan
-    if (req.method === 'POST' && pathname === '/api/scan') {
-      return this.handleScan(req, res);
+    // 1. Repository Validation
+    if (req.method === 'POST' && pathname === '/api/repository/validate') {
+      const body = await this.parseRequestBody(req);
+      const validation = await RepositoryService.validateRepository(body.path || this.rootDir);
+      return this.sendJson(res, 200, validation);
     }
 
-    // 2. Status
-    if (req.method === 'GET' && pathname === '/api/status') {
+    // 2. Open / Ingest Repository
+    if (req.method === 'POST' && (pathname === '/api/repository/open' || pathname === '/api/scan')) {
+      const body = await this.parseRequestBody(req);
+      const targetPath = body.path || body.repoPath || this.rootDir;
+
+      try {
+        console.log(`[Server] Opening repository at: ${targetPath}`);
+        const result = await RepositoryService.openRepository(targetPath);
+        this.activeRepoState = result;
+
+        return this.sendJson(res, 200, {
+          success: true,
+          summary: result.summary,
+          filesCount: result.files.length,
+          commitsCount: result.commits.length,
+          contributorsCount: result.contributors.length,
+          modulesCount: result.dependencyGraph.modules.length,
+          cyclesCount: result.cycles.length,
+          cycles: result.cycles,
+          hotspots: result.hotspots.slice(0, 10),
+          contributors: result.contributors.slice(0, 10),
+          commits: result.commits.slice(0, 50),
+          files: result.files.map(f => ({
+            name: f.name,
+            relativePath: f.relativePath,
+            language: f.language,
+            lineCount: f.lineCount,
+            sizeBytes: f.sizeBytes,
+            symbolsCount: (f.symbols || []).length,
+            importsCount: (f.imports || []).length,
+            exportsCount: (f.exports || []).length,
+            metrics: f.metrics
+          }))
+        });
+      } catch (err) {
+        console.error(`[Server Error] Failed to open repository: ${err.message}`);
+        return this.sendJson(res, 400, {
+          success: false,
+          error: err.message
+        });
+      }
+    }
+
+    // 3. Repository Status
+    if (req.method === 'GET' && (pathname === '/api/repository/status' || pathname === '/api/status')) {
       return this.sendJson(res, 200, {
         status: 'online',
+        isLoaded: !!this.activeRepoState.summary,
         activeRepo: this.activeRepoState.summary ? this.activeRepoState.summary.name : null,
+        branch: this.activeRepoState.summary ? this.activeRepoState.summary.branch : null,
         totalFiles: this.activeRepoState.files.length,
         version: '0.1.0'
       });
     }
 
-    // 3. Search
+    // 4. Git Metadata
+    if (req.method === 'GET' && pathname === '/api/repository/git') {
+      return this.sendJson(res, 200, {
+        branch: this.activeRepoState.summary ? this.activeRepoState.summary.branch : 'unknown',
+        commits: this.activeRepoState.commits || [],
+        contributors: this.activeRepoState.contributors || []
+      });
+    }
+
+    // 5. Search
     if (req.method === 'GET' && pathname === '/api/search') {
       const q = parsedUrl.searchParams.get('q') || '';
       const type = parsedUrl.searchParams.get('type') || 'all';
       const language = parsedUrl.searchParams.get('language') || null;
 
+      if (!this.activeRepoState.searchIndex) {
+        return this.sendJson(res, 200, { query: q, results: [] });
+      }
+
       const results = this.activeRepoState.searchIndex.search({ query: q, type, language });
       return this.sendJson(res, 200, { query: q, results });
     }
 
-    // 4. File Detail
+    // 6. File Detail
     if (req.method === 'GET' && pathname === '/api/file') {
       const relPath = parsedUrl.searchParams.get('path');
       const file = this.activeRepoState.files.find(f => f.relativePath === relPath);
@@ -65,13 +121,13 @@ export class ApiRouter {
       return this.sendJson(res, 200, file);
     }
 
-    // 5. Export Report
+    // 7. Export Report
     if (req.method === 'GET' && pathname === '/api/export') {
       const format = parsedUrl.searchParams.get('format') || 'json';
       return this.handleExport(res, format);
     }
 
-    // 6. Code Metrics
+    // 8. Code Metrics
     if (req.method === 'GET' && pathname === '/api/metrics') {
       const totalLoc = this.activeRepoState.files.reduce((acc, f) => acc + (f.metrics?.loc || f.lineCount || 0), 0);
       const totalSloc = this.activeRepoState.files.reduce((acc, f) => acc + (f.metrics?.sloc || 0), 0);
@@ -91,21 +147,21 @@ export class ApiRouter {
       });
     }
 
-    // 7. Hotspot & Churn Analysis
+    // 9. Hotspot & Churn Analysis
     if (req.method === 'GET' && pathname === '/api/hotspots') {
       return this.sendJson(res, 200, {
         hotspots: this.activeRepoState.hotspots || []
       });
     }
 
-    // 8. Circular Dependency Detection
+    // 10. Circular Dependency Detection
     if (req.method === 'GET' && pathname === '/api/cycles') {
       return this.sendJson(res, 200, {
         cycles: this.activeRepoState.cycles || []
       });
     }
 
-    // 9. Architecture & Class Mermaid Diagrams
+    // 11. Architecture & Class Mermaid Diagrams
     if (req.method === 'GET' && pathname === '/api/diagram') {
       const type = parsedUrl.searchParams.get('type') || 'module';
       const diagram = type === 'class'
@@ -114,7 +170,7 @@ export class ApiRouter {
       return this.sendJson(res, 200, { type, diagram });
     }
 
-    // 10. AI Query
+    // 12. AI Query
     if (req.method === 'POST' && pathname === '/api/ai/query') {
       const body = await this.parseRequestBody(req);
       const engine = new LocalQueryEngine(this.activeRepoState);
@@ -122,7 +178,7 @@ export class ApiRouter {
       return this.sendJson(res, 200, response);
     }
 
-    // 11. AI Context Package
+    // 13. AI Context Package
     if (req.method === 'GET' && pathname === '/api/ai/context') {
       const targetFile = parsedUrl.searchParams.get('file');
       if (targetFile) {
@@ -133,7 +189,7 @@ export class ApiRouter {
       return this.sendJson(res, 200, pkg);
     }
 
-    // 12. Serve UI Dashboard and Static Assets
+    // 14. Serve UI Dashboard and Static Assets
     if (req.method === 'GET' && (pathname.startsWith('/src/ui/') || pathname.startsWith('/ui/') || pathname === '/' || pathname === '/index.html')) {
       const targetRelPath = pathname === '/' || pathname === '/index.html'
         ? 'index.html'
@@ -170,97 +226,6 @@ export class ApiRouter {
     return this.sendJson(res, 404, { error: 'Not Found' });
   }
 
-  async handleScan(req, res) {
-    const { repoPath } = await this.parseRequestBody(req);
-    const targetPath = repoPath ? path.resolve(repoPath) : this.rootDir;
-
-    console.log(`[Server] Scanning repository at: ${targetPath}`);
-
-    const scanner = new RepositoryScanner();
-    const scanResult = await scanner.scan(targetPath);
-
-    for (const file of scanResult.files) {
-      const parsed = CodeParser.parseFile(file);
-      file.symbols = parsed.symbols;
-      file.imports = parsed.imports;
-      file.exports = parsed.exports;
-      file.metrics = CodeMetrics.calculateFileMetrics(file.content, file.language);
-    }
-
-    const dependencyGraph = DependencyAnalyzer.buildGraph(scanResult.files);
-    const cycles = CircularDependencyDetector.detectCycles(dependencyGraph.edges);
-    const gitAnalyzer = new GitAnalyzer(targetPath);
-
-    let branch = 'unknown';
-    let headCommit = '';
-    let workingTreeStatus = { clean: true, modified: [], added: [], deleted: [], untracked: [] };
-    let commits = [];
-    let contributors = [];
-
-    if (scanResult.isValidGit) {
-      branch = await gitAnalyzer.getCurrentBranch();
-      headCommit = await gitAnalyzer.getHeadCommit();
-      workingTreeStatus = await gitAnalyzer.getWorkingTreeStatus();
-      commits = await gitAnalyzer.getCommitHistory(100);
-      contributors = await gitAnalyzer.getContributors(commits);
-    }
-
-    const hotspots = HotspotAnalyzer.analyzeHotspots(scanResult.files, commits);
-
-    const summary = {
-      path: scanResult.path,
-      name: scanResult.name,
-      isValidGit: scanResult.isValidGit,
-      branch,
-      headCommit,
-      totalFiles: scanResult.totalFiles,
-      totalDirectories: scanResult.totalDirectories,
-      totalLines: scanResult.totalLines,
-      totalSizeBytes: scanResult.totalSizeBytes,
-      languages: scanResult.languages,
-      workingTreeStatus
-    };
-
-    const searchIndex = new SearchIndex(scanResult.files);
-
-    this.activeRepoState = {
-      summary,
-      files: scanResult.files,
-      commits,
-      contributors,
-      dependencyGraph,
-      searchIndex,
-      cycles,
-      hotspots
-    };
-
-    return this.sendJson(res, 200, {
-      success: true,
-      summary,
-      filesCount: scanResult.files.length,
-      commitsCount: commits.length,
-      contributorsCount: contributors.length,
-      modulesCount: dependencyGraph.modules.length,
-      dependencyGraph,
-      cyclesCount: cycles.length,
-      cycles,
-      hotspots: hotspots.slice(0, 10),
-      contributors,
-      commits: commits.slice(0, 50),
-      files: scanResult.files.map(f => ({
-        name: f.name,
-        relativePath: f.relativePath,
-        language: f.language,
-        lineCount: f.lineCount,
-        sizeBytes: f.sizeBytes,
-        symbolsCount: f.symbols.length,
-        importsCount: f.imports.length,
-        exportsCount: f.exports.length,
-        metrics: f.metrics
-      }))
-    });
-  }
-
   handleExport(res, format) {
     const { summary, files, contributors, dependencyGraph } = this.activeRepoState;
     if (!summary) {
@@ -272,13 +237,13 @@ export class ApiRouter {
         .map(([l, s]) => `| ${l} | ${s.percentage}% | ${s.lines.toLocaleString()} | ${s.files} |`)
         .join('\n');
 
-      const topContrib = contributors.slice(0, 5)
+      const topContrib = (contributors || []).slice(0, 5)
         .map(c => `- **${c.name}**: ${c.commitCount} commits (${c.email})`)
         .join('\n');
 
       const markdown = `# Architecture Summary: ${summary.name}
 
-> Generated by GitAssist on ${new Date().toISOString()}
+> Generated by Codebase Archaeologist on ${new Date().toISOString()}
 
 ## Repository Overview
 - **Branch**: \`${summary.branch}\`

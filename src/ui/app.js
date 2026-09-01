@@ -13,7 +13,7 @@ import { AiView } from './views/AiView.js';
 
 /**
  * Application Entry Point
- * Coordinates routing, active repository state, and view rendering
+ * Coordinates routing, active repository state, backend API integration, and view rendering
  */
 class App {
   constructor() {
@@ -64,6 +64,36 @@ class App {
     this.renderView(this.router.getCurrentRoute());
   }
 
+  async openRepository(selectedPath) {
+    if (!selectedPath) return;
+
+    this.repositoryState.setIndexing(true, 10);
+
+    try {
+      const res = await fetch('/api/repository/open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: selectedPath })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to open repository');
+      }
+
+      this.repositoryState.setRepository({
+        path: data.summary.path,
+        name: data.summary.name,
+        branch: data.summary.branch || 'main',
+        summary: data.summary
+      });
+    } catch (err) {
+      console.error('[Open Repository Error]', err);
+      this.repositoryState.setError(err.message);
+    }
+  }
+
   promptOpenRepository() {
     const content = document.createElement('div');
     content.innerHTML = `
@@ -75,26 +105,20 @@ class App {
         value="/Users/kingpin/Desktop/gitassist"
         style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;" />
       <p style="margin-top: 8px; font-size: 0.78rem; color: var(--text-muted);">
-        Enter the absolute filesystem path to any Git repository or code directory.
+        Enter the absolute filesystem path to any local Git repository or directory.
       </p>
     `;
 
     const dialog = new Dialog({
       title: 'Open Local Repository',
       content,
-      confirmText: 'Open',
+      confirmText: 'Open & Analyze',
       cancelText: 'Cancel',
-      onConfirm: (overlay) => {
+      onConfirm: async (overlay) => {
         const input = overlay.querySelector('#repo-path-input');
         const selectedPath = input ? input.value.trim() : '';
         if (selectedPath) {
-          const repoName = selectedPath.split('/').filter(Boolean).pop() || 'Repository';
-          // Set state in store (ready for backend validation in Part 2)
-          this.repositoryState.setRepository({
-            path: selectedPath,
-            name: repoName,
-            branch: 'main'
-          });
+          await this.openRepository(selectedPath);
         }
       }
     });
