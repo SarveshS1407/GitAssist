@@ -1,13 +1,28 @@
+import { RepositoryBadge } from './RepositoryBadge.js';
+
 /**
  * Header Component
- * Top-level application bar containing branding, global search trigger, and utility actions
+ * Top-level application bar containing branding, active repository badge, global search trigger, and settings
  */
 export class Header {
-  constructor({ onSearchClick, onSettingsClick, onBrandClick }) {
+  constructor({ repositoryState, onSearchClick, onSettingsClick, onBrandClick }) {
+    this.repositoryState = repositoryState;
     this.onSearchClick = onSearchClick;
     this.onSettingsClick = onSettingsClick;
     this.onBrandClick = onBrandClick;
     this.element = null;
+    this.badgeContainer = null;
+  }
+
+  updateBadge(state) {
+    if (!this.badgeContainer) return;
+    this.badgeContainer.innerHTML = '';
+    const badge = new RepositoryBadge({
+      name: state.repositoryName,
+      branch: state.branch || 'main',
+      isGit: true
+    });
+    this.badgeContainer.appendChild(badge.render());
   }
 
   render() {
@@ -21,6 +36,7 @@ export class Header {
           <span>Codebase Archaeologist</span>
           <span class="brand-badge">Local-First</span>
         </a>
+        <div id="header-repo-badge-container"></div>
       </div>
 
       <div class="header-center">
@@ -38,6 +54,14 @@ export class Header {
         </button>
       </div>
     `;
+
+    this.badgeContainer = header.querySelector('#header-repo-badge-container');
+
+    if (this.repositoryState) {
+      this.repositoryState.subscribe((state) => {
+        this.updateBadge(state);
+      });
+    }
 
     header.querySelector('#brand-link').addEventListener('click', (e) => {
       e.preventDefault();

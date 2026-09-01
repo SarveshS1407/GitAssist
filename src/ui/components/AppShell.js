@@ -6,13 +6,15 @@ import { Sidebar } from './Sidebar.js';
  * Assembles Header, Sidebar, and the dynamic Main Content container
  */
 export class AppShell {
-  constructor({ router, initialPage = 'overview' }) {
+  constructor({ router, repositoryState, initialPage = 'overview' }) {
     this.router = router;
+    this.repositoryState = repositoryState;
     this.currentPage = initialPage;
     this.element = null;
     this.mainContentEl = null;
 
     this.header = new Header({
+      repositoryState: this.repositoryState,
       onSearchClick: () => this.router.navigate('search'),
       onSettingsClick: () => alert('Settings panel will be implemented in future step.'),
       onBrandClick: () => this.router.navigate('overview')

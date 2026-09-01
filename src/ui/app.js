@@ -1,5 +1,6 @@
 import { AppShell } from './components/AppShell.js';
 import { Router } from './router.js';
+import { RepositoryState } from './state/repository-state.js';
 import { Dialog } from './components/Dialog.js';
 import { OverviewView } from './views/OverviewView.js';
 import { ExplorerView } from './views/ExplorerView.js';
@@ -16,13 +17,7 @@ import { AiView } from './views/AiView.js';
  */
 class App {
   constructor() {
-    this.repositoryState = {
-      isLoaded: false,
-      repositoryPath: null,
-      repositoryName: null,
-      isIndexing: false,
-      error: null
-    };
+    this.repositoryState = new RepositoryState();
 
     this.routes = {
       overview: OverviewView,
@@ -37,7 +32,11 @@ class App {
 
     const initialRoute = window.location.hash.replace('#', '') || 'overview';
     this.router = new Router(this.routes, initialRoute);
-    this.shell = new AppShell({ router: this.router, initialPage: initialRoute });
+    this.shell = new AppShell({
+      router: this.router,
+      repositoryState: this.repositoryState,
+      initialPage: initialRoute
+    });
   }
 
   init() {
@@ -54,6 +53,11 @@ class App {
     this.router.onRouteChange((routeId) => {
       this.renderView(routeId);
       this.shell.setActivePage(routeId);
+    });
+
+    // Listen for repository state changes and re-render current view
+    this.repositoryState.subscribe(() => {
+      this.renderView(this.router.getCurrentRoute());
     });
 
     // Render Initial View
@@ -84,7 +88,13 @@ class App {
         const input = overlay.querySelector('#repo-path-input');
         const selectedPath = input ? input.value.trim() : '';
         if (selectedPath) {
-          alert(`Selected repository path:\n${selectedPath}\n\n(Backend validation will connect in Backend Step 5)`);
+          const repoName = selectedPath.split('/').filter(Boolean).pop() || 'Repository';
+          // Set state in store (ready for backend validation in Part 2)
+          this.repositoryState.setRepository({
+            path: selectedPath,
+            name: repoName,
+            branch: 'main'
+          });
         }
       }
     });
@@ -95,7 +105,7 @@ class App {
   renderView(routeId) {
     const ViewClass = this.routes[routeId] || OverviewView;
     const viewInstance = new ViewClass({
-      repositoryState: this.repositoryState,
+      repositoryState: this.repositoryState.getState(),
       onOpenRepository: () => this.promptOpenRepository()
     });
 
