@@ -1,3 +1,6 @@
+import { PageHeader } from '../components/PageHeader.js';
+import { EmptyState } from '../components/EmptyState.js';
+
 /**
  * Architecture View
  * Visual dependency diagrams and module relationship graphs
@@ -11,21 +14,21 @@ export class ArchitectureView {
     const container = document.createElement('div');
     container.className = 'view-container';
 
-    container.innerHTML = `
-      <div class="view-header">
-        <h1 class="view-title">Architecture</h1>
-        <p class="view-description">Visual dependency diagrams and module relationship graphs.</p>
-      </div>
+    const header = new PageHeader({
+      title: 'Architecture',
+      description: 'Visual dependency diagrams and module relationship graphs.',
+      badge: 'Mermaid.js'
+    });
 
-      <div class="placeholder-card">
-        <div style="font-size: 2.2rem;">🏛️</div>
-        <h3>Architecture & Module Flowcharts</h3>
-        <p>Interactive Mermaid diagrams and dependency topology will be rendered here.</p>
-        <span class="landing-card-badge" style="color: var(--accent-primary); border: 1px solid var(--border-default);">
-          Feature Stage: Pending Repository Connection
-        </span>
-      </div>
-    `;
+    const empty = new EmptyState({
+      icon: '🏛️',
+      title: 'Architecture & Module Flowcharts',
+      description: 'Interactive Mermaid diagrams and dependency topology will render here once a repository is active.',
+      badge: 'Pending Repository Connection'
+    });
+
+    container.appendChild(header.render());
+    container.appendChild(empty.render());
 
     return container;
   }

@@ -1,5 +1,6 @@
 import { AppShell } from './components/AppShell.js';
 import { Router } from './router.js';
+import { Dialog } from './components/Dialog.js';
 import { OverviewView } from './views/OverviewView.js';
 import { ExplorerView } from './views/ExplorerView.js';
 import { ArchitectureView } from './views/ArchitectureView.js';
@@ -59,16 +60,43 @@ class App {
     this.renderView(this.router.getCurrentRoute());
   }
 
+  promptOpenRepository() {
+    const content = document.createElement('div');
+    content.innerHTML = `
+      <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-primary);">
+        Local Repository Path:
+      </label>
+      <input type="text" id="repo-path-input" 
+        placeholder="/Users/username/projects/my-repo" 
+        value="/Users/kingpin/Desktop/gitassist"
+        style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;" />
+      <p style="margin-top: 8px; font-size: 0.78rem; color: var(--text-muted);">
+        Enter the absolute filesystem path to any Git repository or code directory.
+      </p>
+    `;
+
+    const dialog = new Dialog({
+      title: 'Open Local Repository',
+      content,
+      confirmText: 'Open',
+      cancelText: 'Cancel',
+      onConfirm: (overlay) => {
+        const input = overlay.querySelector('#repo-path-input');
+        const selectedPath = input ? input.value.trim() : '';
+        if (selectedPath) {
+          alert(`Selected repository path:\n${selectedPath}\n\n(Backend validation will connect in Backend Step 5)`);
+        }
+      }
+    });
+
+    dialog.open();
+  }
+
   renderView(routeId) {
     const ViewClass = this.routes[routeId] || OverviewView;
     const viewInstance = new ViewClass({
       repositoryState: this.repositoryState,
-      onOpenRepository: () => {
-        const path = prompt('Enter absolute path to local repository:');
-        if (path) {
-          alert(`Selected path: ${path}\n(Repository validation and loading will connect in Step 5)`);
-        }
-      }
+      onOpenRepository: () => this.promptOpenRepository()
     });
 
     this.shell.setContent(viewInstance.render());

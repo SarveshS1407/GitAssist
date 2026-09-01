@@ -1,3 +1,6 @@
+import { PageHeader } from '../components/PageHeader.js';
+import { EmptyState } from '../components/EmptyState.js';
+
 /**
  * AI View
  * Local natural language querying and architecture context packaging
@@ -11,21 +14,21 @@ export class AiView {
     const container = document.createElement('div');
     container.className = 'view-container';
 
-    container.innerHTML = `
-      <div class="view-header">
-        <h1 class="view-title">AI Assistant</h1>
-        <p class="view-description">Local natural language querying and architecture context packaging.</p>
-      </div>
+    const header = new PageHeader({
+      title: 'AI Assistant',
+      description: 'Local natural language querying and architecture context packaging.',
+      badge: 'Local Heuristics'
+    });
 
-      <div class="placeholder-card">
-        <div style="font-size: 2.2rem;">🤖</div>
-        <h3>Local AI & Context Packager</h3>
-        <p>Query your repository offline or package targeted context blast radii for LLMs.</p>
-        <span class="landing-card-badge" style="color: var(--accent-primary); border: 1px solid var(--border-default);">
-          Feature Stage: Pending Repository Connection
-        </span>
-      </div>
-    `;
+    const empty = new EmptyState({
+      icon: '🤖',
+      title: 'Local AI & Context Packager',
+      description: 'Query your repository offline or package targeted context blast radii for LLMs once a repository is active.',
+      badge: 'Pending Repository Connection'
+    });
+
+    container.appendChild(header.render());
+    container.appendChild(empty.render());
 
     return container;
   }

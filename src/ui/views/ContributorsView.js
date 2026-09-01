@@ -1,3 +1,6 @@
+import { PageHeader } from '../components/PageHeader.js';
+import { EmptyState } from '../components/EmptyState.js';
+
 /**
  * Contributors View
  * Codebase ownership distribution and author analytics
@@ -11,21 +14,21 @@ export class ContributorsView {
     const container = document.createElement('div');
     container.className = 'view-container';
 
-    container.innerHTML = `
-      <div class="view-header">
-        <h1 class="view-title">Contributors</h1>
-        <p class="view-description">Codebase ownership distribution and author analytics.</p>
-      </div>
+    const header = new PageHeader({
+      title: 'Contributors',
+      description: 'Codebase ownership distribution and author analytics.',
+      badge: 'Authorship'
+    });
 
-      <div class="placeholder-card">
-        <div style="font-size: 2.2rem;">👥</div>
-        <h3>Contributor Leaderboard & Ownership</h3>
-        <p>Identify primary authors, code churn by contributor, and maintainer distribution.</p>
-        <span class="landing-card-badge" style="color: var(--accent-primary); border: 1px solid var(--border-default);">
-          Feature Stage: Pending Repository Connection
-        </span>
-      </div>
-    `;
+    const empty = new EmptyState({
+      icon: '👥',
+      title: 'Contributor Leaderboard & Ownership',
+      description: 'Identify primary authors, code churn by contributor, and maintainer distribution once a repository is loaded.',
+      badge: 'Pending Repository Connection'
+    });
+
+    container.appendChild(header.render());
+    container.appendChild(empty.render());
 
     return container;
   }

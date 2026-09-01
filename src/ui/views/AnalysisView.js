@@ -1,3 +1,6 @@
+import { PageHeader } from '../components/PageHeader.js';
+import { EmptyState } from '../components/EmptyState.js';
+
 /**
  * Analysis View
  * Cyclomatic complexity, maintainability index, and hotspot risk analysis
@@ -11,21 +14,21 @@ export class AnalysisView {
     const container = document.createElement('div');
     container.className = 'view-container';
 
-    container.innerHTML = `
-      <div class="view-header">
-        <h1 class="view-title">Codebase Analysis</h1>
-        <p class="view-description">Cyclomatic complexity, maintainability index, and hotspot risk analysis.</p>
-      </div>
+    const header = new PageHeader({
+      title: 'Codebase Analysis',
+      description: 'Cyclomatic complexity, maintainability index, and hotspot risk analysis.',
+      badge: 'Code Quality'
+    });
 
-      <div class="placeholder-card">
-        <div style="font-size: 2.2rem;">⚡</div>
-        <h3>Architectural Metrics & Risk Hotspots</h3>
-        <p>Inspect cyclomatic complexity, circular dependencies, and high-churn risk hotspots.</p>
-        <span class="landing-card-badge" style="color: var(--accent-primary); border: 1px solid var(--border-default);">
-          Feature Stage: Pending Repository Connection
-        </span>
-      </div>
-    `;
+    const empty = new EmptyState({
+      icon: '⚡',
+      title: 'Architectural Metrics & Risk Hotspots',
+      description: 'Inspect cyclomatic complexity, circular dependencies, and high-churn risk hotspots once a repository is active.',
+      badge: 'Pending Repository Connection'
+    });
+
+    container.appendChild(header.render());
+    container.appendChild(empty.render());
 
     return container;
   }

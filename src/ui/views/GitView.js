@@ -1,3 +1,6 @@
+import { PageHeader } from '../components/PageHeader.js';
+import { EmptyState } from '../components/EmptyState.js';
+
 /**
  * Git Archaeology View
  * Historical commit timelines, branch topologies, and file churn
@@ -11,21 +14,21 @@ export class GitView {
     const container = document.createElement('div');
     container.className = 'view-container';
 
-    container.innerHTML = `
-      <div class="view-header">
-        <h1 class="view-title">Git Archaeology</h1>
-        <p class="view-description">Historical commit timelines, branch topologies, and file churn.</p>
-      </div>
+    const header = new PageHeader({
+      title: 'Git Archaeology',
+      description: 'Historical commit timelines, branch topologies, and file churn.',
+      badge: 'Read-Only Git'
+    });
 
-      <div class="placeholder-card">
-        <div style="font-size: 2.2rem;">📜</div>
-        <h3>Commit Timeline & Archaeological Log</h3>
-        <p>Inspect commit lineages, author chronologies, and historical diff metrics.</p>
-        <span class="landing-card-badge" style="color: var(--accent-primary); border: 1px solid var(--border-default);">
-          Feature Stage: Pending Repository Connection
-        </span>
-      </div>
-    `;
+    const empty = new EmptyState({
+      icon: '📜',
+      title: 'Commit Timeline & Archaeological Log',
+      description: 'Inspect commit lineages, author chronologies, and historical diff metrics once a repository is active.',
+      badge: 'Pending Repository Connection'
+    });
+
+    container.appendChild(header.render());
+    container.appendChild(empty.render());
 
     return container;
   }
