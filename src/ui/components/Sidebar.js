@@ -1,6 +1,6 @@
 /**
  * Sidebar Navigation Component
- * Provides structured tactical investigation console navigation
+ * Provides tactical archaeological lenses navigation
  */
 export class Sidebar {
   constructor({ activePage = 'overview', onNavigate }) {
@@ -10,26 +10,26 @@ export class Sidebar {
 
     this.sections = [
       {
-        title: 'Central Telemetry',
+        title: 'Archaeological Lenses',
         items: [
-          { id: 'overview', label: 'Overview', icon: '◈' }
+          { id: 'overview', label: 'Excavation Holomap', icon: '◈' }
         ]
       },
       {
-        title: 'Explore',
+        title: 'Explore Strata',
         items: [
-          { id: 'explorer', label: 'Codebase Explorer', icon: '📁' },
-          { id: 'architecture', label: 'Architecture Graph', icon: '🕸️' },
-          { id: 'git', label: 'Git Archaeology', icon: '📜' }
+          { id: 'explorer', label: 'Sector Explorer', icon: '📁' },
+          { id: 'architecture', label: 'Dependency Radar', icon: '🕸️' },
+          { id: 'git', label: 'Chrono-Strata Log', icon: '📜' }
         ]
       },
       {
         title: 'Investigate',
         items: [
-          { id: 'search', label: 'Forensic Search', icon: '🔍' },
-          { id: 'analysis', label: 'Quality & Hotspots', icon: '⚡' },
-          { id: 'contributors', label: 'Contributors', icon: '👥' },
-          { id: 'ai', label: 'AI Archaeologist', icon: '🤖' }
+          { id: 'search', label: 'Forensic Code Tracer', icon: '🔍' },
+          { id: 'analysis', label: 'Risk & Churn Hotspots', icon: '⚡' },
+          { id: 'contributors', label: 'Dig Contributors', icon: '👥' },
+          { id: 'ai', label: 'AI Field Dossier', icon: '🤖' }
         ]
       }
     ];
@@ -77,7 +77,7 @@ export class Sidebar {
       <div class="sidebar-footer">
         <span class="system-status-indicator">
           <span class="status-dot"></span>
-          <span>TELEMETRY ONLINE</span>
+          <span>HOLOMAP READY</span>
         </span>
         <span>v0.1.0</span>
       </div>

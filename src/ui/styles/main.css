@@ -1,31 +1,31 @@
 :root {
   /* ==========================================================================
-     Cyber-Forensic Archaeology Palette & Design Tokens
+     Archaeological Strata & Holomap Design System
      ========================================================================== */
-  --bg-deep: #05080d;
-  --bg-space: #090e17;
-  --bg-hud: rgba(13, 20, 32, 0.85);
-  --bg-hud-elevated: rgba(19, 29, 46, 0.95);
-  --bg-hud-hover: rgba(27, 41, 64, 0.9);
-  --bg-input: #060a12;
+  --bg-void: #04070c;
+  --bg-sector: #080d16;
+  --bg-holomap: rgba(10, 16, 26, 0.9);
+  --bg-blade: rgba(14, 22, 36, 0.92);
+  --bg-blade-hover: rgba(22, 34, 54, 0.95);
+  --bg-input: #05080e;
 
-  --border-subtle: #141f30;
-  --border-hud: #1c2d47;
-  --border-glow: rgba(0, 240, 255, 0.4);
-  --border-amber-glow: rgba(255, 179, 0, 0.4);
+  --border-strata: #18263d;
+  --border-holo: #223757;
+  --border-cyan-glow: rgba(0, 240, 255, 0.45);
+  --border-amber-glow: rgba(255, 179, 0, 0.45);
+  --border-neural-glow: rgba(176, 38, 255, 0.45);
 
-  --text-primary: #f0f6fc;
-  --text-secondary: #9db2c9;
-  --text-muted: #576d85;
+  --text-primary: #f2f7fc;
+  --text-secondary: #9cb2c9;
+  --text-muted: #5c728a;
 
-  /* Telemetry Accents */
+  /* Archaeological Telemetry Accents */
   --accent-cyan: #00f0ff;
   --accent-cyan-dim: rgba(0, 240, 255, 0.12);
-  --accent-cyan-glow: 0 0 16px rgba(0, 240, 255, 0.35);
+  --accent-cyan-glow: 0 0 20px rgba(0, 240, 255, 0.35);
 
   --accent-amber: #ffb300;
   --accent-amber-dim: rgba(255, 179, 0, 0.12);
-  --accent-amber-glow: 0 0 16px rgba(255, 179, 0, 0.35);
 
   --accent-neural: #b026ff;
   --accent-neural-dim: rgba(176, 38, 255, 0.12);
@@ -35,7 +35,6 @@
   --danger: #ff3366;
   --danger-dim: rgba(255, 51, 102, 0.12);
 
-  /* Typography */
   --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
 }
@@ -47,12 +46,12 @@
 }
 
 body {
-  background-color: var(--bg-deep);
+  background-color: var(--bg-void);
   background-image: 
+    radial-gradient(circle at 50% 10%, rgba(0, 240, 255, 0.07) 0%, transparent 60%),
     linear-gradient(to right, rgba(0, 240, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 240, 255, 0.02) 1px, transparent 1px),
-    radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.06) 0%, transparent 60%);
-  background-size: 32px 32px, 32px 32px, 100% 100%;
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
   color: var(--text-primary);
   font-family: var(--font-ui);
   height: 100vh;
@@ -71,9 +70,6 @@ body {
   overflow: hidden;
 }
 
-/* ==========================================================================
-   App Shell Layout
-   ========================================================================== */
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -82,20 +78,20 @@ body {
 }
 
 /* ==========================================================================
-   Header Component (HUD Telemetry Bar)
+   Top Archaeological Horizon Bar
    ========================================================================== */
 .app-header {
-  height: 54px;
-  background-color: var(--bg-hud);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-hud);
+  height: 52px;
+  background-color: var(--bg-holomap);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-holo);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
   flex-shrink: 0;
-  z-index: 20;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 30;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
 .header-left {
@@ -109,8 +105,8 @@ body {
   align-items: center;
   gap: 10px;
   font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-primary);
   text-decoration: none;
@@ -119,9 +115,9 @@ body {
 }
 
 .brand-icon {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--accent-cyan);
-  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.6));
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.7));
 }
 
 .brand-badge {
@@ -130,7 +126,7 @@ body {
   border-radius: 4px;
   background-color: var(--accent-cyan-dim);
   color: var(--accent-cyan);
-  border: 1px solid var(--border-glow);
+  border: 1px solid var(--border-cyan-glow);
   font-weight: 700;
   letter-spacing: 0.08em;
   font-family: var(--font-mono);
@@ -138,7 +134,7 @@ body {
 
 .header-center {
   flex: 1;
-  max-width: 460px;
+  max-width: 480px;
   margin: 0 24px;
 }
 
@@ -146,7 +142,7 @@ body {
   display: flex;
   align-items: center;
   background-color: var(--bg-input);
-  border: 1px solid var(--border-hud);
+  border: 1px solid var(--border-holo);
   border-radius: 6px;
   padding: 6px 14px;
   color: var(--text-secondary);
@@ -166,8 +162,8 @@ body {
 .search-shortcut {
   margin-left: auto;
   font-size: 0.68rem;
-  background-color: var(--bg-hud-elevated);
-  border: 1px solid var(--border-hud);
+  background-color: var(--bg-blade);
+  border: 1px solid var(--border-holo);
   border-radius: 4px;
   padding: 1px 6px;
   color: var(--accent-cyan);
@@ -176,60 +172,36 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-.header-btn {
-  background: var(--bg-input);
-  border: 1px solid var(--border-hud);
-  color: var(--text-secondary);
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  font-family: var(--font-mono);
-}
-
-.header-btn:hover {
-  background-color: var(--bg-hud-hover);
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan);
-}
-
-/* ==========================================================================
-   RepositoryBadge Component
-   ========================================================================== */
+/* RepositoryBadge */
 .repo-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 4px 12px;
   background-color: var(--bg-input);
-  border: 1px solid var(--border-hud);
+  border: 1px solid var(--border-holo);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
   font-family: var(--font-mono);
 }
 
-.repo-badge-dot {
+.repo-badge-dot.active {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-}
-
-.repo-badge-dot.active {
   background-color: var(--accent-cyan);
-  box-shadow: 0 0 8px var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
   animation: pulseBeacon 2s infinite;
 }
 
 .repo-badge-dot.inactive {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   background-color: var(--text-muted);
 }
 
@@ -244,28 +216,29 @@ body {
 
 .repo-badge-branch {
   color: var(--accent-cyan);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   background-color: var(--accent-cyan-dim);
   padding: 1px 6px;
   border-radius: 4px;
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  border: 1px solid rgba(0, 240, 255, 0.25);
 }
 
 /* ==========================================================================
-   Body Workspace Layout: Sidebar + Main Content Area
+   Archaeological Workspace & Spatial Canvas Layout
    ========================================================================== */
 .app-body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
-/* Sidebar Component (Tactical Investigation Console) */
+/* Left Tactical Lens Sidebar */
 .app-sidebar {
-  width: 240px;
-  background-color: var(--bg-hud);
-  backdrop-filter: blur(12px);
-  border-right: 1px solid var(--border-hud);
+  width: 230px;
+  background-color: var(--bg-holomap);
+  backdrop-filter: blur(14px);
+  border-right: 1px solid var(--border-strata);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -299,7 +272,7 @@ body {
 .sidebar-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   list-style: none;
 }
 
@@ -320,18 +293,18 @@ body {
 }
 
 .nav-item:hover {
-  background-color: var(--bg-hud-hover);
+  background-color: var(--bg-blade-hover);
   color: var(--text-primary);
-  border-color: var(--border-subtle);
+  border-color: var(--border-strata);
 }
 
 .nav-item.active {
-  background: linear-gradient(90deg, rgba(0, 240, 255, 0.12) 0%, rgba(13, 20, 32, 0.3) 100%);
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.14) 0%, rgba(14, 22, 36, 0.4) 100%);
   color: var(--accent-cyan);
   font-weight: 700;
   border-left: 3px solid var(--accent-cyan);
-  border-color: var(--border-glow);
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+  border-color: var(--border-cyan-glow);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 
 .nav-icon {
@@ -344,7 +317,7 @@ body {
 
 .sidebar-footer {
   padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-strata);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -369,151 +342,195 @@ body {
   box-shadow: 0 0 8px var(--success);
 }
 
-/* Main Workspace Area */
+/* Main Archaeological Workspace */
 .app-main {
   flex: 1;
   background-color: transparent;
   overflow-y: auto;
-  padding: 28px 36px;
+  padding: 24px 32px;
   display: flex;
   flex-direction: column;
 }
 
-/* View Container */
 .view-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 1200px;
+  gap: 22px;
+  max-width: 1280px;
   width: 100%;
   margin: 0 auto;
 }
 
 /* ==========================================================================
-   HUD Panel & Card Styling
+   Archaeological Holomap & Strata Deck Components
    ========================================================================== */
-.hud-panel {
-  background: var(--bg-hud);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border-hud);
-  border-radius: 10px;
-  padding: 22px 26px;
+.holomap-canvas-container {
+  background: var(--bg-holomap);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-holo);
+  border-radius: 12px;
+  padding: 24px;
   position: relative;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  transition: all 0.2s ease;
-}
-
-.hud-panel:hover {
-  border-color: var(--border-glow);
-}
-
-/* PageHeader Component */
-.view-header {
-  border-bottom: 1px solid var(--border-hud);
-  padding-bottom: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.view-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 16px;
 }
 
-.view-title-group {
+.holomap-canvas-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-strata);
+  padding-bottom: 12px;
 }
 
-.view-title {
-  font-size: 1.5rem;
+.holomap-title {
+  font-size: 1rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
   color: var(--text-primary);
-  font-family: var(--font-ui);
-}
-
-.header-badge {
-  font-size: 0.68rem;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background-color: var(--accent-cyan-dim);
-  color: var(--accent-cyan);
-  border: 1px solid var(--border-glow);
-  font-weight: 700;
-  font-family: var(--font-mono);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.view-description {
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.view-actions {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-/* Buttons */
-.btn-primary {
-  background: linear-gradient(135deg, #00f0ff 0%, #0099ff 100%);
-  color: #05080d;
-  border: none;
-  font-weight: 700;
-  font-size: 0.88rem;
-  padding: 9px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
   font-family: var(--font-mono);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 22px rgba(0, 240, 255, 0.65);
+/* 3D Rotating Subsystem Strata Deck */
+.strata-deck-viewport {
+  perspective: 1200px;
+  width: 100%;
+  padding: 28px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
-.btn-secondary {
-  background-color: var(--bg-hud-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-hud);
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 9px 18px;
-  border-radius: 6px;
+.strata-deck {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.strata-card {
+  width: 230px;
+  background: var(--bg-blade);
+  border: 1px solid var(--border-strata);
+  border-radius: 10px;
+  padding: 20px 18px;
   cursor: pointer;
-  display: inline-flex;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  user-select: none;
+  position: relative;
+}
+
+.strata-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  opacity: 0.3;
+}
+
+.strata-card:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.6), var(--accent-cyan-glow);
+}
+
+.strata-card.active {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.45);
+  transform: scale(1.08);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(14, 22, 36, 0.96) 100%);
+}
+
+.strata-card-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
   font-family: var(--font-mono);
 }
 
-.btn-secondary:hover {
-  background-color: var(--bg-hud-hover);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+.strata-card-meta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
 }
 
-/* Stat Cards */
+.strata-card-badge {
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* Dynamic Grid & Dossier Section */
+.archaeology-dual-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .archaeology-dual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Artifact Dossier Blade */
+.dossier-blade {
+  background: var(--bg-holomap);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-holo);
+  border-radius: 10px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dossier-blade-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-strata);
+  padding-bottom: 10px;
+}
+
+.dossier-blade-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Telemetry Stat Cards */
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
 .stat-card {
-  background: var(--bg-hud);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-hud);
+  background: var(--bg-holomap);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-strata);
   border-radius: 8px;
   padding: 18px 20px;
   display: flex;
@@ -538,7 +555,7 @@ body {
 .stat-card:hover {
   border-color: var(--accent-cyan);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), var(--accent-cyan-glow);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), var(--accent-cyan-glow);
 }
 
 .stat-card-header {
@@ -548,11 +565,11 @@ body {
 }
 
 .stat-card-label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   font-family: var(--font-mono);
 }
 
@@ -561,7 +578,7 @@ body {
 }
 
 .stat-card-value {
-  font-size: 1.7rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
@@ -579,12 +596,171 @@ body {
   font-family: var(--font-mono);
 }
 
-/* ==========================================================================
-   Landing Hero & Placeholder Grid
-   ========================================================================== */
+/* PageHeader Component */
+.view-header {
+  border-bottom: 1px solid var(--border-strata);
+  padding-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.view-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.view-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+.header-badge {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: var(--accent-cyan-dim);
+  color: var(--accent-cyan);
+  border: 1px solid var(--border-cyan-glow);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.view-description {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.view-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #00f0ff 0%, #0099ff 100%);
+  color: #04070c;
+  border: none;
+  font-weight: 800;
+  font-size: 0.86rem;
+  padding: 9px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.7);
+}
+
+.btn-secondary {
+  background-color: var(--bg-blade);
+  color: var(--text-primary);
+  border: 1px solid var(--border-holo);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 9px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: var(--font-mono);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-blade-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Forensic Timelines & Nodes */
+.forensic-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timeline-node {
+  background: var(--bg-blade);
+  border: 1px solid var(--border-strata);
+  border-left: 3px solid var(--accent-cyan);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.timeline-node:hover {
+  border-color: var(--accent-cyan);
+  transform: translateX(4px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+}
+
+.timeline-hash {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent-cyan);
+  background-color: var(--accent-cyan-dim);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.timeline-msg {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.timeline-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.landing-card-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background-color: var(--bg-input);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strata);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* Landing Hero Expedition Launcher */
 .landing-hero {
-  background: radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.12) 0%, rgba(13, 20, 32, 0.8) 100%);
-  border: 1px solid var(--border-glow);
+  background: radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.14) 0%, rgba(10, 16, 26, 0.9) 100%);
+  border: 1px solid var(--border-cyan-glow);
   border-radius: 12px;
   padding: 56px 40px;
   text-align: center;
@@ -592,16 +768,16 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
 }
 
 .hero-icon {
-  font-size: 3.2rem;
-  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.6));
+  font-size: 3.4rem;
+  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.7));
 }
 
 .hero-title {
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--text-primary);
@@ -610,20 +786,14 @@ body {
 .hero-description {
   font-size: 1.05rem;
   color: var(--text-secondary);
-  max-width: 640px;
+  max-width: 660px;
   line-height: 1.6;
 }
 
-.landing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
 .landing-card {
-  background: var(--bg-hud);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-hud);
+  background: var(--bg-holomap);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-holo);
   border-radius: 10px;
   padding: 22px 24px;
   display: flex;
@@ -646,42 +816,10 @@ body {
   gap: 8px;
 }
 
-.landing-card-badge {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: 4px;
-  background-color: var(--bg-input);
-  color: var(--text-muted);
-  border: 1px solid var(--border-subtle);
-  font-family: var(--font-mono);
-  font-weight: 700;
-}
-
-.placeholder-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.placeholder-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  padding: 8px 12px;
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  font-family: var(--font-mono);
-}
-
 .placeholder-card {
-  background: var(--bg-hud);
-  backdrop-filter: blur(10px);
-  border: 1px dashed var(--border-hud);
+  background: var(--bg-holomap);
+  backdrop-filter: blur(12px);
+  border: 1px dashed var(--border-holo);
   border-radius: 10px;
   padding: 44px 28px;
   text-align: center;
@@ -693,208 +831,6 @@ body {
   gap: 14px;
 }
 
-/* ==========================================================================
-   Forensic Scanning & Loading State HUD
-   ========================================================================== */
-.scan-radar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 36px 20px;
-}
-
-.radar-scope {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 2px solid var(--accent-cyan);
-  position: relative;
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.3), inset 0 0 20px rgba(0, 240, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.radar-sweep {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  top: 0;
-  right: 0;
-  background: linear-gradient(45deg, transparent 40%, rgba(0, 240, 255, 0.7) 100%);
-  transform-origin: 0% 100%;
-  border-radius: 0 100% 0 0;
-  animation: radarSpin 1.8s linear infinite;
-}
-
-@keyframes radarSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.scan-progress-bar-container {
-  width: 100%;
-  max-width: 480px;
-  height: 6px;
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-hud);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.scan-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #00f0ff, #00ff88);
-  box-shadow: 0 0 10px var(--accent-cyan);
-  animation: scanProgress 2.2s infinite ease-in-out;
-}
-
-@keyframes scanProgress {
-  0% { width: 10%; }
-  50% { width: 75%; }
-  100% { width: 100%; }
-}
-
-.scan-diagnostics-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  max-width: 420px;
-  text-align: left;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-}
-
-.scan-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-secondary);
-}
-
-.scan-step.completed {
-  color: var(--success);
-}
-
-.scan-step.active {
-  color: var(--accent-cyan);
-  font-weight: 700;
-}
-
-/* ==========================================================================
-   3D Module Showcase Carousel
-   ========================================================================== */
-.carousel-viewport {
-  perspective: 1000px;
-  width: 100%;
-  padding: 30px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.carousel-deck {
-  display: flex;
-  gap: 20px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  align-items: center;
-}
-
-.carousel-card {
-  width: 220px;
-  background: var(--bg-hud-elevated);
-  border: 1px solid var(--border-hud);
-  border-radius: 10px;
-  padding: 20px 18px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  user-select: none;
-}
-
-.carousel-card:hover {
-  border-color: var(--accent-cyan);
-  transform: translateY(-6px) scale(1.04);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), var(--accent-cyan-glow);
-}
-
-.carousel-card.active {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.4);
-  transform: scale(1.08);
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(19, 29, 46, 0.95) 100%);
-}
-
-.carousel-card-title {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-}
-
-.carousel-card-meta {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-}
-
-/* ==========================================================================
-   Forensic Timeline & Tree Explorers
-   ========================================================================== */
-.forensic-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.timeline-node {
-  background: var(--bg-hud);
-  border: 1px solid var(--border-hud);
-  border-left: 3px solid var(--accent-cyan);
-  border-radius: 8px;
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  transition: all 0.2s ease;
-}
-
-.timeline-node:hover {
-  border-color: var(--accent-cyan);
-  transform: translateX(4px);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
-}
-
-.timeline-hash {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--accent-cyan);
-  background-color: var(--accent-cyan-dim);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.timeline-msg {
-  font-size: 0.88rem;
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.timeline-meta {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
 /* Modal Dialog */
 .modal-backdrop {
   position: fixed;
@@ -902,8 +838,8 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(5, 8, 13, 0.85);
-  backdrop-filter: blur(8px);
+  background-color: rgba(4, 7, 12, 0.88);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -911,12 +847,12 @@ body {
 }
 
 .modal-box {
-  background-color: var(--bg-hud-elevated);
-  border: 1px solid var(--border-glow);
+  background-color: var(--bg-blade);
+  border: 1px solid var(--border-cyan-glow);
   border-radius: 12px;
   width: 100%;
-  max-width: 520px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.2);
+  max-width: 540px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 240, 255, 0.25);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -930,7 +866,7 @@ body {
 
 .modal-header {
   padding: 16px 22px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-strata);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -967,10 +903,10 @@ body {
 
 .modal-footer {
   padding: 14px 22px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-strata);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  background-color: var(--bg-space);
+  background-color: var(--bg-void);
 }
