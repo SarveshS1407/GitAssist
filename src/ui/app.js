@@ -120,8 +120,22 @@ class App {
   async openRepository(selectedPath) {
     if (!selectedPath) return;
 
-    this.repositoryState.setIndexing(true, 25);
+    // Transition immediately into Excavation Mode
+    this.repositoryState.setIndexing(true, 15, 'DISCOVERING REPOSITORY', selectedPath);
     this.router.navigate('overview');
+
+    // Create non-blocking stage updates while backend request is in-flight
+    const timer1 = setTimeout(() => {
+      if (this.repositoryState.getState().isIndexing) {
+        this.repositoryState.setIndexing(true, 45, 'SCANNING STRUCTURE & DIRECTORIES', selectedPath);
+      }
+    }, 180);
+
+    const timer2 = setTimeout(() => {
+      if (this.repositoryState.getState().isIndexing) {
+        this.repositoryState.setIndexing(true, 75, 'MAPPING ARTIFACTS & EXTENSIONS', selectedPath);
+      }
+    }, 380);
 
     try {
       const res = await fetch('/api/repository/open', {
@@ -130,11 +144,20 @@ class App {
         body: JSON.stringify({ path: selectedPath })
       });
 
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+
       const data = await res.json();
 
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to open repository');
       }
+
+      // Visual Unlock transition
+      this.repositoryState.setIndexing(true, 100, 'EXCAVATION COMPLETE // UNLOCKING ARTIFACT', selectedPath);
+
+      // Brief 400ms reveal so user sees the holographic artifact unlock before workspace opens
+      await new Promise(r => setTimeout(r, 400));
 
       this.repositoryState.setRepository({
         path: data.summary.path,
@@ -143,8 +166,10 @@ class App {
         summary: data.summary
       });
     } catch (err) {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       console.error('[Open Repository Error]', err);
-      this.repositoryState.setError(err.message);
+      this.repositoryState.setError(err.message, selectedPath);
     }
   }
 
@@ -198,7 +223,13 @@ class App {
     const viewInstance = new ViewClass({
       repositoryState: this.repositoryState.getState(),
       onOpenRepository: () => this.promptOpenRepository(),
-      onQuickAnalyze: (path) => this.openRepository(path)
+      onQuickAnalyze: (path) => this.openRepository(path),
+      onReset: () => this.repositoryState.reset(),
+      onClearError: () => {
+        this.repositoryState.state.error = null;
+        this.repositoryState.state.isIndexing = false;
+        this.repositoryState.notify();
+      }
     });
 
     this.shell.setContent(viewInstance.render());

@@ -11,6 +11,8 @@ export class RepositoryState {
       isLoaded: false,
       isIndexing: false,
       indexProgress: 0,
+      indexingStage: 'DISCOVERING REPOSITORY',
+      indexingTarget: '',
       error: null,
       summary: null
     };
@@ -53,6 +55,7 @@ export class RepositoryState {
       isLoaded: true,
       isIndexing: false,
       indexProgress: 100,
+      indexingStage: 'EXCAVATION COMPLETE',
       error: null,
       summary
     };
@@ -60,32 +63,35 @@ export class RepositoryState {
   }
 
   /**
-   * Updates indexing / progress state
+   * Updates indexing / excavation progress state
    */
-  setIndexing(isIndexing, progress = 0) {
+  setIndexing(isIndexing, progress = 0, stage = 'DISCOVERING REPOSITORY', target = '') {
     this.state = {
       ...this.state,
       isIndexing,
       indexProgress: Math.min(100, Math.max(0, progress)),
+      indexingStage: stage,
+      indexingTarget: target || this.state.indexingTarget,
       error: isIndexing ? null : this.state.error
     };
     this.notify();
   }
 
   /**
-   * Sets error state
+   * Sets error state when excavation fails
    */
-  setError(errorMessage) {
+  setError(errorMessage, target = '') {
     this.state = {
       ...this.state,
       error: errorMessage,
-      isIndexing: false
+      isIndexing: false,
+      indexingTarget: target || this.state.indexingTarget
     };
     this.notify();
   }
 
   /**
-   * Clears active repository and restores default state
+   * Resets state back to unindexed landing state
    */
   reset() {
     this.state = {
@@ -95,6 +101,8 @@ export class RepositoryState {
       isLoaded: false,
       isIndexing: false,
       indexProgress: 0,
+      indexingStage: 'DISCOVERING REPOSITORY',
+      indexingTarget: '',
       error: null,
       summary: null
     };

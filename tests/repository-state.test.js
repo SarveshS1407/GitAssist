@@ -13,6 +13,28 @@ describe('RepositoryState Store', () => {
     assert.strictEqual(state.error, null);
   });
 
+  test('setIndexing tracks progressive excavation stages and target repository', () => {
+    const store = new RepositoryState();
+    store.setIndexing(true, 15, 'DISCOVERING REPOSITORY', '/path/to/my-repo');
+    let state = store.getState();
+    assert.strictEqual(state.isIndexing, true);
+    assert.strictEqual(state.indexProgress, 15);
+    assert.strictEqual(state.indexingStage, 'DISCOVERING REPOSITORY');
+    assert.strictEqual(state.indexingTarget, '/path/to/my-repo');
+
+    store.setIndexing(true, 75, 'MAPPING ARTIFACTS & EXTENSIONS');
+    state = store.getState();
+    assert.strictEqual(state.indexProgress, 75);
+    assert.strictEqual(state.indexingStage, 'MAPPING ARTIFACTS & EXTENSIONS');
+    assert.strictEqual(state.indexingTarget, '/path/to/my-repo');
+
+    store.setError('Permission denied', '/path/to/my-repo');
+    state = store.getState();
+    assert.strictEqual(state.isIndexing, false);
+    assert.strictEqual(state.error, 'Permission denied');
+    assert.strictEqual(state.indexingTarget, '/path/to/my-repo');
+  });
+
   test('setRepository updates state and notifies subscribers', () => {
     const store = new RepositoryState();
     let emissions = 0;

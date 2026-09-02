@@ -9,44 +9,69 @@ import { ErrorState } from '../components/ErrorState.js';
  * Central Archaeological Action Carousel & Action Selector Workspace
  */
 export class OverviewView {
-  constructor({ repositoryState, onOpenRepository, onQuickAnalyze }) {
+  constructor({ repositoryState, onOpenRepository, onQuickAnalyze, onReset, onClearError } = {}) {
     this.repositoryState = repositoryState;
     this.onOpenRepository = onOpenRepository;
     this.onQuickAnalyze = onQuickAnalyze;
+    this.onReset = onReset;
+    this.onClearError = onClearError;
     this.selectedAction = 'architecture';
   }
 
   render() {
-    // 1. Loading State
+    // 1. Excavation Mode HUD (Loading / Scanning Sequence)
     if (this.repositoryState?.isIndexing) {
       const container = document.createElement('div');
       container.className = 'view-container';
-      container.appendChild(new LoadingState().render());
+      container.appendChild(new LoadingState({
+        stage: this.repositoryState?.indexingStage || 'DISCOVERING REPOSITORY',
+        progress: this.repositoryState?.indexProgress || 25,
+        target: this.repositoryState?.indexingTarget || this.repositoryState?.repositoryPath || '',
+        onCancel: this.onReset
+      }).render());
       return container;
     }
 
-    // 2. Dedicated Minimalist Homescreen (when not loaded)
+    // 2. Error State (Excavation Failed)
+    if (this.repositoryState?.error) {
+      const container = document.createElement('div');
+      container.className = 'view-container';
+      container.appendChild(new ErrorState({
+        title: 'EXCAVATION FAILED',
+        message: this.repositoryState.error,
+        onRetry: () => {
+          const target = this.repositoryState?.indexingTarget || this.repositoryState?.repositoryPath;
+          if (this.onQuickAnalyze && target) {
+            this.onQuickAnalyze(target);
+          } else if (this.onOpenRepository) {
+            this.onOpenRepository();
+          }
+        },
+        onBack: () => {
+          if (this.onClearError) {
+            this.onClearError();
+          } else if (this.onReset) {
+            this.onReset();
+          }
+        }
+      }).render());
+      return container;
+    }
+
+    // 3. Dedicated Minimalist Homescreen (when not loaded)
     if (!this.repositoryState || !this.repositoryState.isLoaded) {
       return new LandingView({
         onOpenRepository: this.onOpenRepository,
         onQuickAnalyze: this.onQuickAnalyze,
         error: this.repositoryState?.error,
         onClearError: () => {
-          if (this.repositoryState) this.repositoryState.error = null;
+          if (this.onClearError) {
+            this.onClearError();
+          } else if (this.repositoryState) {
+            this.repositoryState.error = null;
+          }
         }
       }).render();
-    }
-
-    // 3. Error State (if error occurs after being loaded)
-    if (this.repositoryState?.error) {
-      const container = document.createElement('div');
-      container.className = 'view-container';
-      container.appendChild(new ErrorState({
-        title: 'ARCHAEOLOGICAL EXCAVATION HALTED',
-        message: this.repositoryState.error,
-        onRetry: this.onOpenRepository
-      }).render());
-      return container;
     }
 
     // 4. Active Archaeological Workspace & Cylindrical Action Carousel

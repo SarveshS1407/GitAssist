@@ -1116,3 +1116,363 @@ body {
     padding: 24px 16px;
   }
 }
+
+/* ===================================================
+   EXCAVATION MODE & INTERACTIVE ARCHAEOLOGICAL SEQUENCE
+   =================================================== */
+
+.excavation-container {
+  max-width: 860px;
+  margin: 30px auto;
+  background: var(--bg-holomap);
+  border: 1px solid var(--border-holo);
+  border-radius: 12px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 240, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Subtle scanning laser line sweeping vertically */
+.excavation-container::before {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.8), transparent);
+  box-shadow: 0 0 14px var(--accent-cyan);
+  animation: scanLaser 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes scanLaser {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Top Telemetry Header */
+.excavation-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-strata);
+  padding-bottom: 14px;
+}
+
+.excavation-tag-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.excavation-coord {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Central Relic & Radar Stage */
+.relic-radar-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 240px;
+  padding: 16px 0;
+}
+
+.radar-scope-box {
+  width: 210px;
+  height: 210px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer Concentric Radar Rings */
+.radar-ring-outer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 240, 255, 0.28);
+  animation: radarRotate 16s linear infinite;
+}
+
+.radar-ring-inner {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  animation: radarRotateReverse 10s linear infinite;
+}
+
+.radar-ring-core {
+  position: absolute;
+  inset: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.06) 0%, transparent 70%);
+}
+
+/* Radial Radar Sweeping Beam */
+.radar-sweeper {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.35) 0deg, transparent 60deg, transparent 360deg);
+  animation: radarRotate 2.5s linear infinite;
+}
+
+@keyframes radarRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes radarRotateReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* Central Digital Relic Monolith */
+.relic-monolith-node {
+  position: relative;
+  z-index: 5;
+  width: 72px;
+  height: 72px;
+  background: rgba(5, 8, 17, 0.9);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.35), inset 0 0 12px rgba(0, 240, 255, 0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  animation: relicPulse 2.8s ease-in-out infinite;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes relicPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 32px rgba(0, 240, 255, 0.65), 0 0 10px var(--accent-neural);
+  }
+}
+
+/* Unlocking Burst State */
+.relic-monolith-node.unlocked {
+  border-color: var(--success);
+  box-shadow: 0 0 45px rgba(0, 255, 170, 0.8), inset 0 0 20px rgba(0, 255, 170, 0.4);
+  transform: scale(1.18);
+}
+
+/* Floating Particles / Data Fragments */
+.floating-particle-node {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  opacity: 0.75;
+  pointer-events: none;
+  animation: particleFloat 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0) scale(0.95); opacity: 0.5; }
+  100% { transform: translateY(-10px) scale(1.05); opacity: 0.9; }
+}
+
+/* Stage & Progress Information */
+.excavation-info-block {
+  text-align: center;
+  margin-top: 14px;
+}
+
+.excavation-main-title {
+  font-family: var(--font-mono);
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.excavation-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-family: var(--font-sans);
+}
+
+/* Conceptual Stages Stepper */
+.excavation-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.excavation-step-card {
+  background: var(--bg-blade);
+  border: 1px solid var(--border-strata);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.25s ease;
+}
+
+.excavation-step-card.active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.15);
+}
+
+.excavation-step-card.completed {
+  border-color: rgba(0, 255, 170, 0.4);
+  background: rgba(0, 255, 170, 0.03);
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.excavation-step-card.active .step-num {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.excavation-step-card.completed .step-num {
+  color: var(--success);
+}
+
+.step-name {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excavation-step-card.active .step-name {
+  color: var(--text-primary);
+}
+
+.excavation-step-card.completed .step-name {
+  color: var(--success);
+}
+
+/* High Precision Linear Gauge */
+.excavation-gauge-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gauge-track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-neural), var(--accent-cyan));
+  box-shadow: 0 0 10px var(--accent-cyan);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gauge-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+/* Live Terminal Log Stream */
+.excavation-terminal-feed {
+  background: rgba(5, 8, 17, 0.85);
+  border: 1px solid var(--border-strata);
+  border-radius: 6px;
+  padding: 10px 14px;
+  max-height: 85px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.terminal-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-line.active {
+  color: var(--accent-cyan);
+}
+
+/* Excavation Failure Card */
+.excavation-failure-card {
+  max-width: 680px;
+  margin: 40px auto;
+  background: var(--bg-holomap);
+  border: 1px solid var(--danger);
+  box-shadow: 0 0 35px rgba(255, 0, 85, 0.25), inset 0 0 30px rgba(255, 0, 85, 0.05);
+  border-radius: 12px;
+  padding: 32px 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.failure-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
