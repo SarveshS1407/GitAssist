@@ -138,7 +138,7 @@ export class OverviewView {
 
     container.appendChild(statGrid);
 
-    // Central Cylindrical Investigation Action Carousel
+    // Central Cylindrical Investigation Action Carousel (3D Merry-Go-Round)
     const carouselSection = document.createElement('div');
     carouselSection.className = 'holomap-canvas-container';
 
@@ -161,13 +161,26 @@ export class OverviewView {
       { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine', theme: 'card-magenta' }
     ];
 
-    const cardsHtml = actionItems.map(a => `
-      <div class="strata-card ${a.theme} ${a.id === this.selectedAction ? 'active' : ''}" data-action="${a.id}">
+    const angleStep = 360 / actionItems.length; // 22.5 deg per card
+    const cylinderRadius = 550; // px radius for 3D circle
+
+    const cardsHtml = actionItems.map((a, idx) => `
+      <div class="carousel-card-3d ${a.theme} ${idx === 0 ? 'is-front' : ''}" 
+           data-action="${a.id}" 
+           data-index="${idx}"
+           style="transform: rotateY(${idx * angleStep}deg) translateZ(${cylinderRadius}px);">
         <div class="strata-card-corner tl"></div>
         <div class="strata-card-corner tr"></div>
-        <div class="strata-card-title"><span>${a.icon}</span><span>${a.title}</span></div>
-        <div class="strata-card-meta">${a.meta}</div>
-        <div class="strata-card-badge">${a.badge}</div>
+        <div>
+          <div class="strata-card-title"><span>${a.icon}</span><span>${a.title}</span></div>
+          <div class="strata-card-meta" style="margin-top: 6px;">${a.meta}</div>
+        </div>
+        <div>
+          <div class="strata-card-badge">${a.badge}</div>
+          <div class="card-prompt-hint">
+            <span>⚡ CLICK TO PROMPT VIEW</span>
+          </div>
+        </div>
       </div>
     `).join('');
 
@@ -175,13 +188,16 @@ export class OverviewView {
       <div class="holomap-canvas-header">
         <h3 class="holomap-title">
           <span class="holomap-icon">◈</span>
-          <span class="text-gradient-cyber">CYLINDRICAL INVESTIGATION CAROUSEL // SELECT ACTION</span>
+          <span class="text-gradient-cyber">CYLINDRICAL INVESTIGATION CAROUSEL // MERRY-GO-ROUND</span>
         </h3>
-        <span class="landing-card-badge neon-badge">Primary Action Selector</span>
+        <span class="landing-card-badge neon-badge">[DRAG • ARROWS • CLICK TO PROMPT]</span>
       </div>
 
-      <div class="strata-deck-viewport">
-        <div class="strata-deck" id="action-strata-deck">
+      <div class="carousel-stage-3d" id="carousel-stage">
+        <button class="carousel-paddle prev" id="carousel-paddle-prev" title="Rotate Left (ArrowLeft)">◀</button>
+        <button class="carousel-paddle next" id="carousel-paddle-next" title="Rotate Right (ArrowRight)">▶</button>
+        
+        <div class="carousel-cylinder-3d" id="carousel-cylinder">
           ${cardsHtml}
         </div>
       </div>
@@ -262,47 +278,161 @@ export class OverviewView {
 
     container.appendChild(dualGrid);
 
-    const cards = Array.from(carouselSection.querySelectorAll('.strata-card'));
-    const selectCardByIndex = (idx) => {
-      const normalizedIdx = (idx + cards.length) % cards.length;
-      cards.forEach(c => c.classList.remove('active'));
-      const targetCard = cards[normalizedIdx];
-      if (targetCard) {
-        targetCard.classList.add('active');
-        targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        const actionId = targetCard.dataset.action;
-        this.selectedAction = actionId;
-        this.renderActionDossier(dossierSection, actionId);
+    // 3D Merry-Go-Round Engine
+    const stageEl = carouselSection.querySelector('#carousel-stage');
+    const cylinderEl = carouselSection.querySelector('#carousel-cylinder');
+    const cards = Array.from(carouselSection.querySelectorAll('.carousel-card-3d'));
+    let currentCarouselIndex = 0;
+
+    const updateCardDepths = (activeIndex) => {
+      cards.forEach((card, idx) => {
+        let diff = ((idx - activeIndex) % actionItems.length + actionItems.length) % actionItems.length;
+        if (diff > actionItems.length / 2) diff -= actionItems.length;
+        const absDiff = Math.abs(diff);
+
+        if (absDiff === 0) {
+          card.classList.add('is-front');
+          card.style.opacity = '1';
+          card.style.filter = 'none';
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = '30';
+        } else if (absDiff === 1) {
+          card.classList.remove('is-front');
+          card.style.opacity = '0.82';
+          card.style.filter = 'brightness(0.85)';
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = '20';
+        } else if (absDiff === 2) {
+          card.classList.remove('is-front');
+          card.style.opacity = '0.55';
+          card.style.filter = 'brightness(0.65) blur(0.5px)';
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = '12';
+        } else if (absDiff === 3) {
+          card.classList.remove('is-front');
+          card.style.opacity = '0.3';
+          card.style.filter = 'brightness(0.4) blur(1.5px)';
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = '6';
+        } else {
+          card.classList.remove('is-front');
+          card.style.opacity = '0.05';
+          card.style.filter = 'brightness(0.25) blur(3px)';
+          card.style.pointerEvents = 'none';
+          card.style.zIndex = '1';
+        }
+      });
+    };
+
+    const rotateToIndex = (targetIndex, shouldPrompt = false) => {
+      currentCarouselIndex = targetIndex;
+      const normalizedIndex = ((currentCarouselIndex % actionItems.length) + actionItems.length) % actionItems.length;
+      
+      cylinderEl.style.transform = `rotateY(${-currentCarouselIndex * angleStep}deg)`;
+      updateCardDepths(normalizedIndex);
+
+      const item = actionItems[normalizedIndex];
+      this.selectedAction = item.id;
+      this.renderActionDossier(dossierSection, item.id);
+
+      if (shouldPrompt) {
+        this.openHolographicPrompt(item);
       }
     };
 
-    // Wire up Carousel Cards to rotate and update Dossier Blade
-    cards.forEach((card, idx) => {
+    // Initial depth calculation
+    updateCardDepths(0);
+
+    // Nav Paddles Click Handlers
+    carouselSection.querySelector('#carousel-paddle-prev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      rotateToIndex(currentCarouselIndex - 1);
+    });
+
+    carouselSection.querySelector('#carousel-paddle-next')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      rotateToIndex(currentCarouselIndex + 1);
+    });
+
+    // Wire up Carousel Cards: clicking any card spins to it and prompts the description & view button
+    cards.forEach((card) => {
       card.addEventListener('click', () => {
-        selectCardByIndex(idx);
+        const cardIndex = parseInt(card.dataset.index, 10);
+        // Calculate shortest rotation delta
+        let delta = ((cardIndex - (currentCarouselIndex % actionItems.length)) + actionItems.length) % actionItems.length;
+        if (delta > actionItems.length / 2) delta -= actionItems.length;
+
+        rotateToIndex(currentCarouselIndex + delta, true);
       });
     });
 
-    // Arrow key navigation for quick forensic cycling
+    // Interactive Dragging / Swiping on the 3D Stage
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartAngle = 0;
+
+    stageEl.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.carousel-paddle') || e.target.closest('.lens-prompt-overlay')) return;
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartAngle = -currentCarouselIndex * angleStep;
+      cylinderEl.classList.add('dragging');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - dragStartX;
+      const currentAngle = dragStartAngle + (deltaX * 0.28);
+      cylinderEl.style.transform = `rotateY(${currentAngle}deg)`;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      cylinderEl.classList.remove('dragging');
+      const deltaX = e.clientX - dragStartX;
+      
+      if (Math.abs(deltaX) > 15) {
+        const stepDelta = Math.round(-deltaX / 80);
+        rotateToIndex(currentCarouselIndex + (stepDelta === 0 ? (deltaX < 0 ? 1 : -1) : stepDelta));
+      } else {
+        rotateToIndex(currentCarouselIndex);
+      }
+    });
+
+    // Horizontal wheel scroll
+    stageEl.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) > 25 || Math.abs(e.deltaY) > 40) {
+        e.preventDefault();
+        const dir = (e.deltaX || e.deltaY) > 0 ? 1 : -1;
+        rotateToIndex(currentCarouselIndex + dir);
+      }
+    }, { passive: false });
+
+    // Arrow key navigation
     const keyHandler = (e) => {
       if (!document.body.contains(container)) {
         window.removeEventListener('keydown', keyHandler);
         return;
       }
-      if (['ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key) && !['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) {
-        const currentIdx = cards.findIndex(c => c.classList.contains('active'));
+      if (['ArrowLeft', 'ArrowRight', 'Enter', 'Escape'].includes(e.key) && !['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) {
         if (e.key === 'ArrowLeft') {
           e.preventDefault();
-          selectCardByIndex(currentIdx - 1);
+          rotateToIndex(currentCarouselIndex - 1);
         } else if (e.key === 'ArrowRight') {
           e.preventDefault();
-          selectCardByIndex(currentIdx + 1);
+          rotateToIndex(currentCarouselIndex + 1);
         } else if (e.key === 'Enter') {
-          const actionBtn = dossierSection.querySelector('#btn-launch-action');
-          if (actionBtn) {
-            e.preventDefault();
-            actionBtn.click();
+          e.preventDefault();
+          const activePromptBtn = document.querySelector('#btn-modal-launch');
+          if (activePromptBtn) {
+            activePromptBtn.click();
+          } else {
+            const normalizedIndex = ((currentCarouselIndex % actionItems.length) + actionItems.length) % actionItems.length;
+            this.openHolographicPrompt(actionItems[normalizedIndex]);
           }
+        } else if (e.key === 'Escape') {
+          document.querySelector('.lens-prompt-overlay')?.remove();
         }
       }
     };
@@ -311,7 +441,75 @@ export class OverviewView {
     return container;
   }
 
-  renderActionDossier(container, actionId) {
+  /**
+   * Opens the Holographic Prompt Modal in a unique laser aperture unfold transition
+   * and provides the direct view trigger button
+   */
+  openHolographicPrompt(item) {
+    // Remove existing prompt if any
+    document.querySelector('.lens-prompt-overlay')?.remove();
+
+    const actionDetails = this.getActionDetails(item.id);
+    const overlay = document.createElement('div');
+    overlay.className = 'lens-prompt-overlay';
+
+    overlay.innerHTML = `
+      <div class="lens-prompt-modal ${item.theme}">
+        <div class="lens-prompt-laser"></div>
+        <div class="strata-card-corner tl"></div>
+        <div class="strata-card-corner tr"></div>
+        
+        <div class="lens-prompt-header">
+          <div class="lens-prompt-title">
+            <span>${actionDetails.icon}</span>
+            <span class="text-gradient-cyber">${actionDetails.title}</span>
+          </div>
+          <button class="lens-prompt-close" id="btn-close-prompt" title="Close Prompt (Esc)">✕</button>
+        </div>
+
+        <div class="lens-prompt-body">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span class="landing-card-badge neon-badge">${actionDetails.type}</span>
+            <span style="font-size: 0.75rem; color: var(--success); font-family: var(--font-mono); font-weight: 700;">
+              ● FORENSIC ENGINE ONLINE
+            </span>
+          </div>
+
+          <p class="lens-prompt-desc">
+            ${actionDetails.description}
+          </p>
+
+          <div class="lens-prompt-chips">
+            <span class="lens-chip">⚡ AST SYMBOLS</span>
+            <span class="lens-chip">🕸️ TOPOLOGY COUPLING</span>
+            <span class="lens-chip">📜 CHRONO-STRATA</span>
+            <span class="lens-chip">🛡️ RISK MATRIX</span>
+          </div>
+
+          <button class="lens-prompt-btn-launch" id="btn-modal-launch">
+            <span>🚀</span>
+            <span>ENTER ${actionDetails.title.toUpperCase()} VIEW →</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Close handlers
+    overlay.querySelector('#btn-close-prompt')?.addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    // Launch button handler directing to corresponding page
+    overlay.querySelector('#btn-modal-launch')?.addEventListener('click', () => {
+      overlay.remove();
+      window.location.hash = item.id;
+    });
+
+    document.body.appendChild(overlay);
+  }
+
+  getActionDetails(actionId) {
     const actionDetails = {
       architecture: {
         title: 'Architecture Topology',
@@ -427,15 +625,19 @@ export class OverviewView {
       }
     };
 
-    const details = actionDetails[actionId] || actionDetails.architecture;
+    return actionDetails[actionId] || actionDetails.architecture;
+  }
+
+  renderActionDossier(container, actionId) {
+    const details = this.getActionDetails(actionId);
 
     container.innerHTML = `
       <div class="dossier-blade-header">
         <h4 class="dossier-title">
           <span>${details.icon}</span>
-          <span>${details.title}</span>
+          <span class="text-gradient-aurora">${details.title}</span>
         </h4>
-        <span class="landing-card-badge" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">${details.type}</span>
+        <span class="landing-card-badge neon-badge">${details.type}</span>
       </div>
 
       <div class="dossier-meta-grid">
@@ -464,7 +666,7 @@ export class OverviewView {
       </div>
     `;
 
-    container.querySelector('#btn-launch-action').addEventListener('click', () => {
+    container.querySelector('#btn-launch-action')?.addEventListener('click', () => {
       window.location.hash = actionId;
     });
   }

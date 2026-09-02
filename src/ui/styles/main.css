@@ -430,42 +430,63 @@ body {
   text-transform: uppercase;
 }
 
-/* 3D Rotating Subsystem Strata Deck */
-.strata-deck-viewport {
-  perspective: 1200px;
+/* ==========================================================================
+   3D Cylindrical Merry-Go-Round Carousel System
+   ========================================================================== */
+.carousel-stage-3d {
+  position: relative;
   width: 100%;
-  padding: 28px 0;
+  height: 340px;
+  perspective: 1100px;
+  perspective-origin: 50% 48%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  user-select: none;
+  cursor: grab;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.06) 0%, rgba(124, 58, 237, 0.04) 45%, transparent 70%);
 }
 
-.strata-deck {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+.carousel-stage-3d:active {
+  cursor: grabbing;
 }
 
-.strata-card {
-  width: 240px;
-  background: linear-gradient(145deg, rgba(14, 24, 44, 0.88) 0%, rgba(7, 13, 26, 0.96) 100%);
+.carousel-cylinder-3d {
+  position: absolute;
+  width: 220px;
+  height: 200px;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.carousel-cylinder-3d.dragging {
+  transition: none !important;
+}
+
+.carousel-card-3d {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 195px;
+  transform-style: preserve-3d;
+  background: linear-gradient(145deg, rgba(14, 24, 46, 0.9) 0%, rgba(6, 11, 24, 0.98) 100%);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(28, 46, 78, 0.8);
-  border-radius: 12px;
-  padding: 22px 20px;
+  border: 1px solid rgba(28, 48, 82, 0.85);
+  border-radius: 14px;
+  padding: 18px 16px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  user-select: none;
-  position: relative;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 28px rgba(0, 0, 0, 0.55);
+  justify-content: space-between;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 30px rgba(0, 0, 0, 0.65);
+  transition: opacity 0.35s ease, filter 0.35s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  transform-origin: center center;
+  backface-visibility: hidden;
 }
 
-.strata-card::after {
+.carousel-card-3d::after {
   content: '';
   position: absolute;
   top: 0;
@@ -473,95 +494,236 @@ body {
   width: 100%;
   height: 3px;
   background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-  opacity: 0.5;
-  border-radius: 12px 12px 0 0;
-}
-
-/* Corner HUD Brackets */
-.strata-card-corner {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  pointer-events: none;
   opacity: 0.6;
+  border-radius: 14px 14px 0 0;
 }
 
-.strata-card-corner.tl {
-  top: 6px;
-  left: 6px;
-  border-top: 1.5px solid var(--accent-cyan);
-  border-left: 1.5px solid var(--accent-cyan);
+.carousel-card-3d.is-front {
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.5), 0 16px 36px rgba(0, 0, 0, 0.8), inset 0 0 16px rgba(0, 240, 255, 0.15) !important;
+  transform-origin: center center;
 }
 
-.strata-card-corner.tr {
-  top: 6px;
-  right: 6px;
-  border-top: 1.5px solid var(--accent-cyan);
-  border-right: 1.5px solid var(--accent-cyan);
+.carousel-card-3d.is-front:hover {
+  filter: brightness(1.1);
 }
 
-/* Colorful Card Theme Highlights */
-.strata-card.card-cyan:hover, .strata-card.card-cyan.active {
-  border-color: #00f0ff;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 240, 255, 0.4);
-}
-.strata-card.card-cyan::after { background: linear-gradient(90deg, transparent, #00f0ff 40%, #0284c7 70%, transparent); }
-
-.strata-card.card-coral:hover, .strata-card.card-coral.active {
-  border-color: #f43f5e;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(244, 63, 94, 0.4);
-}
-.strata-card.card-coral::after { background: linear-gradient(90deg, transparent, #f43f5e 40%, #fb7185 70%, transparent); }
-
-.strata-card.card-blue:hover, .strata-card.card-blue.active {
-  border-color: #38bdf8;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(56, 189, 248, 0.4);
-}
-.strata-card.card-blue::after { background: linear-gradient(90deg, transparent, #38bdf8 40%, #0284c7 70%, transparent); }
-
-.strata-card.card-purple:hover, .strata-card.card-purple.active,
-.strata-card.card-violet:hover, .strata-card.card-violet.active {
-  border-color: #c084fc;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(192, 132, 252, 0.4);
-}
-.strata-card.card-purple::after, .strata-card.card-violet::after { background: linear-gradient(90deg, transparent, #c084fc 40%, #b026ff 70%, transparent); }
-
-.strata-card.card-amber:hover, .strata-card.card-amber.active,
-.strata-card.card-orange:hover, .strata-card.card-orange.active {
-  border-color: #fbbf24;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(251, 191, 36, 0.4);
-}
-.strata-card.card-amber::after, .strata-card.card-orange::after { background: linear-gradient(90deg, transparent, #fbbf24 40%, #ea580c 70%, transparent); }
-
-.strata-card.card-emerald:hover, .strata-card.card-emerald.active,
-.strata-card.card-teal:hover, .strata-card.card-teal.active {
-  border-color: #10b981;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(16, 185, 129, 0.4);
-}
-.strata-card.card-emerald::after, .strata-card.card-teal::after { background: linear-gradient(90deg, transparent, #10b981 40%, #06b6d4 70%, transparent); }
-
-.strata-card.card-crimson:hover, .strata-card.card-crimson.active,
-.strata-card.card-rose:hover, .strata-card.card-rose.active {
-  border-color: #ff3366;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(255, 51, 102, 0.4);
-}
-.strata-card.card-crimson::after, .strata-card.card-rose::after { background: linear-gradient(90deg, transparent, #ff3366 40%, #f43f5e 70%, transparent); }
-
-.strata-card.card-magenta:hover, .strata-card.card-magenta.active {
-  border-color: #ec4899;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 24px rgba(236, 72, 153, 0.4);
-}
-.strata-card.card-magenta::after { background: linear-gradient(90deg, transparent, #ec4899 40%, #7c3aed 70%, transparent); }
-
-.strata-card:hover {
-  transform: translateY(-6px) scale(1.04);
+.card-prompt-hint {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px dashed rgba(0, 240, 255, 0.35);
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+  transition: all 0.2s ease;
 }
 
-.strata-card.active {
-  transform: scale(1.08) translateY(-4px);
-  background: linear-gradient(145deg, rgba(20, 36, 68, 0.95) 0%, rgba(10, 18, 36, 0.98) 100%);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), 0 0 32px rgba(0, 240, 255, 0.5), inset 0 0 18px rgba(0, 240, 255, 0.15);
+.carousel-card-3d:hover .card-prompt-hint {
+  background: rgba(0, 240, 255, 0.18);
   border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Nav Paddles */
+.carousel-paddle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(10, 16, 32, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.05rem;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), 0 6px 16px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.carousel-paddle.prev { left: 24px; }
+.carousel-paddle.next { right: 24px; }
+
+.carousel-paddle:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.14);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.65);
+}
+
+/* Holographic Lens Prompt Modal Overlay & Unique Transition */
+.lens-prompt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(3, 6, 14, 0.78);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeInPromptOverlay 0.22s ease-out;
+}
+
+@keyframes fadeInPromptOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lens-prompt-modal {
+  width: 100%;
+  max-width: 580px;
+  background: linear-gradient(145deg, rgba(14, 24, 48, 0.96) 0%, rgba(6, 11, 24, 0.99) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  border-radius: 16px;
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.4), 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  padding: 28px 30px;
+  position: relative;
+  overflow: hidden;
+  animation: holographicUnfold 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes holographicUnfold {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+    filter: blur(8px) brightness(1.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: none;
+  }
+}
+
+.lens-prompt-laser {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #00f0ff 0%, #7c3aed 50%, #f43f5e 100%);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.8);
+}
+
+.lens-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.lens-prompt-title {
+  font-family: var(--font-cyber);
+  font-size: 1.45rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.01em;
+}
+
+.lens-prompt-close {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.lens-prompt-close:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
+  color: #ffffff;
+}
+
+.lens-prompt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lens-prompt-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+}
+
+.lens-prompt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lens-chip {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--accent-cyan);
+}
+
+.lens-prompt-btn-launch {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px 22px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #00f0ff 0%, #7c3aed 50%, #f43f5e 100%);
+  background-size: 200% 200%;
+  animation: cyberGradientShift 4s ease infinite;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  font-family: var(--font-cyber);
+  font-weight: 900;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.65), 0 8px 25px rgba(0, 0, 0, 0.8);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.lens-prompt-btn-launch:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.9), 0 0 30px rgba(244, 63, 94, 0.6);
+}
+
+.lens-prompt-btn-launch:active {
+  transform: translateY(0) scale(0.99);
 }
 
 .strata-card-title {
