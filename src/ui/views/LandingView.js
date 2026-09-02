@@ -102,7 +102,14 @@ export class LandingView {
 
     const triggerArchaeology = () => {
       const selectedPath = input.value.trim();
-      if (!selectedPath) return;
+      if (!selectedPath) {
+        input.focus();
+        input.style.borderColor = 'var(--danger)';
+        return;
+      }
+
+      beginBtn.innerHTML = '<span>⚡</span><span>INITIALIZING EXCAVATION...</span>';
+      beginBtn.style.opacity = '0.8';
 
       if (this.onQuickAnalyze) {
         this.onQuickAnalyze(selectedPath);
@@ -113,6 +120,7 @@ export class LandingView {
 
     beginBtn.addEventListener('click', triggerArchaeology);
     input.addEventListener('keydown', (e) => {
+      input.style.borderColor = 'var(--border-holo)';
       if (e.key === 'Enter') triggerArchaeology();
     });
 
