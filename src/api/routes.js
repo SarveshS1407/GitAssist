@@ -88,6 +88,17 @@ export class ApiRouter {
       });
     }
 
+    // 4b. Git Velocity & Author Statistics
+    if (req.method === 'GET' && pathname === '/api/repository/git/velocity') {
+      const gitService = new GitService(this.activeRepoState.path);
+      const velocity = await gitService.getCommitVelocity(100);
+      const authors = await gitService.getAuthorStats(100);
+      return this.sendJson(res, 200, {
+        velocity,
+        authors
+      });
+    }
+
     // 5. Code Search (Lazy)
     if (req.method === 'GET' && pathname === '/api/search') {
       const q = parsedUrl.searchParams.get('q') || '';

@@ -81,4 +81,27 @@ describe('E2E REST API Suite', () => {
     const json = JSON.parse(responseBody);
     assert.strictEqual(json.status, 'online');
   });
+
+  test('GET /api/repository/git/velocity returns velocity and author distribution', async () => {
+    const router = new ApiRouter(ROOT_DIR);
+    // Seed active repo
+    router.activeRepoState = { path: ROOT_DIR, isLoaded: true };
+
+    const mockReq = { method: 'GET' };
+    let statusCode = 0;
+    let responseBody = '';
+
+    const mockRes = {
+      writeHead: (status) => { statusCode = status; },
+      end: (data) => { responseBody = data; }
+    };
+
+    await router.handleRequest(mockReq, mockRes, new URL('http://localhost:3333/api/repository/git/velocity'));
+    assert.strictEqual(statusCode, 200);
+
+    const json = JSON.parse(responseBody);
+    assert.ok(json.velocity);
+    assert.ok(Array.isArray(json.authors));
+  });
 });
+
