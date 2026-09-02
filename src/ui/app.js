@@ -239,5 +239,6 @@ class App {
 // Bootstrap on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   const app = new App();
+  window.app = app;
   app.init();
 });
