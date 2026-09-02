@@ -235,16 +235,51 @@ export class OverviewView {
 
     container.appendChild(dualGrid);
 
-    // Wire up Carousel Cards to rotate and update Dossier Blade
-    carouselSection.querySelectorAll('.strata-card').forEach(card => {
-      card.addEventListener('click', () => {
-        carouselSection.querySelectorAll('.strata-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        const actionId = card.dataset.action;
+    const cards = Array.from(carouselSection.querySelectorAll('.strata-card'));
+    const selectCardByIndex = (idx) => {
+      const normalizedIdx = (idx + cards.length) % cards.length;
+      cards.forEach(c => c.classList.remove('active'));
+      const targetCard = cards[normalizedIdx];
+      if (targetCard) {
+        targetCard.classList.add('active');
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        const actionId = targetCard.dataset.action;
         this.selectedAction = actionId;
         this.renderActionDossier(dossierSection, actionId);
+      }
+    };
+
+    // Wire up Carousel Cards to rotate and update Dossier Blade
+    cards.forEach((card, idx) => {
+      card.addEventListener('click', () => {
+        selectCardByIndex(idx);
       });
     });
+
+    // Arrow key navigation for quick forensic cycling
+    const keyHandler = (e) => {
+      if (!document.body.contains(container)) {
+        window.removeEventListener('keydown', keyHandler);
+        return;
+      }
+      if (['ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key) && !['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) {
+        const currentIdx = cards.findIndex(c => c.classList.contains('active'));
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          selectCardByIndex(currentIdx - 1);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          selectCardByIndex(currentIdx + 1);
+        } else if (e.key === 'Enter') {
+          const actionBtn = dossierSection.querySelector('#btn-launch-action');
+          if (actionBtn) {
+            e.preventDefault();
+            actionBtn.click();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', keyHandler);
 
     return container;
   }
