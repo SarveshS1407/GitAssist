@@ -16,12 +16,12 @@ export class LandingView {
     container.className = 'view-container';
 
     const errorHtml = this.error ? `
-      <div style="background: rgba(255, 0, 85, 0.12); border: 1px solid var(--danger); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+      <div id="landing-error-banner" style="background: rgba(255, 0, 85, 0.12); border: 1px solid var(--danger); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
         <div style="display: flex; gap: 10px; align-items: flex-start;">
           <span style="font-size: 1.1rem;">⚠️</span>
           <div>
             <div style="color: var(--danger); font-weight: 800; font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase;">Excavation Alert</div>
-            <div style="color: var(--text-primary); font-size: 0.85rem; margin-top: 2px;">${this.error}</div>
+            <div style="color: var(--text-primary); font-size: 0.85rem; margin-top: 2px; line-height: 1.45;">${this.error}</div>
           </div>
         </div>
         <button type="button" id="btn-dismiss-error" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem;">✕</button>
@@ -43,13 +43,15 @@ export class LandingView {
         </p>
 
         <!-- Direct Ingestion Input & Action -->
-        <div style="width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+        <div style="width: 100%; max-width: 640px; display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
           <div style="display: flex; gap: 10px;">
             <input 
               type="text" 
               id="landing-repo-input" 
               placeholder="Enter local path or Git URL (e.g. /Users/kingpin/Desktop/gitassist)" 
               value="/Users/kingpin/Desktop/gitassist" 
+              autocomplete="off"
+              spellcheck="false"
               style="flex: 1; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-holo); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.86rem;"
             />
             <button class="btn-primary" id="btn-open-repo">
@@ -57,11 +59,14 @@ export class LandingView {
               <span>EXCAVATE</span>
             </button>
           </div>
+
+          <!-- Inline Validation Feedback -->
+          <div id="landing-validation-msg" style="display: none; color: var(--danger); font-size: 0.78rem; font-family: var(--font-mono); text-align: left;"></div>
           
           <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.76rem; color: var(--text-muted);">
-            <span>Quick preset:</span>
+            <span>Quick presets:</span>
             <button type="button" id="btn-preset-current" class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
-              ⚡ Current GitAssist Repo
+              ⚡ Current GitAssist Repo (<code>/Users/kingpin/Desktop/gitassist</code>)
             </button>
           </div>
         </div>
@@ -132,6 +137,7 @@ export class LandingView {
     const openBtn = container.querySelector('#btn-open-repo');
     const presetBtn = container.querySelector('#btn-preset-current');
     const dismissBtn = container.querySelector('#btn-dismiss-error');
+    const valMsg = container.querySelector('#landing-validation-msg');
 
     if (dismissBtn) {
       dismissBtn.addEventListener('click', () => {
@@ -141,9 +147,24 @@ export class LandingView {
 
     const triggerExcavation = () => {
       const selectedPath = input.value.trim();
-      if (!selectedPath) return;
 
+      if (!selectedPath) {
+        input.focus();
+        input.style.borderColor = 'var(--danger)';
+        if (valMsg) {
+          valMsg.textContent = '⚠️ Enter a local directory path or Git repository URL to begin excavation.';
+          valMsg.style.display = 'block';
+        }
+        return;
+      }
+
+      if (valMsg) valMsg.style.display = 'none';
+      input.style.borderColor = 'var(--border-holo)';
+
+      // Visually indicate processing state and disable button
       openBtn.innerHTML = '<span>⚡</span><span>EXCAVATING...</span>';
+      openBtn.disabled = true;
+      openBtn.style.opacity = '0.75';
 
       if (this.onQuickAnalyze) {
         this.onQuickAnalyze(selectedPath);
@@ -152,12 +173,22 @@ export class LandingView {
       }
     };
 
-    openBtn.addEventListener('click', triggerExcavation);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') triggerExcavation();
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerExcavation();
     });
 
-    presetBtn.addEventListener('click', () => {
+    input.addEventListener('keydown', (e) => {
+      if (valMsg) valMsg.style.display = 'none';
+      input.style.borderColor = 'var(--border-holo)';
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        triggerExcavation();
+      }
+    });
+
+    presetBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       input.value = '/Users/kingpin/Desktop/gitassist';
       triggerExcavation();
     });
