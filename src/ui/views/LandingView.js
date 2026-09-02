@@ -1,6 +1,6 @@
 /**
  * LandingView Component
- * Dedicated Archaeological Entrance Experience (No Sidebar)
+ * Dedicated Minimal Homescreen with Direct Inline Git Repository Input
  */
 export class LandingView {
   constructor({ onOpenRepository, onQuickAnalyze }) {
@@ -11,102 +11,90 @@ export class LandingView {
 
   render() {
     const container = document.createElement('div');
-    container.className = 'view-container landing-entrance-container';
+    container.className = 'view-container minimal-homescreen-container';
 
     container.innerHTML = `
-      <!-- Architectural Atmosphere & Decorative Node Strata -->
-      <div class="entrance-nodes-deco">
-        <span class="deco-node">◈</span>
-        <span class="deco-line"></span>
-        <span class="deco-node">◈</span>
-        <span class="deco-line"></span>
-        <span class="deco-node">◈</span>
+      <!-- Minimalist Architectural Emblem & Horizon -->
+      <div class="homescreen-emblem">
+        <span class="emblem-symbol">🏛️</span>
+        <span class="emblem-beacon">● LOCAL-FIRST FORENSICS</span>
       </div>
 
-      <!-- Main Entrance Hero -->
-      <section class="entrance-hero">
-        <div class="entrance-badge-container">
-          <span class="brand-badge">LOCAL-FIRST SOFTWARE FORENSICS</span>
-        </div>
+      <!-- Hero Typography Hierarchy -->
+      <div class="homescreen-hero-text">
+        <h1 class="homescreen-title">
+          <span>CODEBASE</span>
+          <span class="title-highlight">ARCHAEOLOGIST</span>
+        </h1>
 
-        <div class="entrance-icon">🏛️</div>
-
-        <h1 class="entrance-title">CODEBASE ARCHAEOLOGIST</h1>
-
-        <p class="entrance-tagline">
+        <p class="homescreen-tagline">
           Uncover the hidden structure of your codebase.
         </p>
 
-        <p class="entrance-description">
-          A local-first investigation platform designed to explore unfamiliar software systems. 
-          Excavate architecture, trace AST symbol relationships, decode Git chronology, and understand structural changes—completely offline.
+        <p class="homescreen-description">
+          Paste a local Git repository directory or repository path to begin exploring its architecture, relationships, history, and impact.
         </p>
+      </div>
 
-        <!-- Dominant Primary CTA -->
-        <div class="entrance-cta-group">
-          <button class="btn-primary entrance-btn-dominant" id="btn-begin-archaeology">
-            <span>🚀</span>
-            <span>BEGIN ARCHAEOLOGY</span>
+      <!-- Central Git Repository Input Box & Action -->
+      <div class="homescreen-input-card">
+        <div class="input-glow-wrapper">
+          <span class="input-icon">📁</span>
+          <input 
+            type="text" 
+            id="homescreen-repo-input" 
+            class="homescreen-input" 
+            placeholder="Enter repository path (e.g. /Users/username/projects/my-repo)" 
+            value="/Users/kingpin/Desktop/gitassist" 
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <!-- Primary Action Button -->
+        <button class="btn-primary homescreen-btn-begin" id="btn-homescreen-begin">
+          <span>🚀</span>
+          <span>BEGIN ARCHAEOLOGY</span>
+        </button>
+
+        <!-- Quick Launch Preset -->
+        <div class="homescreen-preset-bar">
+          <span class="preset-label">Quick presets:</span>
+          <button type="button" class="preset-chip" id="btn-preset-gitassist">
+            ⚡ Current Project (<code>/Users/kingpin/Desktop/gitassist</code>)
           </button>
         </div>
+      </div>
 
-        <!-- Subtle Quick Launch Alternative -->
-        <div class="entrance-quick-link">
-          <button type="button" class="entrance-subtle-link" id="btn-quick-launch">
-            <span>⚡</span>
-            <span>Or analyze current project: <code>/Users/kingpin/Desktop/gitassist</code></span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Progressive Disclosure: What It Investigates -->
-      <section class="entrance-capabilities-summary">
-        <div class="entrance-capability-item">
-          <span class="cap-icon">◈</span>
-          <div>
-            <div class="cap-title">Architecture & Subsystems</div>
-            <div class="cap-text">Deconstruct complex systems into 3D module strata and living dependency graphs.</div>
-          </div>
-        </div>
-
-        <div class="entrance-capability-item">
-          <span class="cap-icon">📁</span>
-          <div>
-            <div class="cap-title">AST Symbol Relationships</div>
-            <div class="cap-text">Extract classes, functions, and cross-file imports across JS, TS, and Python.</div>
-          </div>
-        </div>
-
-        <div class="entrance-capability-item">
-          <span class="cap-icon">📜</span>
-          <div>
-            <div class="cap-title">Git History & Chronology</div>
-            <div class="cap-text">Navigate branch lineages, commit churn rates, and historical code ownership.</div>
-          </div>
-        </div>
-
-        <div class="entrance-capability-item">
-          <span class="cap-icon">🤖</span>
-          <div>
-            <div class="cap-title">Impact & Understanding</div>
-            <div class="cap-text">Calculate blast radii, detect cyclic dependencies, and consult local AI analysis.</div>
-          </div>
-        </div>
-      </section>
+      <!-- Offline Security Note -->
+      <div class="homescreen-footer-note">
+        <span>🔒 100% Offline & Local-First • Zero Cloud Transmission • Read-Only Analysis</span>
+      </div>
     `;
 
-    // Connect Primary CTA
-    container.querySelector('#btn-begin-archaeology').addEventListener('click', () => {
-      if (this.onOpenRepository) this.onOpenRepository();
-    });
+    const input = container.querySelector('#homescreen-repo-input');
+    const beginBtn = container.querySelector('#btn-homescreen-begin');
+    const presetBtn = container.querySelector('#btn-preset-gitassist');
 
-    // Connect Subtle Preset Launch
-    container.querySelector('#btn-quick-launch').addEventListener('click', () => {
+    const triggerArchaeology = () => {
+      const selectedPath = input.value.trim();
+      if (!selectedPath) return;
+
       if (this.onQuickAnalyze) {
-        this.onQuickAnalyze('/Users/kingpin/Desktop/gitassist');
+        this.onQuickAnalyze(selectedPath);
       } else if (this.onOpenRepository) {
         this.onOpenRepository();
       }
+    };
+
+    beginBtn.addEventListener('click', triggerArchaeology);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') triggerArchaeology();
+    });
+
+    presetBtn.addEventListener('click', () => {
+      input.value = '/Users/kingpin/Desktop/gitassist';
+      triggerArchaeology();
     });
 
     this.element = container;
