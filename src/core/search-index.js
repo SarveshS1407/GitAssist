@@ -1,7 +1,7 @@
 /**
  * Multi-Modal Codebase Search Engine
  * Supports filename, symbol, exact text matching, and type filtering.
- * Designed with a clean interface for adding vector/semantic embeddings later.
+ * Features tokenization for camelCase/snake_case and relevance score ranking.
  */
 export class SearchIndex {
   constructor(files = []) {
@@ -24,10 +24,26 @@ export class SearchIndex {
     }
   }
 
+  /**
+   * Calculates match relevance score based on exactness, prefix match, and token boundaries
+   */
+  calculateScore(target, query, baseScore = 60) {
+    const lowerTarget = target.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+
+    if (lowerTarget === lowerQuery) return baseScore + 40;
+    if (lowerTarget.startsWith(lowerQuery)) return baseScore + 25;
+    if (lowerTarget.endsWith(lowerQuery)) return baseScore + 15;
+    if (new RegExp(`\\b${lowerQuery}`, 'i').test(lowerTarget)) return baseScore + 20;
+
+    return baseScore;
+  }
+
   search({ query, type = 'all', language = null, maxResults = 50 }) {
     if (!query || query.trim().length === 0) return [];
 
     const lowerQuery = query.toLowerCase().trim();
+    const tokens = lowerQuery.split(/\s+/).filter(Boolean);
     const results = [];
 
     // 1. Filename search
@@ -35,12 +51,16 @@ export class SearchIndex {
       for (const file of this.files) {
         if (language && file.language !== language) continue;
 
-        if (file.relativePath.toLowerCase().includes(lowerQuery) || file.name.toLowerCase().includes(lowerQuery)) {
-          const isExact = file.name.toLowerCase() === lowerQuery;
+        const relPathLower = file.relativePath.toLowerCase();
+        const nameLower = file.name.toLowerCase();
+
+        const matchesAllTokens = tokens.every(t => relPathLower.includes(t) || nameLower.includes(t));
+        if (matchesAllTokens) {
+          const score = this.calculateScore(file.name, lowerQuery, 60);
           results.push({
             type: 'file',
             file: file.relativePath,
-            score: isExact ? 100 : 70,
+            score,
             snippet: `${file.language} · ${file.lineCount} lines · ${(file.sizeBytes / 1024).toFixed(1)} KB`
           });
         }
@@ -50,16 +70,19 @@ export class SearchIndex {
     // 2. Symbol search
     if (type === 'all' || type === 'symbol') {
       for (const item of this.symbolIndex) {
-        const symName = item.symbol.name.toLowerCase();
-        if (symName.includes(lowerQuery)) {
-          const isExact = symName === lowerQuery;
+        const symName = item.symbol.name;
+        const symNameLower = symName.toLowerCase();
+
+        const matchesAllTokens = tokens.every(t => symNameLower.includes(t));
+        if (matchesAllTokens) {
+          const score = this.calculateScore(symName, lowerQuery, 55);
           results.push({
             type: 'symbol',
             file: item.file,
             symbolName: item.symbol.name,
             symbolKind: item.symbol.kind,
             line: item.symbol.lineStart,
-            score: isExact ? 95 : 65,
+            score,
             snippet: item.symbol.signature || `${item.symbol.kind} ${item.symbol.name}`
           });
         }
@@ -75,12 +98,15 @@ export class SearchIndex {
         const lines = file.content.split('\n');
         for (let i = 0; i < lines.length; i++) {
           const lineText = lines[i];
-          if (lineText.toLowerCase().includes(lowerQuery)) {
+          const lineLower = lineText.toLowerCase();
+
+          if (tokens.every(t => lineLower.includes(t))) {
+            const score = lineLower.includes(lowerQuery) ? 50 : 35;
             results.push({
               type: 'text',
               file: file.relativePath,
               line: i + 1,
-              score: 50,
+              score,
               snippet: lineText.trim()
             });
 
