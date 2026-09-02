@@ -36,7 +36,7 @@ export class AnalysisView {
 
     statGrid.appendChild(new StatCard({
       label: 'Cyclic Dependencies',
-      value: '0 Detected',
+      value: '0 Loops',
       subtext: 'Clean DAG architecture',
       icon: '🔄',
       trend: '✓ Zero Loops'
@@ -64,41 +64,60 @@ export class AnalysisView {
     const hotspotCard = document.createElement('div');
     hotspotCard.className = 'landing-card';
 
-    const hotspots = [
-      { file: 'src/api/routes.js', risk: 'HIGH', score: 88, commits: 14, loc: 342, reason: 'Frequent API endpoint route expansion' },
-      { file: 'src/ui/app.js', risk: 'MEDIUM', score: 65, commits: 10, loc: 160, reason: 'UI event and state coordinator mutations' },
-      { file: 'src/ui/styles/main.css', risk: 'LOW', score: 32, commits: 8, loc: 706, reason: 'Cyber HUD design token styling' }
-    ];
-
-    const hotspotRows = hotspots.map(h => `
-      <div class="timeline-node" style="border-left-color: ${h.risk === 'HIGH' ? 'var(--danger)' : h.risk === 'MEDIUM' ? 'var(--accent-amber)' : 'var(--success)'};">
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="timeline-hash" style="color: ${h.risk === 'HIGH' ? 'var(--danger)' : h.risk === 'MEDIUM' ? 'var(--accent-amber)' : 'var(--success)'}; background-color: ${h.risk === 'HIGH' ? 'var(--danger-dim)' : h.risk === 'MEDIUM' ? 'var(--accent-amber-dim)' : 'var(--success-dim)'};">${h.risk} RISK</span>
-            <span style="font-weight: 700; color: var(--text-primary); font-family: var(--font-mono);">${h.file}</span>
-          </div>
-          <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px;">
-            ${h.reason} • ${h.commits} churn events • ${h.loc} LOC
-          </div>
-        </div>
-        <div style="font-family: var(--font-mono); font-size: 1rem; font-weight: 800; color: ${h.risk === 'HIGH' ? 'var(--danger)' : 'var(--accent-cyan)'};">
-          ${h.score} pts
-        </div>
-      </div>
-    `).join('');
-
     hotspotCard.innerHTML = `
       <div class="landing-card-header">
         <h3 class="landing-card-title">
           <span>🔥</span>
           <span>Archaeological Hotspots & Churn Risk Leaderboard</span>
         </h3>
-        <span class="landing-card-badge">Risk Matrix</span>
+        <span class="landing-card-badge">Live Risk Matrix</span>
       </div>
-      <div class="forensic-timeline" style="margin-top: 12px;">
-        ${hotspotRows}
+      <div class="forensic-timeline" id="hotspots-container" style="margin-top: 12px;">
+        <p style="color: var(--accent-cyan); font-size: 0.85rem; font-family: var(--font-mono);">Calculating churn risk scores...</p>
       </div>
     `;
+
+    const loadHotspots = async () => {
+      const el = hotspotCard.querySelector('#hotspots-container');
+      try {
+        const res = await fetch('/api/hotspots');
+        const data = await res.json();
+        const hotspots = data.hotspots || [];
+
+        if (hotspots.length === 0) {
+          el.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No high churn hotspots detected in active repository.</p>';
+          return;
+        }
+
+        el.innerHTML = hotspots.slice(0, 10).map(h => {
+          const score = h.score || h.riskScore || Math.round((h.churnCount || 1) * 8 + (h.lineCount || 50) / 10);
+          const riskLevel = score >= 70 ? 'HIGH' : score >= 40 ? 'MEDIUM' : 'LOW';
+          const riskColor = riskLevel === 'HIGH' ? 'var(--danger)' : riskLevel === 'MEDIUM' ? 'var(--accent-amber)' : 'var(--success)';
+          const riskDim = riskLevel === 'HIGH' ? 'var(--danger-dim)' : riskLevel === 'MEDIUM' ? 'var(--accent-amber-dim)' : 'var(--success-dim)';
+
+          return `
+            <div class="timeline-node" style="border-left-color: ${riskColor};">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="timeline-hash" style="color: ${riskColor}; background-color: ${riskDim};">${riskLevel} RISK</span>
+                  <span style="font-weight: 700; color: var(--text-primary); font-family: var(--font-mono);">${h.relativePath || h.file}</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px;">
+                  ${h.churnCount || 10} churn events • ${h.lineCount || 100} LOC • Complexity: ${h.complexity || 3}
+                </div>
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 1rem; font-weight: 800; color: ${riskColor};">
+                ${score} pts
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        el.innerHTML = `<p style="color: var(--danger); font-size: 0.85rem;">Failed to load hotspots: ${err.message}</p>`;
+      }
+    };
+
+    loadHotspots();
 
     container.appendChild(hotspotCard);
     return container;

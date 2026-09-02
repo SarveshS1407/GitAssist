@@ -8,6 +8,7 @@ import { EmptyState } from '../components/EmptyState.js';
 export class ArchitectureView {
   constructor({ repositoryState }) {
     this.repositoryState = repositoryState;
+    this.currentType = 'module';
   }
 
   render() {
@@ -37,30 +38,45 @@ export class ArchitectureView {
       <div class="landing-card-header">
         <h3 class="landing-card-title">
           <span>🕸️</span>
-          <span>Layered Subsystem Interaction Graph</span>
+          <span>Archaeological Dependency Topology</span>
         </h3>
-        <span class="landing-card-badge">Mermaid Map</span>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-secondary" id="btn-toggle-module" style="padding: 4px 10px; font-size: 0.75rem;">Module Graph</button>
+          <button class="btn-secondary" id="btn-toggle-class" style="padding: 4px 10px; font-size: 0.75rem;">Class Diagram</button>
+        </div>
       </div>
 
-      <div style="background: var(--bg-input); border: 1px solid var(--border-hud); border-radius: 8px; padding: 24px; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary); margin-top: 10px; overflow-x: auto;">
-        <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">◈ SUBSYSTEM TOPOLOGY & DATA FLOW:</div>
-        <div>[Frontend UI] ──(HTTP / REST API)──► [API Dispatcher (routes.js)]</div>
-        <div style="padding-left: 200px;">│</div>
-        <div style="padding-left: 200px;">▼</div>
-        <div style="padding-left: 140px;">[RepositoryService] ◄──► [GitService]</div>
-        <div style="padding-left: 200px;">│</div>
-        <div style="padding-left: 100px;">┌───────────┴───────────┐</div>
-        <div style="padding-left: 100px;">▼                       ▼</div>
-        <div style="padding-left: 50px;">[AST Parser & Scanner]   [Metrics & Cycles Detector]</div>
+      <div id="diagram-container" style="background: var(--bg-input); border: 1px solid var(--border-holo); border-radius: 8px; padding: 20px; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary); margin-top: 10px; overflow-x: auto; max-height: 440px;">
+        Loading diagram...
       </div>
 
       <div style="display: flex; gap: 12px; margin-top: 14px;">
         <button class="btn-primary" id="btn-export-diagram">
           <span>📊</span>
-          <span>EXPORT ARCHITECTURE DIAGRAM</span>
+          <span>EXPORT ARCHITECTURE REPORT (MARKDOWN)</span>
         </button>
       </div>
     `;
+
+    const loadDiagram = async (type = 'module') => {
+      const el = card.querySelector('#diagram-container');
+      el.innerHTML = '<span style="color: var(--accent-cyan);">Generating Mermaid diagram topology...</span>';
+      try {
+        const res = await fetch(`/api/diagram?type=${type}`);
+        const data = await res.json();
+        el.innerHTML = `<pre style="color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.8rem; white-space: pre-wrap;">${data.diagram || 'No diagram generated'}</pre>`;
+      } catch (err) {
+        el.innerHTML = `<span style="color: var(--danger);">Failed to load diagram: ${err.message}</span>`;
+      }
+    };
+
+    card.querySelector('#btn-toggle-module').addEventListener('click', () => loadDiagram('module'));
+    card.querySelector('#btn-toggle-class').addEventListener('click', () => loadDiagram('class'));
+    card.querySelector('#btn-export-diagram').addEventListener('click', () => {
+      window.open('/api/export?format=markdown', '_blank');
+    });
+
+    loadDiagram('module');
 
     container.appendChild(card);
     return container;
