@@ -6,14 +6,14 @@ import { ErrorState } from '../components/ErrorState.js';
 
 /**
  * Overview View
- * Central Archaeological Strata Holomap & Live Artifact Dossier Console
+ * Central Archaeological Action Carousel & Action Selector Workspace
  */
 export class OverviewView {
   constructor({ repositoryState, onOpenRepository, onQuickAnalyze }) {
     this.repositoryState = repositoryState;
     this.onOpenRepository = onOpenRepository;
     this.onQuickAnalyze = onQuickAnalyze;
-    this.selectedSubsystem = 'core';
+    this.selectedAction = 'architecture';
   }
 
   render() {
@@ -49,18 +49,18 @@ export class OverviewView {
       return container;
     }
 
-    // 4. Active Archaeological Telemetry & Strata Holomap
+    // 4. Active Archaeological Workspace & Cylindrical Action Carousel
     const summary = this.repositoryState.summary || {};
     const container = document.createElement('div');
     container.className = 'view-container';
 
     const header = new PageHeader({
       title: summary.name || this.repositoryState.repositoryName || 'EXCAVATION SECTOR',
-      description: `PATH: ${summary.path || this.repositoryState.repositoryPath} • STRATA: ${summary.branch || 'main'}`,
-      badge: summary.isValidGit ? 'DIG ACTIVE // READY' : 'LOCAL SECTOR',
+      description: `PATH: ${summary.path || this.repositoryState.repositoryPath} • BRANCH: ${summary.branch || 'main'}`,
+      badge: summary.isValidGit ? 'EXCAVATION ACTIVE' : 'LOCAL REPO',
       actions: [
         {
-          label: 'CHANGE SECTOR',
+          label: 'CHANGE REPOSITORY',
           icon: '📁',
           variant: 'secondary',
           onClick: this.onOpenRepository
@@ -76,7 +76,7 @@ export class OverviewView {
     const totalLoc = summary.totalLines ? summary.totalLines.toLocaleString() : '—';
     const totalFiles = summary.totalFiles ? summary.totalFiles.toString() : '—';
     const mi = summary.avgMaintainability !== undefined ? `${summary.avgMaintainability} / 100` : '100 / 100';
-    const langCount = summary.languages ? Object.keys(summary.languages).length.toString() : '0';
+    const langCount = summary.languages ? Object.keys(summary.languages).length.toString() : '1';
 
     statGrid.appendChild(new StatCard({
       label: 'Excavated Lines',
@@ -88,7 +88,7 @@ export class OverviewView {
     statGrid.appendChild(new StatCard({
       label: 'Mapped Artifacts',
       value: totalFiles,
-      subtext: `${summary.totalDirectories || 0} strata directories`,
+      subtext: 'Indexed files across repo',
       icon: '📁'
     }).render());
 
@@ -109,62 +109,54 @@ export class OverviewView {
 
     container.appendChild(statGrid);
 
-    // Central Archaeological Holomap & 3D Strata Deck
-    const holomapSection = document.createElement('div');
-    holomapSection.className = 'holomap-canvas-container';
+    // Central Cylindrical Investigation Action Carousel
+    const carouselSection = document.createElement('div');
+    carouselSection.className = 'holomap-canvas-container';
 
-    holomapSection.innerHTML = `
+    const actionItems = [
+      { id: 'architecture', icon: '🕸️', title: 'Architecture', meta: 'Module Topology & Mermaid Graph', badge: 'Structural Map' },
+      { id: 'impact', icon: '💥', title: 'Impact Radius', meta: 'Blast Radius & Dependency Callers', badge: 'Ripple Analysis' },
+      { id: 'explorer', icon: '📁', title: 'Source Explorer', meta: 'AST Symbol Hierarchy & Code Viewer', badge: 'File Inspector' },
+      { id: 'search', icon: '🔍', title: 'Forensic Search', meta: 'Symbols, Functions & Text Matches', badge: 'Query Engine' },
+      { id: 'git', icon: '📜', title: 'Git History', meta: 'Chrono-Strata & Author Timeline', badge: 'Read-Only Git' },
+      { id: 'analysis', icon: '⚡', title: 'Drift & Hotspots', meta: 'High Churn & Complexity Risk Score', badge: 'Risk Matrix' },
+      { id: 'archaeology', icon: '🏛️', title: 'Archaeology', meta: 'Evolutionary Lineage & Genesis', badge: 'Synthesis' },
+      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Deterministic Architecture Specs', badge: 'Auto-Doc' },
+      { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health Audit', badge: 'Audit Engine' },
+      { id: 'ai', icon: '🤖', title: 'AI Field Dossier', meta: 'Offline Natural Language Q&A', badge: 'Local Engine' }
+    ];
+
+    const cardsHtml = actionItems.map((a, idx) => `
+      <div class="strata-card ${a.id === this.selectedAction ? 'active' : ''}" data-action="${a.id}">
+        <div class="strata-card-title"><span>${a.icon}</span><span>${a.title}</span></div>
+        <div class="strata-card-meta">${a.meta}</div>
+        <div class="strata-card-badge">${a.badge}</div>
+      </div>
+    `).join('');
+
+    carouselSection.innerHTML = `
       <div class="holomap-canvas-header">
         <h3 class="holomap-title">
           <span>◈</span>
-          <span>Central Archaeological Holomap // 3D Subsystem Strata</span>
+          <span>CYLINDRICAL INVESTIGATION CAROUSEL // SELECT ACTION</span>
         </h3>
-        <span class="landing-card-badge">Spatial Deck</span>
+        <span class="landing-card-badge">Primary Action Selector</span>
       </div>
 
       <div class="strata-deck-viewport">
-        <div class="strata-deck" id="strata-deck">
-          <div class="strata-card active" data-mod="core">
-            <div class="strata-card-title"><span>⚙️</span><span>src/core</span></div>
-            <div class="strata-card-meta">AST Parser • Metrics • Graph • Cycles</div>
-            <div class="strata-card-badge">8 Core Subsystems</div>
-          </div>
-          <div class="strata-card" data-mod="ui">
-            <div class="strata-card-title"><span>🎨</span><span>src/ui</span></div>
-            <div class="strata-card-meta">Spatial Holomap • Router • State</div>
-            <div class="strata-card-badge">12 Archaeological Views</div>
-          </div>
-          <div class="strata-card" data-mod="api">
-            <div class="strata-card-title"><span>🔌</span><span>src/api</span></div>
-            <div class="strata-card-meta">REST Dispatcher • Static Assets</div>
-            <div class="strata-card-badge">14 Endpoints</div>
-          </div>
-          <div class="strata-card" data-mod="services">
-            <div class="strata-card-title"><span>🏛️</span><span>src/services</span></div>
-            <div class="strata-card-meta">RepositoryService • Read-Only GitService</div>
-            <div class="strata-card-badge">Orchestration Layer</div>
-          </div>
-          <div class="strata-card" data-mod="ai">
-            <div class="strata-card-title"><span>🤖</span><span>src/ai</span></div>
-            <div class="strata-card-meta">Local Q&A Engine • Context Packager</div>
-            <div class="strata-card-badge">Neural Investigator</div>
-          </div>
-          <div class="strata-card" data-mod="tests">
-            <div class="strata-card-title"><span>🧪</span><span>tests/</span></div>
-            <div class="strata-card-meta">Node:Test Automated Suites</div>
-            <div class="strata-card-badge" style="color: var(--success);">28 Passing Suites</div>
-          </div>
+        <div class="strata-deck" id="action-strata-deck">
+          ${cardsHtml}
         </div>
       </div>
     `;
 
-    container.appendChild(holomapSection);
+    container.appendChild(carouselSection);
 
-    // Dual Grid: Language Strata Telemetry (Left) + Artifact Dossier Blade (Right)
+    // Dual Grid: Languages Left + Selected Investigation Action Dossier Right
     const dualGrid = document.createElement('div');
     dualGrid.className = 'archaeology-dual-grid';
 
-    // Left: Language Distribution
+    // Left: Languages
     const langSection = document.createElement('div');
     langSection.className = 'landing-card';
 
@@ -202,117 +194,143 @@ export class OverviewView {
 
     dualGrid.appendChild(langSection);
 
-    // Right: Live Artifact Dossier Blade
+    // Right: Action Launch Blade
     const dossierSection = document.createElement('div');
     dossierSection.className = 'dossier-blade';
-    dossierSection.id = 'dossier-blade-container';
+    dossierSection.id = 'action-dossier-container';
 
-    this.renderDossierBlade(dossierSection, 'core');
+    this.renderActionDossier(dossierSection, this.selectedAction);
     dualGrid.appendChild(dossierSection);
 
     container.appendChild(dualGrid);
 
-    // Wire up strata card clicks to rotate deck and update the Artifact Dossier live
-    holomapSection.querySelectorAll('.strata-card').forEach(card => {
+    // Wire up Carousel Cards to rotate and update Dossier Blade
+    carouselSection.querySelectorAll('.strata-card').forEach(card => {
       card.addEventListener('click', () => {
-        holomapSection.querySelectorAll('.strata-card').forEach(c => c.classList.remove('active'));
+        carouselSection.querySelectorAll('.strata-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
-        const mod = card.dataset.mod;
-        this.selectedSubsystem = mod;
-        this.renderDossierBlade(dossierSection, mod);
+        const actionId = card.dataset.action;
+        this.selectedAction = actionId;
+        this.renderActionDossier(dossierSection, actionId);
       });
     });
 
     return container;
   }
 
-  renderDossierBlade(container, mod) {
-    const dossiers = {
-      core: {
-        title: 'Subsystem: src/core',
-        type: 'Algorithmic Engines',
-        risk: 'LOW RISK',
-        riskColor: 'var(--success)',
-        confidence: '98%',
-        files: '8 modules (scanner, parser, metrics, cycles, git-analyzer)',
-        findings: 'Clean Directed Acyclic Graph (DAG). Provides AST parsing, complexity index, and hotspot calculations with zero external runtime dependencies.'
+  renderActionDossier(container, actionId) {
+    const actionDetails = {
+      architecture: {
+        title: 'Investigation: Architecture & Topology',
+        type: 'Structural Mapping',
+        icon: '🕸️',
+        description: 'Explore the high-level components of this repository, module boundaries, and living Mermaid dependency graphs.',
+        cta: 'EXPLORE ARCHITECTURE TOPOLOGY'
       },
-      ui: {
-        title: 'Subsystem: src/ui',
-        type: 'Spatial Holomap & UI',
-        risk: 'LOW RISK',
-        riskColor: 'var(--success)',
-        confidence: '96%',
-        files: '12 components (AppShell, Router, Holomap, State, Views)',
-        findings: 'Zero-dependency native ES modules. Reactive RepositoryState store manages active repository lifecycle and real-time telemetry updates.'
+      impact: {
+        title: 'Investigation: Impact & Blast Radius',
+        type: 'Ripple Analysis',
+        icon: '💥',
+        description: 'Calculate dependency blast radius and upstream caller ripple effects for any selected file or symbol before modifying it.',
+        cta: 'CALCULATE BLAST RADIUS'
       },
-      api: {
-        title: 'Subsystem: src/api',
-        type: 'REST Dispatcher',
-        risk: 'MODERATE CHURN',
-        riskColor: 'var(--accent-amber)',
-        confidence: '94%',
-        files: 'routes.js (342 LOC)',
-        findings: 'Central HTTP REST endpoint dispatcher and static asset server. Handles /api/repository/open, validate, metrics, diagram, and search.'
+      explorer: {
+        title: 'Investigation: Source Explorer',
+        type: 'Code & AST Inspector',
+        icon: '📁',
+        description: 'Browse the repository file hierarchy, inspect extracted classes/functions, and view in-browser source code.',
+        cta: 'OPEN SOURCE EXPLORER'
       },
-      services: {
-        title: 'Subsystem: src/services',
-        type: 'Application Services',
-        risk: 'LOW RISK',
-        riskColor: 'var(--success)',
-        confidence: '97%',
-        files: 'RepositoryService, GitService',
-        findings: 'Encapsulates path validation, repository ingestion orchestration, and strictly read-only Git history extraction.'
+      search: {
+        title: 'Investigation: Forensic Code Search',
+        type: 'Index Query Engine',
+        icon: '🔍',
+        description: 'Query classes, function definitions, exported symbols, and full text across the AST inverted index.',
+        cta: 'LAUNCH FORENSIC SEARCH'
+      },
+      git: {
+        title: 'Investigation: Git Chrono-Strata',
+        type: 'Lineage Timeline',
+        icon: '📜',
+        description: 'Inspect chronological commit lineage, author ownership, and branch history in safe read-only mode.',
+        cta: 'VIEW GIT TIMELINE'
+      },
+      analysis: {
+        title: 'Investigation: Drift & Hotspot Matrix',
+        type: 'Risk Telemetry',
+        icon: '⚡',
+        description: 'Identify high-churn files, cyclomatic complexity spikes, and circular dependency loops.',
+        cta: 'OPEN RISK HOTSPOTS'
+      },
+      archaeology: {
+        title: 'Investigation: Evolutionary Synthesis',
+        type: 'Archaeological Digest',
+        icon: '🏛️',
+        description: 'Synthesize the holistic history of how this software system was constructed from genesis to current strata.',
+        cta: 'SYNTHESIZE ARCHAEOLOGY'
+      },
+      documentation: {
+        title: 'Investigation: Subsystem Docs',
+        type: 'Specification Generator',
+        icon: '📖',
+        description: 'Generate deterministic architecture specifications, subsystem contracts, and exportable Markdown reports.',
+        cta: 'VIEW SPECIFICATIONS'
+      },
+      review: {
+        title: 'Investigation: Automated Code Review',
+        type: 'Heuristic Audit',
+        icon: '🛡️',
+        description: 'Perform an automated structural audit for oversized modules, TODO flags, and maintainability bottlenecks.',
+        cta: 'RUN CODE REVIEW'
       },
       ai: {
-        title: 'Subsystem: src/ai',
-        type: 'Neural Investigator',
-        risk: 'LOW RISK',
-        riskColor: 'var(--accent-neural)',
-        confidence: '95%',
-        files: 'LocalQueryEngine, AIContextPackager',
-        findings: 'Answers natural language archaeological questions and packages structured blast-radius context prompts.'
-      },
-      tests: {
-        title: 'Subsystem: tests/',
-        type: 'Automated Test Harness',
-        risk: 'VERIFIED',
-        riskColor: 'var(--success)',
-        confidence: '100%',
-        files: '13 test suites (28 automated tests)',
-        findings: '100% test pass rate using native node:test runner with zero third-party dependencies.'
+        title: 'Investigation: AI Field Dossier',
+        type: 'Local Neural Q&A',
+        icon: '🤖',
+        description: 'Ask natural language questions about the codebase architecture and package structured prompt context.',
+        cta: 'CONSULT AI DOSSIER'
       }
     };
 
-    const d = dossiers[mod] || dossiers.core;
+    const details = actionDetails[actionId] || actionDetails.architecture;
 
     container.innerHTML = `
       <div class="dossier-blade-header">
-        <h3 class="dossier-blade-title">
-          <span>🤖</span>
-          <span>${d.title}</span>
-        </h3>
-        <span class="landing-card-badge" style="color: ${d.riskColor}; border-color: ${d.riskColor}; font-weight: 800;">${d.risk}</span>
+        <h4 class="dossier-title">
+          <span>${details.icon}</span>
+          <span>${details.title}</span>
+        </h4>
+        <span class="landing-card-badge" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">${details.type}</span>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.84rem;">
-        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: var(--text-muted);">
-          <span>LAYER TYPE:</span>
-          <span style="color: var(--text-primary); font-weight: 600;">${d.type}</span>
+      <div class="dossier-meta-grid">
+        <div class="dossier-meta-item">
+          <span class="dossier-meta-label">Selected Action</span>
+          <span class="dossier-meta-val">${actionId.toUpperCase()}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: var(--text-muted);">
-          <span>AI CONFIDENCE:</span>
-          <span style="color: var(--accent-cyan); font-weight: 700;">${d.confidence}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: var(--text-muted);">
-          <span>ARTIFACTS:</span>
-          <span style="color: var(--text-secondary);">${d.files}</span>
+        <div class="dossier-meta-item">
+          <span class="dossier-meta-label">Engine Status</span>
+          <span class="dossier-meta-val" style="color: var(--success);">ONLINE // READY</span>
         </div>
       </div>
 
-      <div style="background: var(--bg-input); border: 1px solid var(--border-strata); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-top: 4px;">
-        <span style="color: var(--accent-cyan); font-weight: 700; font-family: var(--font-mono);">FIELD NOTE:</span> ${d.findings}
+      <div class="dossier-section">
+        <div class="dossier-section-title">◈ INVESTIGATION PURPOSE:</div>
+        <p class="dossier-findings-text" style="font-size: 0.85rem; line-height: 1.55;">
+          ${details.description}
+        </p>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <button class="btn-primary" id="btn-launch-action" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 0.88rem;">
+          <span>🚀</span>
+          <span>${details.cta}</span>
+        </button>
       </div>
     `;
+
+    container.querySelector('#btn-launch-action').addEventListener('click', () => {
+      window.location.hash = actionId;
+    });
   }
 }

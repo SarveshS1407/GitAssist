@@ -5,10 +5,14 @@ import { Dialog } from './components/Dialog.js';
 import { OverviewView } from './views/OverviewView.js';
 import { ExplorerView } from './views/ExplorerView.js';
 import { ArchitectureView } from './views/ArchitectureView.js';
+import { ImpactView } from './views/ImpactView.js';
 import { GitView } from './views/GitView.js';
 import { SearchView } from './views/SearchView.js';
 import { ContributorsView } from './views/ContributorsView.js';
 import { AnalysisView } from './views/AnalysisView.js';
+import { ArchaeologyView } from './views/ArchaeologyView.js';
+import { DocumentationView } from './views/DocumentationView.js';
+import { ReviewView } from './views/ReviewView.js';
 import { AiView } from './views/AiView.js';
 
 /**
@@ -23,10 +27,14 @@ class App {
       overview: OverviewView,
       explorer: ExplorerView,
       architecture: ArchitectureView,
+      impact: ImpactView,
       git: GitView,
       search: SearchView,
       contributors: ContributorsView,
       analysis: AnalysisView,
+      archaeology: ArchaeologyView,
+      documentation: DocumentationView,
+      review: ReviewView,
       ai: AiView
     };
 

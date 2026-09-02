@@ -10,25 +10,33 @@ export class Sidebar {
 
     this.sections = [
       {
-        title: 'Archaeological Lenses',
+        title: 'Central Command',
         items: [
-          { id: 'overview', label: 'Excavation Holomap', icon: '◈' }
+          { id: 'overview', label: 'Action Carousel', icon: '◈' }
         ]
       },
       {
-        title: 'Explore Strata',
+        title: 'Structural Lenses',
         items: [
-          { id: 'explorer', label: 'Sector Explorer', icon: '📁' },
-          { id: 'architecture', label: 'Dependency Radar', icon: '🕸️' },
-          { id: 'git', label: 'Chrono-Strata Log', icon: '📜' }
+          { id: 'architecture', label: 'Architecture Topology', icon: '🕸️' },
+          { id: 'impact', label: 'Impact & Blast Radius', icon: '💥' },
+          { id: 'explorer', label: 'Source Explorer', icon: '📁' }
         ]
       },
       {
-        title: 'Investigate',
+        title: 'Forensic Lenses',
         items: [
           { id: 'search', label: 'Forensic Code Tracer', icon: '🔍' },
-          { id: 'analysis', label: 'Risk & Churn Hotspots', icon: '⚡' },
-          { id: 'contributors', label: 'Dig Contributors', icon: '👥' },
+          { id: 'git', label: 'Git Chrono-Strata', icon: '📜' },
+          { id: 'analysis', label: 'Drift & Risk Hotspots', icon: '⚡' },
+          { id: 'archaeology', label: 'Evolutionary Synthesis', icon: '🏛️' }
+        ]
+      },
+      {
+        title: 'Intelligence & Audit',
+        items: [
+          { id: 'documentation', label: 'Subsystem Docs', icon: '📖' },
+          { id: 'review', label: 'Heuristic Review', icon: '🛡️' },
           { id: 'ai', label: 'AI Field Dossier', icon: '🤖' }
         ]
       }
