@@ -450,7 +450,12 @@ export class ApiRouter {
           '.svg': 'image/svg+xml',
           '.png': 'image/png'
         };
-        res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' });
+        res.writeHead(200, {
+          'Content-Type': mimeTypes[ext] || 'text/plain',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        });
         res.end(content);
         return;
       } catch (err) {

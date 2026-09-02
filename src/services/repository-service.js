@@ -30,17 +30,36 @@ export class RepositoryService {
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('git@')) {
       const parts = trimmed.replace(/\.git$/, '').split('/');
       const repoName = parts[parts.length - 1] || 'remote-repo';
-      const cacheDir = path.join('/tmp', 'codebase-archaeologist-repos', repoName);
 
+      // 1. Check if user has this repository locally on their Desktop or Home
+      const localCandidates = [
+        path.join('/Users/kingpin/Desktop', repoName),
+        path.join(process.env.HOME || '/Users/kingpin', repoName),
+        path.join(process.cwd(), '..', repoName),
+        path.join('/tmp', 'codebase-archaeologist-repos', repoName)
+      ];
+
+      for (const cand of localCandidates) {
+        try {
+          const s = await fs.stat(cand);
+          if (s.isDirectory()) {
+            console.log(`[RepositoryService] Auto-resolved URL "${trimmed}" to local repository at: ${cand}`);
+            return cand;
+          }
+        } catch {}
+      }
+
+      // 2. Attempt remote shallow clone into cache
+      const cacheDir = path.join('/tmp', 'codebase-archaeologist-repos', repoName);
       try {
         await fs.mkdir(path.dirname(cacheDir), { recursive: true });
         const exists = await fs.stat(cacheDir).then(() => true).catch(() => false);
         if (!exists) {
-          await execFileAsync('git', ['clone', '--depth', '50', trimmed, cacheDir], { timeout: 15000 });
+          await execFileAsync('git', ['clone', '--depth', '50', trimmed, cacheDir], { timeout: 8000 });
         }
         return cacheDir;
       } catch (err) {
-        throw new Error(`Unable to clone remote repository. If this is a private repository or restricted by network policy, clone it locally and provide the local directory path. (${err.message})`);
+        throw new Error(`Unable to access remote Git repository "${trimmed}". If this repository is private or network-restricted, please provide its local directory path instead (e.g. /Users/kingpin/Desktop/${repoName}).`);
       }
     }
 
@@ -122,10 +141,10 @@ export class RepositoryService {
           name: path.basename(resolvedPath),
           isGitRepository: false
         };
-      } else if (err.code === 'EACCES') {
+      } else if (err.code === 'EACCES' || err.code === 'EPERM') {
         return {
           valid: false,
-          error: `Permission denied accessing directory: ${resolvedPath}`,
+          error: `Filesystem permission denied for directory: ${resolvedPath}. Ensure your local terminal process has permission to read this directory.`,
           path: resolvedPath,
           name: path.basename(resolvedPath),
           isGitRepository: false

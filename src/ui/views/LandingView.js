@@ -63,10 +63,13 @@ export class LandingView {
           <!-- Inline Validation Feedback -->
           <div id="landing-validation-msg" style="display: none; color: var(--danger); font-size: 0.78rem; font-family: var(--font-mono); text-align: left;"></div>
           
-          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.76rem; color: var(--text-muted);">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-size: 0.76rem; color: var(--text-muted);">
             <span>Quick presets:</span>
             <button type="button" id="btn-preset-current" class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
-              ⚡ Current GitAssist Repo (<code>/Users/kingpin/Desktop/gitassist</code>)
+              ⚡ GitAssist Repo (<code>/Users/kingpin/Desktop/gitassist</code>)
+            </button>
+            <button type="button" id="btn-preset-veritas" class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
+              ⚡ Veritas Mortis (<code>/Users/kingpin/Desktop/veritas-mortis</code>)
             </button>
           </div>
         </div>
@@ -100,7 +103,7 @@ export class LandingView {
               <span>◈</span>
               <span>Excavation Engines</span>
             </h3>
-            <span class="landing-card-badge">10 Lenses</span>
+            <span class="landing-card-badge">16 Lenses</span>
           </div>
           <div class="landing-card-content">
             <ul class="placeholder-list">
@@ -135,7 +138,8 @@ export class LandingView {
 
     const input = container.querySelector('#landing-repo-input');
     const openBtn = container.querySelector('#btn-open-repo');
-    const presetBtn = container.querySelector('#btn-preset-current');
+    const presetCurrentBtn = container.querySelector('#btn-preset-current');
+    const presetVeritasBtn = container.querySelector('#btn-preset-veritas');
     const dismissBtn = container.querySelector('#btn-dismiss-error');
     const valMsg = container.querySelector('#landing-validation-msg');
 
@@ -145,7 +149,7 @@ export class LandingView {
       });
     }
 
-    const triggerExcavation = () => {
+    const triggerExcavation = async () => {
       const selectedPath = input.value.trim();
 
       if (!selectedPath) {
@@ -166,10 +170,24 @@ export class LandingView {
       openBtn.disabled = true;
       openBtn.style.opacity = '0.75';
 
-      if (this.onQuickAnalyze) {
-        this.onQuickAnalyze(selectedPath);
-      } else if (this.onOpenRepository) {
-        this.onOpenRepository();
+      try {
+        if (this.onQuickAnalyze) {
+          await this.onQuickAnalyze(selectedPath);
+        } else if (this.onOpenRepository) {
+          await this.onOpenRepository();
+        }
+      } catch (err) {
+        console.error('[Landing Excavate Error]', err);
+        if (valMsg) {
+          valMsg.textContent = `⚠️ ${err.message}`;
+          valMsg.style.display = 'block';
+        }
+      } finally {
+        if (openBtn) {
+          openBtn.innerHTML = '<span>🚀</span><span>EXCAVATE</span>';
+          openBtn.disabled = false;
+          openBtn.style.opacity = '1';
+        }
       }
     };
 
@@ -187,11 +205,21 @@ export class LandingView {
       }
     });
 
-    presetBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      input.value = '/Users/kingpin/Desktop/gitassist';
-      triggerExcavation();
-    });
+    if (presetCurrentBtn) {
+      presetCurrentBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        input.value = '/Users/kingpin/Desktop/gitassist';
+        triggerExcavation();
+      });
+    }
+
+    if (presetVeritasBtn) {
+      presetVeritasBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        input.value = '/Users/kingpin/Desktop/veritas-mortis';
+        triggerExcavation();
+      });
+    }
 
     this.element = container;
     return container;
