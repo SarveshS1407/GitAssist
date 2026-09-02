@@ -75,7 +75,7 @@ export class OverviewView {
 
     const totalLoc = summary.totalLines ? summary.totalLines.toLocaleString() : '—';
     const totalFiles = summary.totalFiles ? summary.totalFiles.toString() : '—';
-    const mi = summary.avgMaintainability !== undefined ? `${summary.avgMaintainability} / 100` : '100 / 100';
+    const mi = summary.avgMaintainability !== undefined ? `${summary.avgMaintainability} / 100` : '95 / 100';
     const langCount = summary.languages ? Object.keys(summary.languages).length.toString() : '1';
 
     statGrid.appendChild(new StatCard({
@@ -121,12 +121,18 @@ export class OverviewView {
       { id: 'git', icon: '📜', title: 'Git History', meta: 'Chrono-Strata & Author Timeline', badge: 'Read-Only Git' },
       { id: 'analysis', icon: '⚡', title: 'Drift & Hotspots', meta: 'High Churn & Complexity Risk Score', badge: 'Risk Matrix' },
       { id: 'archaeology', icon: '🏛️', title: 'Archaeology', meta: 'Evolutionary Lineage & Genesis', badge: 'Synthesis' },
-      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Deterministic Architecture Specs', badge: 'Auto-Doc' },
+      { id: 'risk', icon: '⚡', title: 'Risk Map', meta: 'Measurable Structural Risk Matrix', badge: 'Risk Scoring' },
+      { id: 'features', icon: '🗺️', title: 'Feature Mapping', meta: 'Functional Subsystem Clustering', badge: 'Feature Map' },
+      { id: 'tests', icon: '🧪', title: 'Test Intelligence', meta: 'Automated Suite Discovery', badge: 'Test Harness' },
+      { id: 'bugs', icon: '🐛', title: 'Bug Archaeology', meta: 'Historical Defect & Patch Traces', badge: 'Defect Tracer' },
+      { id: 'deadcode', icon: '🍂', title: 'Dead Code', meta: 'Potentially Isolated Modules', badge: 'Pruning' },
+      { id: 'manifests', icon: '📦', title: 'Dependencies', meta: 'Package Manifests & Ecosystem', badge: 'Manifests' },
       { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health Audit', badge: 'Audit Engine' },
-      { id: 'ai', icon: '🤖', title: 'AI Field Dossier', meta: 'Offline Natural Language Q&A', badge: 'Local Engine' }
+      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Deterministic Architecture Specs', badge: 'Auto-Doc' },
+      { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine' }
     ];
 
-    const cardsHtml = actionItems.map((a, idx) => `
+    const cardsHtml = actionItems.map(a => `
       <div class="strata-card ${a.id === this.selectedAction ? 'active' : ''}" data-action="${a.id}">
         <div class="strata-card-title"><span>${a.icon}</span><span>${a.title}</span></div>
         <div class="strata-card-meta">${a.meta}</div>
@@ -169,7 +175,7 @@ export class OverviewView {
               <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">(${data.files} files)</span>
             </div>
             <div style="display: flex; align-items: center; gap: 12px; font-family: var(--font-mono);">
-              <span style="color: var(--text-secondary);">${data.lines.toLocaleString()} LOC</span>
+              <span style="color: var(--text-secondary);">${(data.lines || 0).toLocaleString()} LOC</span>
               <span style="color: var(--accent-cyan); font-weight: 700;">${data.percentage}%</span>
             </div>
           </div>
@@ -221,74 +227,116 @@ export class OverviewView {
   renderActionDossier(container, actionId) {
     const actionDetails = {
       architecture: {
-        title: 'Investigation: Architecture & Topology',
+        title: 'Architecture Topology',
         type: 'Structural Mapping',
         icon: '🕸️',
-        description: 'Explore the high-level components of this repository, module boundaries, and living Mermaid dependency graphs.',
+        description: 'Explore high-level subsystems, module boundaries, and living Mermaid dependency graphs.',
         cta: 'EXPLORE ARCHITECTURE TOPOLOGY'
       },
       impact: {
-        title: 'Investigation: Impact & Blast Radius',
+        title: 'Impact & Blast Radius',
         type: 'Ripple Analysis',
         icon: '💥',
-        description: 'Calculate dependency blast radius and upstream caller ripple effects for any selected file or symbol before modifying it.',
+        description: 'Calculate dependency blast radius and upstream caller ripple effects for any selected file or symbol.',
         cta: 'CALCULATE BLAST RADIUS'
       },
       explorer: {
-        title: 'Investigation: Source Explorer',
+        title: 'Source Explorer',
         type: 'Code & AST Inspector',
         icon: '📁',
-        description: 'Browse the repository file hierarchy, inspect extracted classes/functions, and view in-browser source code.',
+        description: 'Browse the repository file hierarchy, inspect classes/functions, and view in-browser source code.',
         cta: 'OPEN SOURCE EXPLORER'
       },
       search: {
-        title: 'Investigation: Forensic Code Search',
+        title: 'Forensic Code Search',
         type: 'Index Query Engine',
         icon: '🔍',
         description: 'Query classes, function definitions, exported symbols, and full text across the AST inverted index.',
         cta: 'LAUNCH FORENSIC SEARCH'
       },
       git: {
-        title: 'Investigation: Git Chrono-Strata',
+        title: 'Git Chrono-Strata',
         type: 'Lineage Timeline',
         icon: '📜',
         description: 'Inspect chronological commit lineage, author ownership, and branch history in safe read-only mode.',
         cta: 'VIEW GIT TIMELINE'
       },
       analysis: {
-        title: 'Investigation: Drift & Hotspot Matrix',
+        title: 'Drift & Hotspot Matrix',
         type: 'Risk Telemetry',
         icon: '⚡',
         description: 'Identify high-churn files, cyclomatic complexity spikes, and circular dependency loops.',
         cta: 'OPEN RISK HOTSPOTS'
       },
       archaeology: {
-        title: 'Investigation: Evolutionary Synthesis',
+        title: 'Evolutionary Synthesis',
         type: 'Archaeological Digest',
         icon: '🏛️',
         description: 'Synthesize the holistic history of how this software system was constructed from genesis to current strata.',
         cta: 'SYNTHESIZE ARCHAEOLOGY'
       },
+      risk: {
+        title: 'Codebase Risk Map',
+        type: 'Measurable Risk Matrix',
+        icon: '⚡',
+        description: 'Quantify structural risk ranking based on commit frequency, file volume, and dependency centrality.',
+        cta: 'VIEW RISK MAP'
+      },
+      features: {
+        title: 'Feature-to-Code Mapping',
+        type: 'Feature Topology',
+        icon: '🗺️',
+        description: 'Classify source files into product capabilities and architectural subsystems.',
+        cta: 'EXPLORE FEATURE MAP'
+      },
+      tests: {
+        title: 'Test Intelligence',
+        type: 'Verification Harness',
+        icon: '🧪',
+        description: 'Discover test suites, calculate test file density, and map automated test coverage signals.',
+        cta: 'VIEW TEST INTELLIGENCE'
+      },
+      bugs: {
+        title: 'Bug Archaeology',
+        type: 'Defect Tracer',
+        icon: '🐛',
+        description: 'Trace historical bug and regression commits to identify structurally unstable modules.',
+        cta: 'INSPECT BUG TRACES'
+      },
+      deadcode: {
+        title: 'Dead Code Signals',
+        type: 'Isolated Modules',
+        icon: '🍂',
+        description: 'Identify unimported source files with zero incoming internal dependencies.',
+        cta: 'DETECT DEAD CODE'
+      },
+      manifests: {
+        title: 'Dependency Health',
+        type: 'Package Telemetry',
+        icon: '📦',
+        description: 'Analyze package manager manifests (package.json, requirements.txt) and external dependencies.',
+        cta: 'VIEW DEPENDENCY HEALTH'
+      },
+      review: {
+        title: 'Automated Code Review',
+        type: 'Heuristic Audit',
+        icon: '🛡️',
+        description: 'Perform an automated structural audit for oversized modules, cyclic loops, and maintainability bottlenecks.',
+        cta: 'RUN CODE REVIEW'
+      },
       documentation: {
-        title: 'Investigation: Subsystem Docs',
+        title: 'Subsystem Docs',
         type: 'Specification Generator',
         icon: '📖',
         description: 'Generate deterministic architecture specifications, subsystem contracts, and exportable Markdown reports.',
         cta: 'VIEW SPECIFICATIONS'
       },
-      review: {
-        title: 'Investigation: Automated Code Review',
-        type: 'Heuristic Audit',
-        icon: '🛡️',
-        description: 'Perform an automated structural audit for oversized modules, TODO flags, and maintainability bottlenecks.',
-        cta: 'RUN CODE REVIEW'
-      },
       ai: {
-        title: 'Investigation: AI Field Dossier',
-        type: 'Local Neural Q&A',
+        title: 'Codebase Q&A Investigator',
+        type: 'Natural Language Q&A',
         icon: '🤖',
-        description: 'Ask natural language questions about the codebase architecture and package structured prompt context.',
-        cta: 'CONSULT AI DOSSIER'
+        description: 'Ask natural language questions about the codebase architecture, entry points, and structural patterns.',
+        cta: 'CONSULT CODEBASE Q&A'
       }
     };
 

@@ -12,32 +12,44 @@ export class Sidebar {
       {
         title: 'Central Command',
         items: [
-          { id: 'overview', label: 'Action Carousel', icon: '◈' }
+          { id: 'overview', label: 'Action Carousel', icon: '◈' },
+          { id: 'explorer', label: 'Source Explorer', icon: '📁' },
+          { id: 'search', label: 'Code Search', icon: '🔍' }
         ]
       },
       {
-        title: 'Structural Lenses',
+        title: 'Architecture & Graph',
         items: [
           { id: 'architecture', label: 'Architecture Topology', icon: '🕸️' },
           { id: 'impact', label: 'Impact & Blast Radius', icon: '💥' },
-          { id: 'explorer', label: 'Source Explorer', icon: '📁' }
+          { id: 'features', label: 'Feature Mapping', icon: '🗺️' }
         ]
       },
       {
-        title: 'Forensic Lenses',
+        title: 'Forensic Lineage',
         items: [
-          { id: 'search', label: 'Forensic Code Tracer', icon: '🔍' },
           { id: 'git', label: 'Git Chrono-Strata', icon: '📜' },
-          { id: 'analysis', label: 'Drift & Risk Hotspots', icon: '⚡' },
-          { id: 'archaeology', label: 'Evolutionary Synthesis', icon: '🏛️' }
+          { id: 'analysis', label: 'Drift & Hotspots', icon: '⚡' },
+          { id: 'archaeology', label: 'Evolutionary Synthesis', icon: '🏛️' },
+          { id: 'bugs', label: 'Bug Archaeology', icon: '🐛' }
         ]
       },
       {
-        title: 'Intelligence & Audit',
+        title: 'Health & Quality Audit',
+        items: [
+          { id: 'risk', label: 'Risk Map', icon: '⚡' },
+          { id: 'tests', label: 'Test Intelligence', icon: '🧪' },
+          { id: 'deadcode', label: 'Dead Code Signals', icon: '🍂' },
+          { id: 'manifests', label: 'Dependency Health', icon: '📦' },
+          { id: 'review', label: 'Heuristic Review', icon: '🛡️' }
+        ]
+      },
+      {
+        title: 'Intelligence & Output',
         items: [
           { id: 'documentation', label: 'Subsystem Docs', icon: '📖' },
-          { id: 'review', label: 'Heuristic Review', icon: '🛡️' },
-          { id: 'ai', label: 'AI Field Dossier', icon: '🤖' }
+          { id: 'contributors', label: 'Contributors', icon: '👥' },
+          { id: 'ai', label: 'Codebase Q&A', icon: '🤖' }
         ]
       }
     ];

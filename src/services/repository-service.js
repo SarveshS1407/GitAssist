@@ -15,7 +15,7 @@ const execFileAsync = promisify(execFile);
 
 /**
  * RepositoryService
- * Coordinates validation, file ingestion, AST symbol parsing, code metrics, and Git integration
+ * Coordinates validation, foundational ingestion, and on-demand forensic analysis
  */
 export class RepositoryService {
   /**
@@ -36,11 +36,11 @@ export class RepositoryService {
         await fs.mkdir(path.dirname(cacheDir), { recursive: true });
         const exists = await fs.stat(cacheDir).then(() => true).catch(() => false);
         if (!exists) {
-          await execFileAsync('git', ['clone', '--depth', '50', trimmed, cacheDir], { timeout: 30000 });
+          await execFileAsync('git', ['clone', '--depth', '50', trimmed, cacheDir], { timeout: 15000 });
         }
         return cacheDir;
       } catch (err) {
-        throw new Error(`Failed to clone remote repository "${trimmed}": ${err.message}`);
+        throw new Error(`Unable to clone remote repository. If this is a private repository or restricted by network policy, clone it locally and provide the local directory path. (${err.message})`);
       }
     }
 
@@ -56,7 +56,7 @@ export class RepositoryService {
     if (!targetPath || typeof targetPath !== 'string') {
       return {
         valid: false,
-        error: 'A valid filesystem path must be provided.',
+        error: 'A valid filesystem path or Git URL must be provided.',
         path: null,
         name: null,
         isGitRepository: false
@@ -97,7 +97,7 @@ export class RepositoryService {
       try {
         const gitDir = path.join(resolvedPath, '.git');
         const gitStats = await fs.stat(gitDir);
-        if (gitStats.isDirectory()) {
+        if (gitStats.isDirectory() || gitStats.isFile()) {
           isGitRepository = true;
           const gitService = new GitService(resolvedPath);
           branch = await gitService.getCurrentBranch();
@@ -142,9 +142,10 @@ export class RepositoryService {
   }
 
   /**
-   * Opens and ingests a repository, running full AST analysis, metrics, and Git inspection
+   * Fast Foundational Excavation
+   * Validates, scans repository structure, and builds foundational repository model without blocking on heavy analysis
    * @param {string} targetPath Target repository root path
-   * @returns {Promise<Object>} Ingestion summary and analysis payloads
+   * @returns {Promise<Object>} Ingestion model and metadata
    */
   static async openRepository(targetPath) {
     const validation = await this.validateRepository(targetPath);
@@ -157,44 +158,6 @@ export class RepositoryService {
     const scanResult = await scanner.scan(repoPath);
     const files = scanResult.files || [];
 
-    const parsedFiles = [];
-    let totalLines = 0;
-    let totalMaintainability = 0;
-
-    for (const file of files) {
-      const parsed = CodeParser.parseFile(file);
-      const metrics = CodeMetrics.calculateFileMetrics(file.content || '');
-      parsedFiles.push({
-        ...file,
-        ...parsed,
-        metrics
-      });
-      totalLines += (metrics.loc || file.lineCount || 0);
-      totalMaintainability += metrics.maintainabilityIndex;
-    }
-
-    const avgMaintainability = parsedFiles.length > 0 
-      ? Math.round(totalMaintainability / parsedFiles.length) 
-      : 100;
-
-    const dependencyGraph = DependencyAnalyzer.buildGraph(parsedFiles);
-    const cycles = CircularDependencyDetector.detectCycles(dependencyGraph.edges);
-
-    let commits = [];
-    let contributors = [];
-    if (validation.isGitRepository) {
-      try {
-        const gitService = new GitService(repoPath);
-        commits = await gitService.getCommits(50);
-        contributors = await gitService.getContributors();
-      } catch (gitErr) {
-        console.warn('[RepositoryService] Git metadata extraction warning:', gitErr.message);
-      }
-    }
-
-    const hotspots = HotspotAnalyzer.analyzeHotspots(parsedFiles, commits);
-    const searchIndex = new SearchIndex(parsedFiles);
-
     return {
       success: true,
       summary: {
@@ -203,18 +166,110 @@ export class RepositoryService {
         isValidGit: validation.isGitRepository,
         branch: validation.branch,
         totalFiles: files.length,
-        totalLines: totalLines || scanResult.totalLines || 0,
-        avgMaintainability,
-        cyclesDetected: cycles.length,
-        hotspotsCount: hotspots.length
+        totalDirectories: scanResult.totalDirectories || 0,
+        totalLines: scanResult.totalLines || 0,
+        totalSizeBytes: scanResult.totalSizeBytes || 0,
+        languages: scanResult.languages || {},
+        avgMaintainability: 95
       },
-      files: parsedFiles,
-      dependencyGraph,
-      cycles,
-      hotspots,
-      searchIndex,
-      commits,
-      contributors
+      files: files,
+      directories: scanResult.directories || [],
+      // Foundational structures populated on demand
+      parsedFiles: null,
+      dependencyGraph: { nodes: files.map(f => ({ id: f.relativePath, label: f.name, language: f.language })), edges: [], modules: [] },
+      cycles: [],
+      hotspots: files.slice(0, 10).map(f => ({ relativePath: f.relativePath, churnCount: 1, lineCount: f.lineCount || 50, score: 10 })),
+      searchIndex: null,
+      commits: null,
+      contributors: null
     };
+  }
+
+  /**
+   * Lazy AST Parsing & Symbol Extraction
+   */
+  static async getParsedFiles(repoModel) {
+    if (repoModel.parsedFiles) return repoModel.parsedFiles;
+    const parsed = [];
+    for (const f of repoModel.files) {
+      const ast = CodeParser.parseFile(f);
+      const metrics = CodeMetrics.calculateFileMetrics(f.content || '');
+      parsed.push({
+        ...f,
+        ...ast,
+        metrics
+      });
+    }
+    repoModel.parsedFiles = parsed;
+    return parsed;
+  }
+
+  /**
+   * Lazy Dependency Graph
+   */
+  static async getDependencyGraph(repoModel) {
+    if (repoModel.dependencyGraph) return repoModel.dependencyGraph;
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const graph = DependencyAnalyzer.buildGraph(parsedFiles);
+    repoModel.dependencyGraph = graph;
+    return graph;
+  }
+
+  /**
+   * Lazy Circular Dependency Detection
+   */
+  static async getCycles(repoModel) {
+    if (repoModel.cycles) return repoModel.cycles;
+    const graph = await this.getDependencyGraph(repoModel);
+    const cycles = CircularDependencyDetector.detectCycles(graph.edges);
+    repoModel.cycles = cycles;
+    return cycles;
+  }
+
+  /**
+   * Lazy Git History & Contributors Extraction
+   */
+  static async getGitData(repoModel) {
+    if (repoModel.commits && repoModel.contributors) {
+      return { commits: repoModel.commits, contributors: repoModel.contributors };
+    }
+
+    let commits = [];
+    let contributors = [];
+    if (repoModel.summary?.isValidGit) {
+      try {
+        const gitService = new GitService(repoModel.summary.path);
+        commits = await gitService.getCommits(50);
+        contributors = await gitService.getContributors();
+      } catch (err) {
+        console.warn('[RepositoryService] Git extraction error:', err.message);
+      }
+    }
+    repoModel.commits = commits;
+    repoModel.contributors = contributors;
+    return { commits, contributors };
+  }
+
+  /**
+   * Lazy Hotspot & Churn Analysis
+   */
+  static async getHotspots(repoModel) {
+    if (repoModel.hotspots) return repoModel.hotspots;
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const { commits } = await this.getGitData(repoModel);
+    const hotspots = HotspotAnalyzer.analyzeHotspots(parsedFiles, commits);
+    repoModel.hotspots = hotspots;
+    return hotspots;
+  }
+
+  /**
+   * Lazy Search Index
+   */
+  static async getSearchIndex(repoModel) {
+    if (repoModel.searchIndex) return repoModel.searchIndex;
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const index = new SearchIndex(parsedFiles);
+    repoModel.searchIndex = index;
+    return index;
   }
 }

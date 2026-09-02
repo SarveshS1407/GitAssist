@@ -11,6 +11,12 @@ import { SearchView } from './views/SearchView.js';
 import { ContributorsView } from './views/ContributorsView.js';
 import { AnalysisView } from './views/AnalysisView.js';
 import { ArchaeologyView } from './views/ArchaeologyView.js';
+import { RiskView } from './views/RiskView.js';
+import { FeatureMapView } from './views/FeatureMapView.js';
+import { TestIntelligenceView } from './views/TestIntelligenceView.js';
+import { BugArchaeologyView } from './views/BugArchaeologyView.js';
+import { DeadCodeView } from './views/DeadCodeView.js';
+import { ManifestView } from './views/ManifestView.js';
 import { DocumentationView } from './views/DocumentationView.js';
 import { ReviewView } from './views/ReviewView.js';
 import { AiView } from './views/AiView.js';
@@ -33,6 +39,12 @@ class App {
       contributors: ContributorsView,
       analysis: AnalysisView,
       archaeology: ArchaeologyView,
+      risk: RiskView,
+      features: FeatureMapView,
+      tests: TestIntelligenceView,
+      bugs: BugArchaeologyView,
+      deadcode: DeadCodeView,
+      manifests: ManifestView,
       documentation: DocumentationView,
       review: ReviewView,
       ai: AiView
@@ -108,7 +120,7 @@ class App {
   async openRepository(selectedPath) {
     if (!selectedPath) return;
 
-    this.repositoryState.setIndexing(true, 10);
+    this.repositoryState.setIndexing(true, 25);
     this.router.navigate('overview');
 
     try {
