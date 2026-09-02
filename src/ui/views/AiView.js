@@ -2,7 +2,7 @@ import { PageHeader } from '../components/PageHeader.js';
 import { EmptyState } from '../components/EmptyState.js';
 
 /**
- * AI Archaeologist View
+ * GitAssist AI Investigator View
  * Forensic investigation dossier, natural language query console, and blast radius packager
  */
 export class AiView {
@@ -15,7 +15,7 @@ export class AiView {
     container.className = 'view-container';
 
     const header = new PageHeader({
-      title: 'AI Archaeologist Investigation Dossier',
+      title: 'GitAssist AI Investigation Dossier',
       description: 'Local semantic query engine, evidence synthesis, and prompt blast radius packager.',
       badge: 'Local Neural Q&A'
     });
@@ -25,7 +25,7 @@ export class AiView {
       container.appendChild(new EmptyState({
         icon: '🤖',
         title: 'NO REPOSITORY LOADED',
-        description: 'Open a local repository from the Central Telemetry overview to activate the AI Archaeologist Dossier.'
+        description: 'Open a local repository from the Central Telemetry overview to activate the GitAssist AI Dossier.'
       }).render());
       return container;
     }

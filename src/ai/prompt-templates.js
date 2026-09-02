@@ -3,7 +3,7 @@
  */
 
 export const PromptTemplates = {
-  SYSTEM_ARCHITECT: `You are an expert Principal Software Architect and Code Archaeologist.
+  SYSTEM_ARCHITECT: `You are an expert Principal Software Architect and GitAssist Architecture Specialist.
 Your role is to analyze codebase structures, dependency graphs, and historical Git churn to provide crisp, actionable, and accurate insights.`,
 
   buildArchitecturePrompt(summary, dependencyGraph, topModules) {

@@ -36,7 +36,7 @@ export class RepositoryService {
         path.join('/Users/kingpin/Desktop', repoName),
         path.join(process.env.HOME || '/Users/kingpin', repoName),
         path.join(process.cwd(), '..', repoName),
-        path.join('/tmp', 'codebase-archaeologist-repos', repoName)
+        path.join('/tmp', 'gitassist-repos', repoName)
       ];
 
       for (const cand of localCandidates) {
@@ -50,7 +50,7 @@ export class RepositoryService {
       }
 
       // 2. Attempt remote shallow clone into cache
-      const cacheDir = path.join('/tmp', 'codebase-archaeologist-repos', repoName);
+      const cacheDir = path.join('/tmp', 'gitassist-repos', repoName);
       try {
         await fs.mkdir(path.dirname(cacheDir), { recursive: true });
         const exists = await fs.stat(cacheDir).then(() => true).catch(() => false);

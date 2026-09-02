@@ -1,4 +1,4 @@
-# 🏛️ Codebase Archaeologist (GitAssist)
+# ⚡ GitAssist
 
 [![CI](https://github.com/SarveshS1407/GitAssist/actions/workflows/ci.yml/badge.svg)](https://github.com/SarveshS1407/GitAssist/actions)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -61,7 +61,7 @@ npm install
 npm run dev
 # or: node src/server.js
 ```
-Open your browser at **`http://localhost:3333`** to enter the Codebase Archaeologist.
+Open your browser at **`http://localhost:3333`** to enter GitAssist.
 
 ### 3. Excavate Any Repository
 - Paste any local filesystem path (e.g. `/Users/username/Desktop/my-project`) or GitHub URL.

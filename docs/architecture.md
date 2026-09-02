@@ -1,7 +1,7 @@
-# 🏛️ Codebase Archaeologist — System Architecture
+# ⚡ GitAssist — System Architecture
 
 ## Overview
-**Codebase Archaeologist** is a local-first, zero-dependency software archaeology platform designed to inspect, analyze, and map unknown codebases.
+**GitAssist** is a local-first, zero-dependency software archaeology platform designed to inspect, analyze, and map unknown codebases.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐

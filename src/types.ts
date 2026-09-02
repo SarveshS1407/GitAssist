@@ -1,5 +1,5 @@
 /**
- * Codebase Archaeologist - Core Data Types & Interfaces
+ * GitAssist - Core Data Types & Interfaces
  */
 
 export interface RepositorySummary {

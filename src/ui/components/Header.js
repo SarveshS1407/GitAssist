@@ -31,9 +31,9 @@ export class Header {
 
     header.innerHTML = `
       <div class="header-left">
-        <a class="app-brand" id="brand-link" title="Codebase Archaeologist Home">
-          <span class="brand-icon">🏛️</span>
-          <span>Codebase Archaeologist</span>
+        <a class="app-brand" id="brand-link" title="GitAssist Home">
+          <span class="brand-icon">⚡</span>
+          <span>GitAssist</span>
           <span class="brand-badge">Local-First</span>
         </a>
         <div id="header-repo-badge-container"></div>

@@ -36,8 +36,8 @@ export class LandingView {
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
           <span class="brand-badge" style="font-size: 0.72rem; padding: 3px 8px;">LOCAL-FIRST // ZERO-CLOUD // FORENSICS</span>
         </div>
-        <div class="hero-icon">🏛️</div>
-        <h1 class="hero-title">Codebase Archaeologist</h1>
+        <div class="hero-icon">⚡</div>
+        <h1 class="hero-title text-gradient-cyber">GitAssist</h1>
         <p class="hero-description">
           Analyze your codebase, understand its architecture, trace AST relationships, explore Git chronology, and uncover structural dependencies—100% offline.
         </p>
