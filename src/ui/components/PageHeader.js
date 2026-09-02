@@ -3,7 +3,7 @@
  * Renders consistent titles, descriptions, and optional action buttons/badges
  */
 export class PageHeader {
-  constructor({ title, description, badge, actions = [] }) {
+  constructor({ title, description, badge, actions = [] } = {}) {
     this.title = title;
     this.description = description;
     this.badge = badge;

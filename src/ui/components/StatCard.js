@@ -3,7 +3,7 @@
  * Reusable metric card displaying key indicators (LOC, files, complexity, commits)
  */
 export class StatCard {
-  constructor({ label, value, subtext, icon, trend }) {
+  constructor({ label, value, subtext, icon, trend } = {}) {
     this.label = label;
     this.value = value;
     this.subtext = subtext;

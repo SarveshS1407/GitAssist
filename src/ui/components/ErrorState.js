@@ -3,7 +3,7 @@
  * Displays user-friendly error banners and retry actions
  */
 export class ErrorState {
-  constructor({ title = 'Error Loading Repository', message, onRetry }) {
+  constructor({ title = 'Error Loading Repository', message, onRetry } = {}) {
     this.title = title;
     this.message = message || 'An unexpected error occurred while processing the repository.';
     this.onRetry = onRetry;

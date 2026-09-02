@@ -3,7 +3,7 @@
  * Displays a phased Cyber-Forensic Archaeological Scan HUD
  */
 export class LoadingState {
-  constructor({ message = 'EXECUTING ARCHAEOLOGICAL SCAN...', subtext = 'Mapping AST symbols, dependency loops, and Git churn...' }) {
+  constructor({ message = 'EXECUTING ARCHAEOLOGICAL SCAN...', subtext = 'Mapping AST symbols, dependency loops, and Git churn...' } = {}) {
     this.message = message;
     this.subtext = subtext;
   }

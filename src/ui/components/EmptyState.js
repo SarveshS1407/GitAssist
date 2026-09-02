@@ -3,7 +3,7 @@
  * Standard empty state card for views when data is absent or feature is not yet loaded
  */
 export class EmptyState {
-  constructor({ icon = '📭', title, description, badge = 'Pending Repository Connection', actionText, onAction }) {
+  constructor({ icon = '📭', title, description, badge = 'Pending Repository Connection', actionText, onAction } = {}) {
     this.icon = icon;
     this.title = title;
     this.description = description;
