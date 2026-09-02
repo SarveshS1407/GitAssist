@@ -9,9 +9,10 @@ import { ErrorState } from '../components/ErrorState.js';
  * Central Archaeological Strata Holomap & Live Artifact Dossier Console
  */
 export class OverviewView {
-  constructor({ repositoryState, onOpenRepository }) {
+  constructor({ repositoryState, onOpenRepository, onQuickAnalyze }) {
     this.repositoryState = repositoryState;
     this.onOpenRepository = onOpenRepository;
+    this.onQuickAnalyze = onQuickAnalyze;
     this.selectedSubsystem = 'core';
   }
 
@@ -36,9 +37,12 @@ export class OverviewView {
       return container;
     }
 
-    // 3. Unloaded Landing State
+    // 3. Dedicated Landing Homepage State
     if (!this.repositoryState || !this.repositoryState.isLoaded) {
-      return new LandingView({ onOpenRepository: this.onOpenRepository }).render();
+      return new LandingView({
+        onOpenRepository: this.onOpenRepository,
+        onQuickAnalyze: this.onQuickAnalyze
+      }).render();
     }
 
     // 4. Active Archaeological Telemetry & Strata Holomap

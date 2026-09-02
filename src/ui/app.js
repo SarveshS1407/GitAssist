@@ -186,7 +186,8 @@ class App {
     const ViewClass = this.routes[routeId] || OverviewView;
     const viewInstance = new ViewClass({
       repositoryState: this.repositoryState.getState(),
-      onOpenRepository: () => this.promptOpenRepository()
+      onOpenRepository: () => this.promptOpenRepository(),
+      onQuickAnalyze: (path) => this.openRepository(path)
     });
 
     this.shell.setContent(viewInstance.render());
