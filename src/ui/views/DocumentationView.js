@@ -39,10 +39,16 @@ export class DocumentationView {
           <span>📖</span>
           <span>Subsystem Specifications & API Contracts</span>
         </h3>
-        <button class="btn-primary" id="btn-export-docs" style="padding: 6px 14px; font-size: 0.78rem;">
-          <span>📥</span>
-          <span>EXPORT DOCS (MD)</span>
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-primary" id="btn-export-docs-md" style="padding: 6px 12px; font-size: 0.76rem;">
+            <span>📥</span>
+            <span>EXPORT MARKDOWN</span>
+          </button>
+          <button class="btn-secondary" id="btn-export-docs-json" style="padding: 6px 12px; font-size: 0.76rem;">
+            <span>💾</span>
+            <span>EXPORT JSON</span>
+          </button>
+        </div>
       </div>
 
       <div id="docs-content-container" style="margin-top: 14px;">
@@ -83,8 +89,12 @@ export class DocumentationView {
       }
     };
 
-    docCard.querySelector('#btn-export-docs').addEventListener('click', () => {
+    docCard.querySelector('#btn-export-docs-md')?.addEventListener('click', () => {
       window.open('/api/export?format=markdown', '_blank');
+    });
+
+    docCard.querySelector('#btn-export-docs-json')?.addEventListener('click', () => {
+      window.open('/api/export?format=json', '_blank');
     });
 
     loadDocs();
