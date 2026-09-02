@@ -94,7 +94,7 @@ export class OverviewView {
     });
     container.appendChild(header.render());
 
-    // Stat Cards Horizon
+    // Stat Cards Horizon with Multi-Colored Futuristic Cyber Lighting
     const statGrid = document.createElement('div');
     statGrid.className = 'landing-grid';
 
@@ -104,32 +104,36 @@ export class OverviewView {
     const langCount = summary.languages ? Object.keys(summary.languages).length.toString() : '1';
 
     statGrid.appendChild(new StatCard({
-      label: 'Excavated Lines',
+      label: 'EXCAVATED STRATA',
       value: totalLoc,
-      subtext: 'Calculated source lines',
-      icon: '📝'
-    }).render());
-
-    statGrid.appendChild(new StatCard({
-      label: 'Mapped Artifacts',
-      value: totalFiles,
-      subtext: 'Indexed files across repo',
-      icon: '📁'
-    }).render());
-
-    statGrid.appendChild(new StatCard({
-      label: 'Maintainability',
-      value: mi,
-      subtext: 'Cyclomatic complexity rating',
+      subtext: 'Verified source code lines',
       icon: '⚡',
+      variant: 'cyan'
+    }).render());
+
+    statGrid.appendChild(new StatCard({
+      label: 'INDEXED ARTIFACTS',
+      value: totalFiles,
+      subtext: 'Indexed files & AST trees',
+      icon: '💎',
+      variant: 'purple'
+    }).render());
+
+    statGrid.appendChild(new StatCard({
+      label: 'SYSTEM INTEGRITY',
+      value: mi,
+      subtext: 'Cyclomatic health score',
+      icon: '🛡️',
+      variant: 'emerald',
       trend: summary.avgMaintainability >= 70 ? '✓ HIGH HEALTH' : '⚠️ ELEVATED CHURN'
     }).render());
 
     statGrid.appendChild(new StatCard({
-      label: 'Technologies',
+      label: 'TECH ECOSYSTEM',
       value: langCount,
-      subtext: 'Identified languages',
-      icon: '🌐'
+      subtext: 'Identified languages & formats',
+      icon: '🌐',
+      variant: 'amber'
     }).render());
 
     container.appendChild(statGrid);
@@ -139,26 +143,28 @@ export class OverviewView {
     carouselSection.className = 'holomap-canvas-container';
 
     const actionItems = [
-      { id: 'architecture', icon: '🕸️', title: 'Architecture', meta: 'Module Topology & Mermaid Graph', badge: 'Structural Map' },
-      { id: 'impact', icon: '💥', title: 'Impact Radius', meta: 'Blast Radius & Dependency Callers', badge: 'Ripple Analysis' },
-      { id: 'explorer', icon: '📁', title: 'Source Explorer', meta: 'AST Symbol Hierarchy & Code Viewer', badge: 'File Inspector' },
-      { id: 'search', icon: '🔍', title: 'Forensic Search', meta: 'Symbols, Functions & Text Matches', badge: 'Query Engine' },
-      { id: 'git', icon: '📜', title: 'Git History', meta: 'Chrono-Strata & Author Timeline', badge: 'Read-Only Git' },
-      { id: 'analysis', icon: '⚡', title: 'Drift & Hotspots', meta: 'High Churn & Complexity Risk Score', badge: 'Risk Matrix' },
-      { id: 'archaeology', icon: '🏛️', title: 'Archaeology', meta: 'Evolutionary Lineage & Genesis', badge: 'Synthesis' },
-      { id: 'risk', icon: '⚡', title: 'Risk Map', meta: 'Measurable Structural Risk Matrix', badge: 'Risk Scoring' },
-      { id: 'features', icon: '🗺️', title: 'Feature Mapping', meta: 'Functional Subsystem Clustering', badge: 'Feature Map' },
-      { id: 'tests', icon: '🧪', title: 'Test Intelligence', meta: 'Automated Suite Discovery', badge: 'Test Harness' },
-      { id: 'bugs', icon: '🐛', title: 'Bug Archaeology', meta: 'Historical Defect & Patch Traces', badge: 'Defect Tracer' },
-      { id: 'deadcode', icon: '🍂', title: 'Dead Code', meta: 'Potentially Isolated Modules', badge: 'Pruning' },
-      { id: 'manifests', icon: '📦', title: 'Dependencies', meta: 'Package Manifests & Ecosystem', badge: 'Manifests' },
-      { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health Audit', badge: 'Audit Engine' },
-      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Deterministic Architecture Specs', badge: 'Auto-Doc' },
-      { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine' }
+      { id: 'architecture', icon: '🕸️', title: 'Architecture', meta: 'Module Topology & Mermaid Graph', badge: 'Structural Map', theme: 'card-cyan' },
+      { id: 'impact', icon: '💥', title: 'Impact Radius', meta: 'Blast Radius & Dependency Callers', badge: 'Ripple Analysis', theme: 'card-coral' },
+      { id: 'explorer', icon: '📁', title: 'Source Explorer', meta: 'AST Symbol Hierarchy & Code Viewer', badge: 'File Inspector', theme: 'card-blue' },
+      { id: 'search', icon: '🔍', title: 'Forensic Search', meta: 'Symbols, Functions & Text Matches', badge: 'Query Engine', theme: 'card-purple' },
+      { id: 'git', icon: '📜', title: 'Git History', meta: 'Chrono-Strata & Author Timeline', badge: 'Read-Only Git', theme: 'card-amber' },
+      { id: 'analysis', icon: '⚡', title: 'Drift & Hotspots', meta: 'High Churn & Complexity Risk Score', badge: 'Risk Matrix', theme: 'card-orange' },
+      { id: 'archaeology', icon: '🏛️', title: 'Archaeology', meta: 'Evolutionary Lineage & Genesis', badge: 'Synthesis', theme: 'card-violet' },
+      { id: 'risk', icon: '⚡', title: 'Risk Map', meta: 'Measurable Structural Risk Matrix', badge: 'Risk Scoring', theme: 'card-rose' },
+      { id: 'features', icon: '🗺️', title: 'Feature Mapping', meta: 'Functional Subsystem Clustering', badge: 'Feature Map', theme: 'card-cyan' },
+      { id: 'tests', icon: '🧪', title: 'Test Intelligence', meta: 'Automated Suite Discovery', badge: 'Test Harness', theme: 'card-emerald' },
+      { id: 'bugs', icon: '🐛', title: 'Bug Archaeology', meta: 'Historical Defect & Patch Traces', badge: 'Defect Tracer', theme: 'card-crimson' },
+      { id: 'deadcode', icon: '🍂', title: 'Dead Code', meta: 'Potentially Isolated Modules', badge: 'Pruning', theme: 'card-amber' },
+      { id: 'manifests', icon: '📦', title: 'Dependencies', meta: 'Package Manifests & Ecosystem', badge: 'Manifests', theme: 'card-blue' },
+      { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health Audit', badge: 'Audit Engine', theme: 'card-teal' },
+      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Deterministic Architecture Specs', badge: 'Auto-Doc', theme: 'card-purple' },
+      { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine', theme: 'card-magenta' }
     ];
 
     const cardsHtml = actionItems.map(a => `
-      <div class="strata-card ${a.id === this.selectedAction ? 'active' : ''}" data-action="${a.id}">
+      <div class="strata-card ${a.theme} ${a.id === this.selectedAction ? 'active' : ''}" data-action="${a.id}">
+        <div class="strata-card-corner tl"></div>
+        <div class="strata-card-corner tr"></div>
         <div class="strata-card-title"><span>${a.icon}</span><span>${a.title}</span></div>
         <div class="strata-card-meta">${a.meta}</div>
         <div class="strata-card-badge">${a.badge}</div>
@@ -168,10 +174,10 @@ export class OverviewView {
     carouselSection.innerHTML = `
       <div class="holomap-canvas-header">
         <h3 class="holomap-title">
-          <span>◈</span>
-          <span>CYLINDRICAL INVESTIGATION CAROUSEL // SELECT ACTION</span>
+          <span class="holomap-icon">◈</span>
+          <span class="text-gradient-cyber">CYLINDRICAL INVESTIGATION CAROUSEL // SELECT ACTION</span>
         </h3>
-        <span class="landing-card-badge">Primary Action Selector</span>
+        <span class="landing-card-badge neon-badge">Primary Action Selector</span>
       </div>
 
       <div class="strata-deck-viewport">
@@ -187,36 +193,57 @@ export class OverviewView {
     const dualGrid = document.createElement('div');
     dualGrid.className = 'archaeology-dual-grid';
 
+    // Multi-color palette for authentic cyber language strata
+    const languagePalette = {
+      'TypeScript': { bar: 'linear-gradient(90deg, #3178c6, #00f0ff)', text: '#00f0ff', dot: '#00f0ff' },
+      'TypeScript React': { bar: 'linear-gradient(90deg, #0284c7, #38bdf8)', text: '#38bdf8', dot: '#38bdf8' },
+      'JavaScript': { bar: 'linear-gradient(90deg, #ca8a04, #fde047)', text: '#fde047', dot: '#fde047' },
+      'JavaScript React': { bar: 'linear-gradient(90deg, #0ea5e9, #67e8f9)', text: '#67e8f9', dot: '#67e8f9' },
+      'Python': { bar: 'linear-gradient(90deg, #2563eb, #fbbf24)', text: '#60a5fa', dot: '#60a5fa' },
+      'HTML': { bar: 'linear-gradient(90deg, #ea580c, #fb923c)', text: '#fb923c', dot: '#fb923c' },
+      'CSS': { bar: 'linear-gradient(90deg, #ec4899, #f43f5e)', text: '#f43f5e', dot: '#f43f5e' },
+      'JSON': { bar: 'linear-gradient(90deg, #10b981, #34d399)', text: '#34d399', dot: '#34d399' },
+      'YAML': { bar: 'linear-gradient(90deg, #8b5cf6, #c084fc)', text: '#c084fc', dot: '#c084fc' },
+      'Markdown': { bar: 'linear-gradient(90deg, #06b6d4, #22d3ee)', text: '#22d3ee', dot: '#22d3ee' },
+      'Rust': { bar: 'linear-gradient(90deg, #b91c1c, #f87171)', text: '#f87171', dot: '#f87171' },
+      'Go': { bar: 'linear-gradient(90deg, #0891b2, #67e8f9)', text: '#67e8f9', dot: '#67e8f9' },
+      'Text': { bar: 'linear-gradient(90deg, #64748b, #94a3b8)', text: '#94a3b8', dot: '#94a3b8' }
+    };
+
     // Left: Languages
     const langSection = document.createElement('div');
-    langSection.className = 'landing-card';
+    langSection.className = 'landing-card cyber-glass-card';
 
     const langRows = Object.entries(summary.languages || {})
-      .map(([lang, data]) => `
-        <div style="display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--border-strata); font-size: 0.85rem;">
+      .map(([lang, data]) => {
+        const pal = languagePalette[lang] || { bar: 'linear-gradient(90deg, #6366f1, #a855f7)', text: '#a855f7', dot: '#a855f7' };
+        return `
+        <div style="display: flex; flex-direction: column; gap: 5px; padding: 7px 0; border-bottom: 1px solid var(--border-strata); font-size: 0.85rem;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-weight: 700; color: var(--text-primary);">${lang}</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">(${data.files} files)</span>
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: ${pal.dot}; box-shadow: 0 0 6px ${pal.dot};"></span>
+              <span style="font-weight: 700; color: var(--text-primary); font-family: var(--font-display);">${lang}</span>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">(${data.files} files)</span>
             </div>
             <div style="display: flex; align-items: center; gap: 12px; font-family: var(--font-mono);">
               <span style="color: var(--text-secondary);">${(data.lines || 0).toLocaleString()} LOC</span>
-              <span style="color: var(--accent-cyan); font-weight: 700;">${data.percentage}%</span>
+              <span style="color: ${pal.text}; font-weight: 800; text-shadow: 0 0 8px ${pal.dot};">${data.percentage}%</span>
             </div>
           </div>
-          <div style="width: 100%; height: 4px; background: var(--bg-input); border-radius: 2px; overflow: hidden;">
-            <div style="width: ${data.percentage}%; height: 100%; background: var(--accent-cyan); box-shadow: 0 0 6px var(--accent-cyan);"></div>
+          <div style="width: 100%; height: 5px; background: rgba(5, 8, 14, 0.8); border-radius: 3px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05);">
+            <div style="width: ${data.percentage}%; height: 100%; background: ${pal.bar}; box-shadow: 0 0 8px ${pal.dot}; border-radius: 3px;"></div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
     langSection.innerHTML = `
       <div class="landing-card-header">
         <h3 class="landing-card-title">
           <span>📊</span>
-          <span>Language Strata Share</span>
+          <span class="text-gradient-aurora">Language Strata Share</span>
         </h3>
-        <span class="landing-card-badge">Telemetry</span>
+        <span class="landing-card-badge neon-badge">Telemetry</span>
       </div>
       <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
         ${langRows || '<p style="color: var(--text-muted); font-size: 0.85rem;">No files detected.</p>'}
