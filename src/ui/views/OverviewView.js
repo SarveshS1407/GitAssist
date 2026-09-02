@@ -25,7 +25,19 @@ export class OverviewView {
       return container;
     }
 
-    // 2. Error State
+    // 2. Dedicated Minimalist Homescreen (when not loaded)
+    if (!this.repositoryState || !this.repositoryState.isLoaded) {
+      return new LandingView({
+        onOpenRepository: this.onOpenRepository,
+        onQuickAnalyze: this.onQuickAnalyze,
+        error: this.repositoryState?.error,
+        onClearError: () => {
+          if (this.repositoryState) this.repositoryState.error = null;
+        }
+      }).render();
+    }
+
+    // 3. Error State (if error occurs after being loaded)
     if (this.repositoryState?.error) {
       const container = document.createElement('div');
       container.className = 'view-container';
@@ -35,14 +47,6 @@ export class OverviewView {
         onRetry: this.onOpenRepository
       }).render());
       return container;
-    }
-
-    // 3. Dedicated Landing Homepage State
-    if (!this.repositoryState || !this.repositoryState.isLoaded) {
-      return new LandingView({
-        onOpenRepository: this.onOpenRepository,
-        onQuickAnalyze: this.onQuickAnalyze
-      }).render();
     }
 
     // 4. Active Archaeological Telemetry & Strata Holomap

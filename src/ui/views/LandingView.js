@@ -3,15 +3,30 @@
  * Dedicated Minimal Homescreen with Direct Inline Git Repository Input
  */
 export class LandingView {
-  constructor({ onOpenRepository, onQuickAnalyze }) {
+  constructor({ onOpenRepository, onQuickAnalyze, error, onClearError }) {
     this.onOpenRepository = onOpenRepository;
     this.onQuickAnalyze = onQuickAnalyze;
+    this.error = error;
+    this.onClearError = onClearError;
     this.element = null;
   }
 
   render() {
     const container = document.createElement('div');
     container.className = 'view-container minimal-homescreen-container';
+
+    const errorHtml = this.error ? `
+      <div style="background: rgba(255, 0, 85, 0.12); border: 1px solid var(--danger); border-radius: 8px; padding: 12px 16px; width: 100%; text-align: left; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <span style="font-size: 1.1rem;">⚠️</span>
+          <div>
+            <div style="color: var(--danger); font-weight: 800; font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase;">Excavation Alert</div>
+            <div style="color: var(--text-primary); font-size: 0.85rem; margin-top: 2px;">${this.error}</div>
+          </div>
+        </div>
+        <button type="button" id="btn-dismiss-error" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem;">✕</button>
+      </div>
+    ` : '';
 
     container.innerHTML = `
       <!-- Minimalist Architectural Emblem & Horizon -->
@@ -32,9 +47,11 @@ export class LandingView {
         </p>
 
         <p class="homescreen-description">
-          Paste a local Git repository directory or repository path to begin exploring its architecture, relationships, history, and impact.
+          Paste a local Git repository directory or repository URL to begin exploring its architecture, relationships, history, and impact.
         </p>
       </div>
+
+      ${errorHtml}
 
       <!-- Central Git Repository Input Box & Action -->
       <div class="homescreen-input-card">
@@ -44,7 +61,7 @@ export class LandingView {
             type="text" 
             id="homescreen-repo-input" 
             class="homescreen-input" 
-            placeholder="Enter repository path (e.g. /Users/username/projects/my-repo)" 
+            placeholder="Enter local path or repo URL (e.g. /Users/kingpin/Desktop/gitassist)" 
             value="/Users/kingpin/Desktop/gitassist" 
             autocomplete="off"
             spellcheck="false"
@@ -75,6 +92,13 @@ export class LandingView {
     const input = container.querySelector('#homescreen-repo-input');
     const beginBtn = container.querySelector('#btn-homescreen-begin');
     const presetBtn = container.querySelector('#btn-preset-gitassist');
+    const dismissBtn = container.querySelector('#btn-dismiss-error');
+
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        if (this.onClearError) this.onClearError();
+      });
+    }
 
     const triggerArchaeology = () => {
       const selectedPath = input.value.trim();

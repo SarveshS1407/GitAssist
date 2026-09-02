@@ -100,15 +100,6 @@ class App {
   async openRepository(selectedPath) {
     if (!selectedPath) return;
 
-    // Check if user entered a remote URL instead of a local filesystem path
-    if (selectedPath.startsWith('http://') || selectedPath.startsWith('https://') || selectedPath.startsWith('git@')) {
-      this.repositoryState.setError(
-        `Codebase Archaeologist is a local-first offline tool that inspects files on your computer. To analyze "${selectedPath}", please enter the local folder path where you cloned it (e.g. /Users/kingpin/Desktop/gitassist).`
-      );
-      this.router.navigate('overview');
-      return;
-    }
-
     this.repositoryState.setIndexing(true, 10);
     this.router.navigate('overview');
 
