@@ -33,69 +33,66 @@ export class ReviewView {
     const reviewCard = document.createElement('div');
     reviewCard.className = 'landing-card';
 
-    const findings = [
-      {
-        severity: 'INFO',
-        category: 'Architecture Topology',
-        file: 'Entire Codebase',
-        message: '0 circular dependency loops detected. Module imports form a clean Directed Acyclic Graph (DAG).'
-      },
-      {
-        severity: 'MEDIUM',
-        category: 'Oversized Module',
-        file: 'src/api/routes.js (342 LOC)',
-        message: 'Endpoint dispatcher exceeds 300 LOC. Consider splitting individual REST routes into modular sub-controllers in future iterations.'
-      },
-      {
-        severity: 'LOW',
-        category: 'CSS Token Structure',
-        file: 'src/ui/styles/main.css (950 LOC)',
-        message: 'Central design system stylesheet contains all HUD and 3D strata tokens in one file. Consider component-scoped CSS modules.'
-      },
-      {
-        severity: 'INFO',
-        category: 'Zero External Dependencies',
-        file: 'package.json',
-        message: 'Application runs 100% on Node.js built-in standard libraries (http, fs, path, child_process, util). No vulnerable third-party packages.'
-      }
-    ];
-
-    const findingsHtml = findings.map(f => {
-      const color = f.severity === 'HIGH' ? 'var(--danger)' : f.severity === 'MEDIUM' ? 'var(--accent-amber)' : 'var(--accent-cyan)';
-      const dim = f.severity === 'HIGH' ? 'var(--danger-dim)' : f.severity === 'MEDIUM' ? 'var(--accent-amber-dim)' : 'var(--accent-cyan-dim)';
-
-      return `
-        <div class="timeline-node" style="border-left-color: ${color};">
-          <div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="timeline-hash" style="color: ${color}; background-color: ${dim};">${f.severity} // ${f.category}</span>
-              <span style="font-weight: 700; color: var(--text-primary); font-family: var(--font-mono);">${f.file}</span>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.45;">
-              ${f.message}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
     reviewCard.innerHTML = `
       <div class="landing-card-header">
         <h3 class="landing-card-title">
           <span>🛡️</span>
-          <span>Heuristic Code Quality Findings (${findings.length} Signals)</span>
+          <span>Heuristic Code Quality Findings</span>
         </h3>
-        <span class="landing-card-badge" style="color: var(--success); border-color: var(--success);">OVERALL HEALTH: EXCELLENT</span>
+        <span class="landing-card-badge" id="review-health-badge">Auditing...</span>
       </div>
 
-      <div class="forensic-timeline" style="margin-top: 14px;">
-        ${findingsHtml}
+      <div class="forensic-timeline" id="review-findings-container" style="margin-top: 14px;">
+        <p style="color: var(--accent-cyan); font-size: 0.85rem; font-family: var(--font-mono);">Running heuristic structural audit...</p>
       </div>
 
       <div style="margin-top: 16px; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
         * Note: These findings are heuristic automated signals designed to assist human architectural reviews.
       </div>
     `;
+
+    const loadReview = async () => {
+      const containerEl = reviewCard.querySelector('#review-findings-container');
+      const badgeEl = reviewCard.querySelector('#review-health-badge');
+
+      try {
+        const res = await fetch('/api/review');
+        const data = await res.json();
+        const findings = data.findings || [];
+
+        badgeEl.textContent = `HEALTH SCORE: ${data.healthScore || 95}/100`;
+        badgeEl.style.color = (data.healthScore >= 80) ? 'var(--success)' : 'var(--accent-amber)';
+        badgeEl.style.borderColor = (data.healthScore >= 80) ? 'var(--success)' : 'var(--accent-amber)';
+
+        if (findings.length === 0) {
+          containerEl.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No critical architectural smells detected.</p>';
+          return;
+        }
+
+        containerEl.innerHTML = findings.map(f => {
+          const color = f.severity === 'HIGH' ? 'var(--danger)' : f.severity === 'MEDIUM' ? 'var(--accent-amber)' : 'var(--accent-cyan)';
+          const dim = f.severity === 'HIGH' ? 'var(--danger-dim)' : f.severity === 'MEDIUM' ? 'var(--accent-amber-dim)' : 'var(--accent-cyan-dim)';
+
+          return `
+            <div class="timeline-node" style="border-left-color: ${color};">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="timeline-hash" style="color: ${color}; background-color: ${dim};">${f.severity} // ${f.category}</span>
+                  <span style="font-weight: 700; color: var(--text-primary); font-family: var(--font-mono);">${f.file}</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.45;">
+                  ${f.message}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        containerEl.innerHTML = `<p style="color: var(--danger);">Failed to execute review: ${err.message}</p>`;
+      }
+    };
+
+    loadReview();
 
     container.appendChild(reviewCard);
     return container;

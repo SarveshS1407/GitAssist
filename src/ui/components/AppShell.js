@@ -3,7 +3,7 @@ import { Sidebar } from './Sidebar.js';
 
 /**
  * AppShell Component
- * Assembles Header, conditional Sidebar, and the dynamic Main Content container
+ * Assembles Header, Sidebar, and the dynamic Main Content container
  */
 export class AppShell {
   constructor({ router, repositoryState, initialPage = 'overview' }) {
@@ -12,7 +12,6 @@ export class AppShell {
     this.currentPage = initialPage;
     this.element = null;
     this.mainContentEl = null;
-    this.sidebarEl = null;
 
     this.header = new Header({
       repositoryState: this.repositoryState,
@@ -27,15 +26,6 @@ export class AppShell {
     });
   }
 
-  updateSidebarVisibility(isLoaded) {
-    if (!this.sidebarEl) return;
-    if (isLoaded) {
-      this.sidebarEl.style.display = 'flex';
-    } else {
-      this.sidebarEl.style.display = 'none';
-    }
-  }
-
   render() {
     const container = document.createElement('div');
     container.className = 'app-shell';
@@ -47,8 +37,7 @@ export class AppShell {
     const body = document.createElement('div');
     body.className = 'app-body';
 
-    this.sidebarEl = this.sidebar.render();
-    body.appendChild(this.sidebarEl);
+    body.appendChild(this.sidebar.render());
 
     const main = document.createElement('main');
     main.className = 'app-main';
@@ -59,14 +48,6 @@ export class AppShell {
 
     this.element = container;
     this.mainContentEl = main;
-
-    // Initial sidebar visibility based on state
-    if (this.repositoryState) {
-      this.updateSidebarVisibility(this.repositoryState.getState().isLoaded);
-      this.repositoryState.subscribe((state) => {
-        this.updateSidebarVisibility(state.isLoaded);
-      });
-    }
 
     return container;
   }

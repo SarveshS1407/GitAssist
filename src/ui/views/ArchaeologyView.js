@@ -41,49 +41,11 @@ export class ArchaeologyView {
           <span>🏛️</span>
           <span>Archaeological Evolutionary Digest (${summary.name || 'Repository'})</span>
         </h3>
-        <span class="landing-card-badge" style="color: var(--accent-cyan);">Lineage Complete</span>
+        <span class="landing-card-badge" style="color: var(--accent-cyan);">Lineage Synthesis</span>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
-        <!-- Epoch Timeline Card -->
-        <div class="timeline-node" style="border-left-color: var(--accent-cyan);">
-          <div>
-            <div style="font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.85rem;">
-              EPOCH 01 // FOUNDATIONAL GENESIS & CORE SCANNERS
-            </div>
-            <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
-              The project was initialized as a zero-dependency, local-first software exploration engine. 
-              Core scanners, AST parser abstractions, and cyclomatic metrics engines were established in <code>src/core</code>.
-            </div>
-          </div>
-          <span class="landing-card-badge">Genesis</span>
-        </div>
-
-        <!-- Epoch 02 -->
-        <div class="timeline-node" style="border-left-color: var(--accent-neural);">
-          <div>
-            <div style="font-weight: 700; color: var(--accent-neural); font-family: var(--font-mono); font-size: 0.85rem;">
-              EPOCH 02 // REST API DISPATCHER & READ-ONLY GIT INTEGRATION
-            </div>
-            <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
-              Added high-performance Node.js native HTTP router in <code>src/api/routes.js</code> and read-only Git child process wrappers in <code>src/services/git-service.js</code>.
-            </div>
-          </div>
-          <span class="landing-card-badge">Service Layer</span>
-        </div>
-
-        <!-- Epoch 03 -->
-        <div class="timeline-node" style="border-left-color: var(--success);">
-          <div>
-            <div style="font-weight: 700; color: var(--success); font-family: var(--font-mono); font-size: 0.85rem;">
-              EPOCH 03 // CYBER FORENSIC UI & 3D STRATA HOLOMAP
-            </div>
-            <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
-              Architectural holomap, cylindrical investigation carousel, live AST inspector, and local Q&A engine were integrated into <code>src/ui</code>.
-            </div>
-          </div>
-          <span class="landing-card-badge" style="color: var(--success);">Current Strata</span>
-        </div>
+      <div id="archaeology-content-container" style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px;">
+        <p style="color: var(--accent-cyan); font-size: 0.85rem; font-family: var(--font-mono);">Synthesizing evolutionary commit strata...</p>
       </div>
 
       <!-- Archaeological Health Summary -->
@@ -93,11 +55,71 @@ export class ArchaeologyView {
         </div>
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;">
           • Total Code Volume: <strong>${summary.totalLines ? summary.totalLines.toLocaleString() : '—'} lines of code</strong> across <strong>${summary.totalFiles || 0} source files</strong>.<br/>
-          • Subsystem Circularity: <strong>${summary.cyclesDetected || 0} cyclic import loops</strong> (Strict Directed Acyclic Graph).<br/>
+          • Subsystem Circularity: <strong>${summary.cyclesDetected || 0} cyclic import loops</strong>.<br/>
           • Evolutionary Health Score: <strong>${summary.avgMaintainability || 98} / 100 Maintainability Index</strong>.
         </div>
       </div>
     `;
+
+    const loadEvolution = async () => {
+      const el = digestCard.querySelector('#archaeology-content-container');
+      try {
+        const [gitRes, hotspotRes] = await Promise.all([
+          fetch('/api/repository/git'),
+          fetch('/api/hotspots')
+        ]);
+        const gitData = await gitRes.json();
+        const hotspotData = await hotspotRes.json();
+
+        const commits = gitData.commits || [];
+        const topHotspots = (hotspotData.hotspots || []).slice(0, 3);
+
+        const firstCommit = commits[commits.length - 1] || { message: 'Initial genesis commit', author: 'Repository Author', date: 'Genesis' };
+        const latestCommit = commits[0] || { message: 'Latest development update', author: 'Repository Author', date: 'Recent' };
+
+        el.innerHTML = `
+          <div class="timeline-node" style="border-left-color: var(--accent-cyan);">
+            <div>
+              <div style="font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.85rem;">
+                EPOCH 01 // GENESIS & INITIAL STRATA
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Repository initialized: <em>"${firstCommit.message}"</em> by <strong>${firstCommit.author}</strong> (${firstCommit.date}).
+              </div>
+            </div>
+            <span class="landing-card-badge">Genesis</span>
+          </div>
+
+          <div class="timeline-node" style="border-left-color: var(--accent-neural);">
+            <div>
+              <div style="font-weight: 700; color: var(--accent-neural); font-family: var(--font-mono); font-size: 0.85rem;">
+                EPOCH 02 // RECENT CHURN & EVOLUTIONARY HOTSPOTS
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Key areas under active evolution: ${topHotspots.map(h => `<code>${h.relativePath}</code>`).join(', ') || 'Clean distribution'}.
+              </div>
+            </div>
+            <span class="landing-card-badge">Evolution</span>
+          </div>
+
+          <div class="timeline-node" style="border-left-color: var(--success);">
+            <div>
+              <div style="font-weight: 700; color: var(--success); font-family: var(--font-mono); font-size: 0.85rem;">
+                EPOCH 03 // ACTIVE HEAD STRATA
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+                Current active state: <em>"${latestCommit.message}"</em> by <strong>${latestCommit.author}</strong>.
+              </div>
+            </div>
+            <span class="landing-card-badge" style="color: var(--success);">Active Head</span>
+          </div>
+        `;
+      } catch (err) {
+        el.innerHTML = `<p style="color: var(--danger);">Failed to load evolution: ${err.message}</p>`;
+      }
+    };
+
+    loadEvolution();
 
     container.appendChild(digestCard);
     return container;

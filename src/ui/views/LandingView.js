@@ -1,6 +1,6 @@
 /**
  * LandingView Component
- * Dedicated Minimal Homescreen with Direct Inline Git Repository Input
+ * Restored Original Blue/Cyber Technical Landing Experience
  */
 export class LandingView {
   constructor({ onOpenRepository, onQuickAnalyze, error, onClearError }) {
@@ -13,10 +13,10 @@ export class LandingView {
 
   render() {
     const container = document.createElement('div');
-    container.className = 'view-container minimal-homescreen-container';
+    container.className = 'view-container';
 
     const errorHtml = this.error ? `
-      <div style="background: rgba(255, 0, 85, 0.12); border: 1px solid var(--danger); border-radius: 8px; padding: 12px 16px; width: 100%; text-align: left; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+      <div style="background: rgba(255, 0, 85, 0.12); border: 1px solid var(--danger); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
         <div style="display: flex; gap: 10px; align-items: flex-start;">
           <span style="font-size: 1.1rem;">⚠️</span>
           <div>
@@ -29,69 +29,108 @@ export class LandingView {
     ` : '';
 
     container.innerHTML = `
-      <!-- Minimalist Architectural Emblem & Horizon -->
-      <div class="homescreen-emblem">
-        <span class="emblem-symbol">🏛️</span>
-        <span class="emblem-beacon">● LOCAL-FIRST FORENSICS</span>
-      </div>
-
-      <!-- Hero Typography Hierarchy -->
-      <div class="homescreen-hero-text">
-        <h1 class="homescreen-title">
-          <span>CODEBASE</span>
-          <span class="title-highlight">ARCHAEOLOGIST</span>
-        </h1>
-
-        <p class="homescreen-tagline">
-          Uncover the hidden structure of your codebase.
-        </p>
-
-        <p class="homescreen-description">
-          Paste a local Git repository directory or repository URL to begin exploring its architecture, relationships, history, and impact.
-        </p>
-      </div>
-
       ${errorHtml}
 
-      <!-- Central Git Repository Input Box & Action -->
-      <div class="homescreen-input-card">
-        <div class="input-glow-wrapper">
-          <span class="input-icon">📁</span>
-          <input 
-            type="text" 
-            id="homescreen-repo-input" 
-            class="homescreen-input" 
-            placeholder="Enter local path or repo URL (e.g. /Users/kingpin/Desktop/gitassist)" 
-            value="/Users/kingpin/Desktop/gitassist" 
-            autocomplete="off"
-            spellcheck="false"
-          />
+      <!-- Original Cyber Hero Section -->
+      <section class="landing-hero">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <span class="brand-badge" style="font-size: 0.72rem; padding: 3px 8px;">LOCAL-FIRST // ZERO-CLOUD // FORENSICS</span>
+        </div>
+        <div class="hero-icon">🏛️</div>
+        <h1 class="hero-title">Codebase Archaeologist</h1>
+        <p class="hero-description">
+          Analyze your codebase, understand its architecture, trace AST relationships, explore Git chronology, and uncover structural dependencies—100% offline.
+        </p>
+
+        <!-- Direct Ingestion Input & Action -->
+        <div style="width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+          <div style="display: flex; gap: 10px;">
+            <input 
+              type="text" 
+              id="landing-repo-input" 
+              placeholder="Enter local path or Git URL (e.g. /Users/kingpin/Desktop/gitassist)" 
+              value="/Users/kingpin/Desktop/gitassist" 
+              style="flex: 1; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-holo); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.86rem;"
+            />
+            <button class="btn-primary" id="btn-open-repo">
+              <span>🚀</span>
+              <span>EXCAVATE</span>
+            </button>
+          </div>
+          
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.76rem; color: var(--text-muted);">
+            <span>Quick preset:</span>
+            <button type="button" id="btn-preset-current" class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
+              ⚡ Current GitAssist Repo
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Original Cyber 3-Card Grid -->
+      <section class="landing-grid">
+        <!-- 1. Recent Repositories -->
+        <div class="landing-card">
+          <div class="landing-card-header">
+            <h3 class="landing-card-title">
+              <span>🕒</span>
+              <span>Active Workspace</span>
+            </h3>
+            <span class="landing-card-badge">Local-First</span>
+          </div>
+          <div class="landing-card-content">
+            <ul class="placeholder-list">
+              <li class="placeholder-item">
+                <span>📁</span>
+                <span>Ready to scan local directories or auto-clone public Git repositories into local memory.</span>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Primary Action Button -->
-        <button class="btn-primary homescreen-btn-begin" id="btn-homescreen-begin">
-          <span>🚀</span>
-          <span>BEGIN ARCHAEOLOGY</span>
-        </button>
-
-        <!-- Quick Launch Preset -->
-        <div class="homescreen-preset-bar">
-          <span class="preset-label">Quick presets:</span>
-          <button type="button" class="preset-chip" id="btn-preset-gitassist">
-            ⚡ Current Project (<code>/Users/kingpin/Desktop/gitassist</code>)
-          </button>
+        <!-- 2. Archaeological Capabilities -->
+        <div class="landing-card">
+          <div class="landing-card-header">
+            <h3 class="landing-card-title">
+              <span>◈</span>
+              <span>Excavation Engines</span>
+            </h3>
+            <span class="landing-card-badge">10 Lenses</span>
+          </div>
+          <div class="landing-card-content">
+            <ul class="placeholder-list">
+              <li class="placeholder-item">
+                <span>🔍</span>
+                <span>AST Symbol Indexing, 3D Subsystem Strata, Living Dependency Graphs, and Risk Hotspot Telemetry.</span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <!-- Offline Security Note -->
-      <div class="homescreen-footer-note">
-        <span>🔒 100% Offline & Local-First • Zero Cloud Transmission • Read-Only Analysis</span>
-      </div>
+        <!-- 3. Tactical Hotkeys -->
+        <div class="landing-card">
+          <div class="landing-card-header">
+            <h3 class="landing-card-title">
+              <span>⚡</span>
+              <span>Quick Navigation</span>
+            </h3>
+            <span class="landing-card-badge">Hotkeys</span>
+          </div>
+          <div class="landing-card-content">
+            <ul class="placeholder-list">
+              <li class="placeholder-item">
+                <span>⌨️</span>
+                <span>Press <code>⌘K</code> for Forensic Search, <code>1-6</code> to switch tactical investigation lenses.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
     `;
 
-    const input = container.querySelector('#homescreen-repo-input');
-    const beginBtn = container.querySelector('#btn-homescreen-begin');
-    const presetBtn = container.querySelector('#btn-preset-gitassist');
+    const input = container.querySelector('#landing-repo-input');
+    const openBtn = container.querySelector('#btn-open-repo');
+    const presetBtn = container.querySelector('#btn-preset-current');
     const dismissBtn = container.querySelector('#btn-dismiss-error');
 
     if (dismissBtn) {
@@ -100,16 +139,11 @@ export class LandingView {
       });
     }
 
-    const triggerArchaeology = () => {
+    const triggerExcavation = () => {
       const selectedPath = input.value.trim();
-      if (!selectedPath) {
-        input.focus();
-        input.style.borderColor = 'var(--danger)';
-        return;
-      }
+      if (!selectedPath) return;
 
-      beginBtn.innerHTML = '<span>⚡</span><span>INITIALIZING EXCAVATION...</span>';
-      beginBtn.style.opacity = '0.8';
+      openBtn.innerHTML = '<span>⚡</span><span>EXCAVATING...</span>';
 
       if (this.onQuickAnalyze) {
         this.onQuickAnalyze(selectedPath);
@@ -118,15 +152,14 @@ export class LandingView {
       }
     };
 
-    beginBtn.addEventListener('click', triggerArchaeology);
+    openBtn.addEventListener('click', triggerExcavation);
     input.addEventListener('keydown', (e) => {
-      input.style.borderColor = 'var(--border-holo)';
-      if (e.key === 'Enter') triggerArchaeology();
+      if (e.key === 'Enter') triggerExcavation();
     });
 
     presetBtn.addEventListener('click', () => {
       input.value = '/Users/kingpin/Desktop/gitassist';
-      triggerArchaeology();
+      triggerExcavation();
     });
 
     this.element = container;
