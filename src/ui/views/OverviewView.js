@@ -143,26 +143,26 @@ export class OverviewView {
     carouselSection.className = 'holomap-canvas-container';
 
     const actionItems = [
-      { id: 'architecture', icon: '🕸️', title: 'Architecture', meta: 'Module Topology & Mermaid Graph', badge: 'Structural Map', theme: 'card-cyan' },
-      { id: 'impact', icon: '💥', title: 'Impact Radius', meta: 'Blast Radius & Dependency Callers', badge: 'Ripple Analysis', theme: 'card-coral' },
-      { id: 'explorer', icon: '📁', title: 'Source Explorer', meta: 'AST Symbol Hierarchy & Code Viewer', badge: 'File Inspector', theme: 'card-blue' },
-      { id: 'search', icon: '🔍', title: 'Forensic Search', meta: 'Symbols, Functions & Text Matches', badge: 'Query Engine', theme: 'card-purple' },
-      { id: 'git', icon: '📜', title: 'Git History', meta: 'Chrono-Strata & Author Timeline', badge: 'Read-Only Git', theme: 'card-amber' },
-      { id: 'analysis', icon: '⚡', title: 'Drift & Hotspots', meta: 'High Churn & Complexity Risk Score', badge: 'Risk Matrix', theme: 'card-orange' },
-      { id: 'archaeology', icon: '🏛️', title: 'Archaeology', meta: 'Evolutionary Lineage & Genesis', badge: 'Synthesis', theme: 'card-violet' },
-      { id: 'risk', icon: '⚡', title: 'Risk Map', meta: 'Measurable Structural Risk Matrix', badge: 'Risk Scoring', theme: 'card-rose' },
-      { id: 'features', icon: '🗺️', title: 'Feature Mapping', meta: 'Functional Subsystem Clustering', badge: 'Feature Map', theme: 'card-cyan' },
-      { id: 'tests', icon: '🧪', title: 'Test Intelligence', meta: 'Automated Suite Discovery', badge: 'Test Harness', theme: 'card-emerald' },
-      { id: 'bugs', icon: '🐛', title: 'Bug Archaeology', meta: 'Historical Defect & Patch Traces', badge: 'Defect Tracer', theme: 'card-crimson' },
-      { id: 'deadcode', icon: '🍂', title: 'Dead Code', meta: 'Potentially Isolated Modules', badge: 'Pruning', theme: 'card-amber' },
-      { id: 'manifests', icon: '📦', title: 'Dependencies', meta: 'Package Manifests & Ecosystem', badge: 'Manifests', theme: 'card-blue' },
-      { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health Audit', badge: 'Audit Engine', theme: 'card-teal' },
-      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Deterministic Architecture Specs', badge: 'Auto-Doc', theme: 'card-purple' },
+      { id: 'architecture', icon: '🕸️', title: 'Architecture', meta: 'Module Boundaries & Graph', badge: 'Structural Map', theme: 'card-cyan' },
+      { id: 'impact', icon: '💥', title: 'Impact Radius', meta: 'Blast Radius & Caller Ripple', badge: 'Ripple Analysis', theme: 'card-coral' },
+      { id: 'explorer', icon: '📁', title: 'Source Explorer', meta: 'AST Hierarchy & Code Viewer', badge: 'File Inspector', theme: 'card-blue' },
+      { id: 'search', icon: '🔍', title: 'Forensic Search', meta: 'Symbols, Functions & Text', badge: 'Query Engine', theme: 'card-purple' },
+      { id: 'git', icon: '📜', title: 'Git History', meta: 'Author Ownership & Commits', badge: 'Lineage Timeline', theme: 'card-amber' },
+      { id: 'analysis', icon: '⚡', title: 'Drift & Hotspots', meta: 'Churn Volatility & Risk Score', badge: 'Risk Matrix', theme: 'card-orange' },
+      { id: 'archaeology', icon: '🏛️', title: 'Archaeology', meta: 'Evolutionary System Genesis', badge: 'Synthesis', theme: 'card-violet' },
+      { id: 'risk', icon: '⚡', title: 'Risk Map', meta: 'Centrality & Churn Scoring', badge: 'Risk Scoring', theme: 'card-rose' },
+      { id: 'features', icon: '🗺️', title: 'Feature Mapping', meta: 'Subsystem Domain Clusters', badge: 'Feature Map', theme: 'card-cyan' },
+      { id: 'tests', icon: '🧪', title: 'Test Intelligence', meta: 'Suite Inventory & Coverage', badge: 'Test Harness', theme: 'card-emerald' },
+      { id: 'bugs', icon: '🐛', title: 'Bug Archaeology', meta: 'Defect & Regression Traces', badge: 'Defect Tracer', theme: 'card-crimson' },
+      { id: 'deadcode', icon: '🍂', title: 'Dead Code', meta: 'Isolated Zero-Inflow Modules', badge: 'Pruning', theme: 'card-amber' },
+      { id: 'manifests', icon: '📦', title: 'Dependencies', meta: 'Manifests & Ecosystem Health', badge: 'Manifests', theme: 'card-blue' },
+      { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health', badge: 'Audit Engine', theme: 'card-teal' },
+      { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Architecture Specs & Markdown', badge: 'Auto-Doc', theme: 'card-purple' },
       { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine', theme: 'card-magenta' }
     ];
 
     const angleStep = 360 / actionItems.length; // 22.5 deg per card
-    const cylinderRadius = 550; // px radius for 3D circle
+    const cylinderRadius = 490; // Optimal radius for 188px cards without clipping
 
     const cardsHtml = actionItems.map((a, idx) => `
       <div class="carousel-card-3d ${a.theme} ${idx === 0 ? 'is-front' : ''}" 
@@ -171,15 +171,26 @@ export class OverviewView {
            style="transform: rotateY(${idx * angleStep}deg) translateZ(${cylinderRadius}px);">
         <div class="strata-card-corner tl"></div>
         <div class="strata-card-corner tr"></div>
-        <div>
-          <div class="strata-card-title"><span>${a.icon}</span><span>${a.title}</span></div>
-          <div class="strata-card-meta" style="margin-top: 6px;">${a.meta}</div>
+        
+        <div class="card-header-bar">
+          <span class="card-sector-tag">${String(idx + 1).padStart(2, '0')}</span>
+          <span class="card-badge-pill">${a.badge}</span>
         </div>
-        <div>
-          <div class="strata-card-badge">${a.badge}</div>
-          <div class="card-prompt-hint">
-            <span>⚡ CLICK TO PROMPT VIEW</span>
+
+        <div class="card-core-visual">
+          <div class="card-icon-aura">
+            <span>${a.icon}</span>
           </div>
+          <div class="card-core-title">${a.title}</div>
+          <div class="card-core-meta">${a.meta}</div>
+        </div>
+
+        <div class="card-footer-trigger">
+          <span class="card-trigger-btn">
+            <span style="color: var(--accent-cyan);">◈</span>
+            <span>INSPECT</span>
+            <span style="font-size: 0.6rem; opacity: 0.7;">❯</span>
+          </span>
         </div>
       </div>
     `).join('');
@@ -188,17 +199,33 @@ export class OverviewView {
       <div class="holomap-canvas-header">
         <h3 class="holomap-title">
           <span class="holomap-icon">◈</span>
-          <span class="text-gradient-cyber">CYLINDRICAL INVESTIGATION CAROUSEL // MERRY-GO-ROUND</span>
+          <span class="text-gradient-cyber">HOLOGRAPHIC ACTION CAROUSEL // MERRY-GO-ROUND</span>
         </h3>
         <span class="landing-card-badge neon-badge">[DRAG • ARROWS • CLICK TO PROMPT]</span>
       </div>
 
       <div class="carousel-stage-3d" id="carousel-stage">
-        <button class="carousel-paddle prev" id="carousel-paddle-prev" title="Rotate Left (ArrowLeft)">◀</button>
-        <button class="carousel-paddle next" id="carousel-paddle-next" title="Rotate Right (ArrowRight)">▶</button>
+        <!-- 3D Holographic Turntable Platform -->
+        <div class="carousel-holo-pedestal">
+          <div class="carousel-holo-ring-inner"></div>
+        </div>
+
+        <button class="carousel-paddle prev" id="carousel-paddle-prev" title="Rotate Left (ArrowLeft)">❮</button>
+        <button class="carousel-paddle next" id="carousel-paddle-next" title="Rotate Right (ArrowRight)">❯</button>
         
         <div class="carousel-cylinder-3d" id="carousel-cylinder">
           ${cardsHtml}
+        </div>
+      </div>
+
+      <!-- Orbital Sector Tracker Bar -->
+      <div class="carousel-orbital-tracker" id="carousel-orbital-tracker">
+        <div style="display: flex; align-items: center;">
+          <span class="tracker-sector-badge">SECTOR <strong id="tracker-current-num">01</strong> / 16</span>
+          <span class="tracker-lens-title" id="tracker-current-title">ARCHITECTURE</span>
+        </div>
+        <div class="tracker-dots-bar" id="tracker-dots-bar">
+          ${actionItems.map((_, i) => `<span class="tracker-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
         </div>
       </div>
     `;
@@ -324,6 +351,16 @@ export class OverviewView {
       });
     };
 
+    const trackerNum = carouselSection.querySelector('#tracker-current-num');
+    const trackerTitle = carouselSection.querySelector('#tracker-current-title');
+    const trackerDots = Array.from(carouselSection.querySelectorAll('.tracker-dot'));
+
+    const updateTracker = (normalizedIndex, item) => {
+      if (trackerNum) trackerNum.textContent = String(normalizedIndex + 1).padStart(2, '0');
+      if (trackerTitle) trackerTitle.textContent = item.title.toUpperCase();
+      trackerDots.forEach((d, i) => d.classList.toggle('active', i === normalizedIndex));
+    };
+
     const rotateToIndex = (targetIndex, shouldPrompt = false) => {
       currentCarouselIndex = targetIndex;
       const normalizedIndex = ((currentCarouselIndex % actionItems.length) + actionItems.length) % actionItems.length;
@@ -332,6 +369,8 @@ export class OverviewView {
       updateCardDepths(normalizedIndex);
 
       const item = actionItems[normalizedIndex];
+      updateTracker(normalizedIndex, item);
+
       this.selectedAction = item.id;
       this.renderActionDossier(dossierSection, item.id);
 
@@ -340,8 +379,20 @@ export class OverviewView {
       }
     };
 
-    // Initial depth calculation
+    // Initial depth and tracker calculation
     updateCardDepths(0);
+    updateTracker(0, actionItems[0]);
+
+    // Tracker dot clicks
+    trackerDots.forEach((dot) => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dotIndex = parseInt(dot.dataset.index, 10);
+        let delta = ((dotIndex - (currentCarouselIndex % actionItems.length)) + actionItems.length) % actionItems.length;
+        if (delta > actionItems.length / 2) delta -= actionItems.length;
+        rotateToIndex(currentCarouselIndex + delta);
+      });
+    });
 
     // Nav Paddles Click Handlers
     carouselSection.querySelector('#carousel-paddle-prev')?.addEventListener('click', (e) => {

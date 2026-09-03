@@ -3,9 +3,11 @@
  * Provides tactical archaeological lenses navigation
  */
 export class Sidebar {
-  constructor({ activePage = 'overview', onNavigate }) {
+  constructor({ activePage = 'overview', onNavigate, onPinToggle }) {
     this.activePage = activePage;
     this.onNavigate = onNavigate;
+    this.onPinToggle = onPinToggle;
+    this.isPinned = false; // Default: push/pull hover drawer
     this.element = null;
 
     this.sections = [
@@ -71,7 +73,8 @@ export class Sidebar {
 
   render() {
     const sidebar = document.createElement('aside');
-    sidebar.className = 'app-sidebar';
+    sidebar.className = `app-sidebar ${this.isPinned ? 'is-pinned' : ''}`;
+    sidebar.id = 'app-sidebar-drawer';
 
     const sectionsHtml = this.sections.map(sec => `
       <div class="sidebar-section">
@@ -90,6 +93,16 @@ export class Sidebar {
     `).join('');
 
     sidebar.innerHTML = `
+      <div class="sidebar-header-bar">
+        <div class="sidebar-brand-mini">
+          <span class="brand-glyph">⚡</span>
+          <span class="brand-text">TACTICAL LENSES</span>
+        </div>
+        <button type="button" class="btn-sidebar-pin ${this.isPinned ? 'active' : ''}" id="btn-sidebar-pin" title="${this.isPinned ? 'Unpin (Auto-collapse on exit)' : 'Pin Sidebar (Keep expanded)'}">
+          ${this.isPinned ? '📌' : '📍'}
+        </button>
+      </div>
+
       <div class="sidebar-nav-container">
         ${sectionsHtml}
       </div>
@@ -102,6 +115,18 @@ export class Sidebar {
         <span>v0.1.0</span>
       </div>
     `;
+
+    // Pin toggle handler
+    const pinBtn = sidebar.querySelector('#btn-sidebar-pin');
+    pinBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.isPinned = !this.isPinned;
+      sidebar.classList.toggle('is-pinned', this.isPinned);
+      pinBtn.classList.toggle('active', this.isPinned);
+      pinBtn.innerHTML = this.isPinned ? '📌' : '📍';
+      pinBtn.title = this.isPinned ? 'Unpin (Auto-collapse on exit)' : 'Pin Sidebar (Keep expanded)';
+      if (this.onPinToggle) this.onPinToggle(this.isPinned);
+    });
 
     sidebar.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', (e) => {
