@@ -494,13 +494,13 @@ export class OverviewView {
 
   /**
    * Opens the Holographic Prompt Modal in a unique laser aperture unfold transition
-   * and provides the direct view trigger button
+   * with deep architectural explanation and direct view trigger button
    */
   openHolographicPrompt(item) {
     // Remove existing prompt if any
     document.querySelector('.lens-prompt-overlay')?.remove();
 
-    const actionDetails = this.getActionDetails(item.id);
+    const d = this.getActionDetails(item.id);
     const overlay = document.createElement('div');
     overlay.className = 'lens-prompt-overlay';
 
@@ -512,34 +512,51 @@ export class OverviewView {
         
         <div class="lens-prompt-header">
           <div class="lens-prompt-title">
-            <span>${actionDetails.icon}</span>
-            <span class="text-gradient-cyber">${actionDetails.title}</span>
+            <span>${d.icon}</span>
+            <span class="text-gradient-cyber">${d.title}</span>
           </div>
           <button class="lens-prompt-close" id="btn-close-prompt" title="Close Prompt (Esc)">✕</button>
         </div>
 
         <div class="lens-prompt-body">
           <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span class="landing-card-badge neon-badge">${actionDetails.type}</span>
-            <span style="font-size: 0.75rem; color: var(--success); font-family: var(--font-mono); font-weight: 700;">
+            <span class="landing-card-badge neon-badge">${d.type}</span>
+            <span style="font-size: 0.72rem; color: var(--success); font-family: var(--font-mono); font-weight: 700;">
               ● FORENSIC ENGINE ONLINE
             </span>
           </div>
 
+          <div class="lens-prompt-tagline">
+            ⚡ ${d.tagline}
+          </div>
+
           <p class="lens-prompt-desc">
-            ${actionDetails.description}
+            ${d.overview}
           </p>
 
+          <div class="lens-prompt-section">
+            <div class="lens-prompt-section-title">◈ KEY QUESTIONS THIS LENS ANSWERS:</div>
+            <div class="lens-prompt-qa-list">
+              ${d.questionsAnswered.map(q => `
+                <div class="lens-prompt-qa-item">
+                  <span class="qa-bullet">◈</span>
+                  <span>${q}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
           <div class="lens-prompt-chips">
-            <span class="lens-chip">⚡ AST SYMBOLS</span>
-            <span class="lens-chip">🕸️ TOPOLOGY COUPLING</span>
-            <span class="lens-chip">📜 CHRONO-STRATA</span>
-            <span class="lens-chip">🛡️ RISK MATRIX</span>
+            ${d.capabilities.map(cap => `<span class="lens-chip">⚡ ${cap}</span>`).join('')}
+          </div>
+
+          <div class="lens-prompt-usecase">
+            <strong>💡 Tactical Use Case:</strong> ${d.useCase}
           </div>
 
           <button class="lens-prompt-btn-launch" id="btn-modal-launch">
             <span>🚀</span>
-            <span>ENTER ${actionDetails.title.toUpperCase()} VIEW →</span>
+            <span>ENTER ${d.title.toUpperCase()} VIEW →</span>
           </button>
         </div>
       </div>
@@ -566,112 +583,320 @@ export class OverviewView {
         title: 'Architecture Topology',
         type: 'Structural Mapping',
         icon: '🕸️',
-        description: 'Explore high-level subsystems, module boundaries, and living Mermaid dependency graphs.',
+        tagline: 'Deconstruct living module boundaries and cross-package dependency webs.',
+        overview: 'The Architecture Topology lens analyzes all internal import statements, module references, and package boundaries to construct a living directed graph of your codebase. It automatically generates interactive Mermaid.js diagrams that visualize the entire structural hierarchy.',
+        questionsAnswered: [
+          'How are files and directories structurally interconnected across the project?',
+          'Where are the primary architectural boundaries and core system entry points?',
+          'Are there hidden couplings between supposedly separated layers or domain modules?'
+        ],
+        capabilities: [
+          'Directed Graph Topography',
+          'Interactive Mermaid Diagram',
+          'Coupling Density Metrics',
+          'Subsystem Cluster Isolation'
+        ],
+        useCase: 'Essential when onboarding to an unfamiliar codebase, planning system modularization, or validating architectural separation of concerns.',
         cta: 'EXPLORE ARCHITECTURE TOPOLOGY'
       },
       impact: {
         title: 'Impact & Blast Radius',
         type: 'Ripple Analysis',
         icon: '💥',
-        description: 'Calculate dependency blast radius and upstream caller ripple effects for any selected file or symbol.',
+        tagline: 'Calculate upstream ripple effects and downstream caller blast radius for any file.',
+        overview: 'Computes the transitive dependency closure and blast radius multiplier for any selected module. Reveals exactly which files, services, and tests will break or require re-testing if you modify a given file.',
+        questionsAnswered: [
+          'If I change a function or export in file X, what other files will be impacted?',
+          'What is the transitive blast radius percentage across the entire project?',
+          'Which root modules carry the highest catastrophic failure risk if modified?'
+        ],
+        capabilities: [
+          'Transitive Blast Radius',
+          'Direct & Indirect Callers',
+          'Upstream Dependency Tree',
+          'Safe Refactoring Horizon'
+        ],
+        useCase: 'Crucial before merging pull requests, modifying shared utilities, or refactoring core library APIs.',
         cta: 'CALCULATE BLAST RADIUS'
       },
       explorer: {
         title: 'Source Explorer',
         type: 'Code & AST Inspector',
         icon: '📁',
-        description: 'Browse the repository file hierarchy, inspect classes/functions, and view in-browser source code.',
+        tagline: 'Navigate full AST symbol hierarchies, exported signatures, and syntax structures.',
+        overview: 'A lightning-fast in-browser file and syntax explorer that decomposes source files into their constituent AST structures: functions, classes, interfaces, methods, and imports with line-indexed syntax highlighting.',
+        questionsAnswered: [
+          'What classes, methods, and functions are declared and exported in this file?',
+          'How is the physical directory tree laid out relative to logical components?',
+          'What are the exact signatures, parameter lists, and internal calls in a module?'
+        ],
+        capabilities: [
+          'AST Function & Class Extraction',
+          'Syntax Highlighted Viewer',
+          'Symbol Signature Outlines',
+          'Line-Indexed Code Strata'
+        ],
+        useCase: 'Perfect for inspecting implementation details, auditing signatures, and reviewing source code without switching to a heavy external editor.',
         cta: 'OPEN SOURCE EXPLORER'
       },
       search: {
         title: 'Forensic Code Search',
         type: 'Index Query Engine',
         icon: '🔍',
-        description: 'Query classes, function definitions, exported symbols, and full text across the AST inverted index.',
+        tagline: 'Query symbols, identifiers, signatures, and string literals across an in-memory inverted index.',
+        overview: 'Powered by a deterministic in-memory inverted index that separates symbol names from full-text occurrences. Features multi-token matching, language filtering, and ranked relevance scoring.',
+        questionsAnswered: [
+          'Where is a specific function, class, or type declared and referenced across all strata?',
+          'Which files match multi-token architectural patterns (e.g. "auth service token")?',
+          'How can I quickly locate dead references or specific string literals in microseconds?'
+        ],
+        capabilities: [
+          'Exact Symbol Prioritization',
+          'Multi-Token Boolean Search',
+          'Language Scope Filtering',
+          'Sub-Millisecond Inverted Index'
+        ],
+        useCase: 'Used for rapid cross-codebase lookups, tracking deprecations, and tracing where shared constants and methods are invoked.',
         cta: 'LAUNCH FORENSIC SEARCH'
       },
       git: {
         title: 'Git Chrono-Strata',
         type: 'Lineage Timeline',
         icon: '📜',
-        description: 'Inspect chronological commit lineage, author ownership, and branch history in safe read-only mode.',
+        tagline: 'Uncover chronological commit velocity, author ownership distribution, and commit cadence.',
+        overview: 'Inspects repository revision history using safe, read-only Git operations. Extracts commit velocity, churn rhythms, author ownership shares, and temporal milestones from genesis to HEAD.',
+        questionsAnswered: [
+          'Who are the primary maintainers and knowledge owners for different subsystems?',
+          'What has been the commit frequency, velocity cadence, and development trajectory?',
+          'When were major system rewrites and architectural shifts merged into the default branch?'
+        ],
+        capabilities: [
+          'Read-Only Git Pipeline',
+          'Author Ownership Stratification',
+          'Velocity & Cadence Curves',
+          'Milestone Tag Lineage'
+        ],
+        useCase: 'Invaluable for technical due diligence, identifying single-point-of-failure maintainers (bus factor), and tracking velocity trends.',
         cta: 'VIEW GIT TIMELINE'
       },
       analysis: {
         title: 'Drift & Hotspot Matrix',
         type: 'Risk Telemetry',
         icon: '⚡',
-        description: 'Identify high-churn files, cyclomatic complexity spikes, and circular dependency loops.',
+        tagline: 'Pinpoint high-churn, high-complexity files where bugs are statistically most likely to breed.',
+        overview: 'Merges Git commit churn frequency with cyclomatic complexity and line counts to calculate an empirical "Hotspot Risk Score" (0–100). Highlights unstable files that are constantly modified and structurally fragile.',
+        questionsAnswered: [
+          'Which files combine both high cyclomatic complexity and high edit frequency?',
+          'Where does technical debt concentrate in the codebase?',
+          'Which components are experiencing active structural drift and need test coverage?'
+        ],
+        capabilities: [
+          'Combined Churn-Complexity Scoring',
+          'Statistical Defect Risk Heatmap',
+          'Top 10 High-Risk Hotspots',
+          'Volatility Trajectory Curves'
+        ],
+        useCase: 'Primary tool for planning refactoring sprints, preventing regressions, and prioritizing code review scrutiny.',
         cta: 'OPEN RISK HOTSPOTS'
       },
       archaeology: {
         title: 'Evolutionary Synthesis',
         type: 'Archaeological Digest',
         icon: '🏛️',
-        description: 'Synthesize the holistic history of how this software system was constructed from genesis to current strata.',
+        tagline: 'Reconstruct the complete biographical narrative of how the software system evolved.',
+        overview: 'Synthesizes the holistic chronological story of the repository: foundation genesis, language adoption phases, major architectural milestones, and contributor eras into a readable archaeological dossier.',
+        questionsAnswered: [
+          'What was the original architectural design when the repository was created?',
+          'How did the tech stack, frameworks, and conventions shift over time?',
+          'What were the distinct development eras and major transitional refactors?'
+        ],
+        capabilities: [
+          'Genesis-to-HEAD Timeline',
+          'Multi-Era Classification',
+          'Tech Stack Evolution Tracking',
+          'Archaeological Summary Dossier'
+        ],
+        useCase: 'Essential for new tech leads, engineering managers, and architects taking over legacy or inherited systems.',
         cta: 'SYNTHESIZE ARCHAEOLOGY'
       },
       risk: {
         title: 'Codebase Risk Map',
         type: 'Measurable Risk Matrix',
         icon: '⚡',
-        description: 'Quantify structural risk ranking based on commit frequency, file volume, and dependency centrality.',
+        tagline: 'Quantify structural risk through graph centrality, module size, and fan-out fragility.',
+        overview: 'A holistic risk assessment matrix that evaluates maintainability index, cyclomatic complexity spikes, dependency centrality, and lack of test insulation across every directory and file.',
+        questionsAnswered: [
+          'Which files represent critical structural bottlenecks with high fan-in and low maintainability?',
+          'Where are the highest-risk single points of failure across the codebase?',
+          'How does the aggregate system integrity score (0–100) benchmark across components?'
+        ],
+        capabilities: [
+          'Maintainability Index (MI)',
+          'Cyclomatic Complexity Spikes',
+          'Fan-In/Fan-Out Centrality',
+          'System Health Gauge (95/100)'
+        ],
+        useCase: 'Used by engineering leadership to establish health baselines, set quality gates, and justify technical debt reduction.',
         cta: 'VIEW RISK MAP'
       },
       features: {
         title: 'Feature-to-Code Mapping',
         type: 'Feature Topology',
         icon: '🗺️',
-        description: 'Classify source files into product capabilities and architectural subsystems.',
+        tagline: 'Cluster loose source files into functional domain modules and user capabilities.',
+        overview: 'Employs heuristic clustering to map physical source files to logical product features, domain boundaries, and backend capabilities (e.g. Authentication, Billing, Search, AI, Parsing).',
+        questionsAnswered: [
+          'Which files and packages belong to which business or product feature?',
+          'Are feature concerns cleanly separated or scattered across unstructured utility files?',
+          'How many lines of code and components contribute to a specific user-facing feature?'
+        ],
+        capabilities: [
+          'Domain Capability Clustering',
+          'Cross-Cutting Concern Identification',
+          'Feature Footprint Metrics',
+          'Directory-to-Domain Map'
+        ],
+        useCase: 'Perfect for domain-driven design (DDD) refactoring, microservice extraction, and feature-oriented onboarding.',
         cta: 'EXPLORE FEATURE MAP'
       },
       tests: {
         title: 'Test Intelligence',
         type: 'Verification Harness',
         icon: '🧪',
-        description: 'Discover test suites, calculate test file density, and map automated test coverage signals.',
+        tagline: 'Discover test suites, measure test-to-source ratios, and find unshielded code.',
+        overview: 'Automatically discovers unit, integration, and E2E test files across modern test frameworks (Node test runner, Jest, Mocha, PyTest). Calculates test density and highlights production code lacking tests.',
+        questionsAnswered: [
+          'What automated test suites exist and which test runners are configured?',
+          'What is the ratio of test code lines to production source code lines?',
+          'Which core business modules have zero test files insulating them from regression?'
+        ],
+        capabilities: [
+          'Automated Test Discovery',
+          'Test-to-Source Code Ratio',
+          'Test Framework Detection',
+          'Unshielded File Signals'
+        ],
+        useCase: 'Critical for QA engineers, test architects, and developers establishing automated CI/CD safety rails.',
         cta: 'VIEW TEST INTELLIGENCE'
       },
       bugs: {
         title: 'Bug Archaeology',
         type: 'Defect Tracer',
         icon: '🐛',
-        description: 'Trace historical bug and regression commits to identify structurally unstable modules.',
+        tagline: 'Trace historical bug fixes, regression patches, and recurring defect clusters.',
+        overview: 'Scans git commit messages for defect markers (fix, bug, issue, regression, patch, resolve) to reconstruct a historical map of where bugs have repeatedly occurred in the codebase.',
+        questionsAnswered: [
+          'Which specific modules have required the most bug fixes over their lifespan?',
+          'Are there recurring defect patterns or fragility hotbeds that break repeatedly?',
+          'Which commit patches resolved critical historical defects in the system?'
+        ],
+        capabilities: [
+          'Commit Message Defect Filtering',
+          'Historical Bug Density Score',
+          'Regression-Prone Module Highlights',
+          'Defect Timeline Strata'
+        ],
+        useCase: 'Indispensable for root-cause post-mortems, reliability engineering, and locating brittle legacy logic.',
         cta: 'INSPECT BUG TRACES'
       },
       deadcode: {
         title: 'Dead Code Signals',
         type: 'Isolated Modules',
         icon: '🍂',
-        description: 'Identify unimported source files with zero incoming internal dependencies.',
+        tagline: 'Detect isolated source files with zero incoming imports or callers.',
+        overview: 'Traverses the global dependency graph to isolate orphaned source files that are never imported, called, or referenced by any active application entrypoint or test harness.',
+        questionsAnswered: [
+          'Are there forgotten experimental files or obsolete components left in the repository?',
+          'Which files have 0 incoming dependencies from any active system pathway?',
+          'How many lines of dead code can be safely pruned to reduce cognitive overhead and bundle size?'
+        ],
+        capabilities: [
+          'Zero-Inflow Module Discovery',
+          'Orphaned Component Listing',
+          'Estimated Pruning Volume',
+          'False-Positive Entrypoint Filters'
+        ],
+        useCase: 'Essential during spring-cleaning refactors, library migrations, and bundle size reduction initiatives.',
         cta: 'DETECT DEAD CODE'
       },
       manifests: {
         title: 'Dependency Health',
         type: 'Package Telemetry',
         icon: '📦',
-        description: 'Analyze package manager manifests (package.json, requirements.txt) and external dependencies.',
+        tagline: 'Audit package manifests, third-party libraries, and ecosystem dependencies.',
+        overview: 'Parses package declarations (package.json, requirements.txt, Cargo.toml, etc.) to catalog external third-party dependencies, distinguish direct from dev dependencies, and evaluate ecosystem exposure.',
+        questionsAnswered: [
+          'What external libraries, frameworks, and versions does this project depend upon?',
+          'What is the breakdown between production dependencies and developer tooling?',
+          'Are there obsolete or redundant third-party libraries bloating the dependency tree?'
+        ],
+        capabilities: [
+          'Multi-Ecosystem Manifest Parsing',
+          'Direct vs Dev Dependency Breakdown',
+          'External Library Catalog',
+          'Dependency Count Telemetry'
+        ],
+        useCase: 'Key for supply-chain security reviews, license compliance checks, and dependency update planning.',
         cta: 'VIEW DEPENDENCY HEALTH'
       },
       review: {
         title: 'Automated Code Review',
         type: 'Heuristic Audit',
         icon: '🛡️',
-        description: 'Perform an automated structural audit for oversized modules, cyclic loops, and maintainability bottlenecks.',
+        tagline: 'Instant heuristic audit for cyclic loops, giant modules, and maintainability antipatterns.',
+        overview: 'Runs deterministic rule-based heuristic analyzers across the codebase to flag anti-patterns: God files (>500 LOC), deeply nested logic, circular dependency cycles (A -> B -> A), and poor maintainability scores.',
+        questionsAnswered: [
+          'Are there circular dependency cycles that cause bundle bloat or runtime initialization bugs?',
+          'Which files exceed recommended size thresholds and violate Single Responsibility?',
+          'What concrete, actionable code quality fixes should be prioritized first?'
+        ],
+        capabilities: [
+          'Circular Import Loop Detection',
+          'God File (>500 LOC) Detection',
+          'Cyclomatic Threshold Flags',
+          'Prioritized Action Items'
+        ],
+        useCase: 'Use before code freeze, during pull request reviews, and as an objective linting and architectural audit.',
         cta: 'RUN CODE REVIEW'
       },
       documentation: {
         title: 'Subsystem Docs',
         type: 'Specification Generator',
         icon: '📖',
-        description: 'Generate deterministic architecture specifications, subsystem contracts, and exportable Markdown reports.',
+        tagline: 'Generate deterministic architecture specifications, API contracts, and Markdown summaries.',
+        overview: 'Synthesizes parsed AST symbols, module boundaries, metrics, and dependency graphs into clean, comprehensive, exportable architectural documentation and developer handbooks.',
+        questionsAnswered: [
+          'How do I automatically generate up-to-date architecture documentation for this repo?',
+          'What are the documented public API contracts, classes, and exported signatures?',
+          'Can I export a complete Markdown dossier for offline distribution or team handoff?'
+        ],
+        capabilities: [
+          'Deterministic Architecture Specs',
+          'Automated Markdown Report Export',
+          'Component Contract Catalog',
+          'Living README Generator'
+        ],
+        useCase: 'Ideal for enterprise knowledge handovers, generating compliance documentation, and keeping project wikis synchronized.',
         cta: 'VIEW SPECIFICATIONS'
       },
       ai: {
         title: 'Codebase Q&A Investigator',
-        type: 'Natural Language Q&A',
+        type: 'Local Query Engine',
         icon: '🤖',
-        description: 'Ask natural language questions about the codebase architecture, entry points, and structural patterns.',
+        tagline: 'Query architecture, ownership, dependencies, and syntax using natural language offline.',
+        overview: 'An offline-first natural language query engine that interprets developer questions about contributors, file locations, language breakdowns, and structural metrics without needing external API keys.',
+        questionsAnswered: [
+          'Who wrote the most code in this project and what files do they own?',
+          'Which files are the most complex or statistically risky to touch?',
+          'Where is the authentication or router logic located and how does it connect to other layers?'
+        ],
+        capabilities: [
+          'Offline Deterministic NL Engine',
+          'Structured AI Prompt Synthesizer',
+          'Context-Aware Codebase Packager',
+          'Multi-Turn Technical Q&A'
+        ],
+        useCase: 'The ultimate assistant for instantly answering repository questions and generating grounded LLM prompts with full context.',
         cta: 'CONSULT CODEBASE Q&A'
       }
     };
@@ -680,39 +905,63 @@ export class OverviewView {
   }
 
   renderActionDossier(container, actionId) {
-    const details = this.getActionDetails(actionId);
+    const d = this.getActionDetails(actionId);
 
     container.innerHTML = `
       <div class="dossier-blade-header">
         <h4 class="dossier-title">
-          <span>${details.icon}</span>
-          <span class="text-gradient-aurora">${details.title}</span>
+          <span>${d.icon}</span>
+          <span class="text-gradient-aurora">${d.title}</span>
         </h4>
-        <span class="landing-card-badge neon-badge">${details.type}</span>
+        <span class="landing-card-badge neon-badge">${d.type}</span>
+      </div>
+
+      <div class="dossier-tagline">
+        ⚡ ${d.tagline}
       </div>
 
       <div class="dossier-meta-grid">
         <div class="dossier-meta-item">
-          <span class="dossier-meta-label">Selected Action</span>
+          <span class="dossier-meta-label">Selected Lens</span>
           <span class="dossier-meta-val">${actionId.toUpperCase()}</span>
         </div>
         <div class="dossier-meta-item">
-          <span class="dossier-meta-label">Engine Status</span>
+          <span class="dossier-meta-label">Forensic Engine</span>
           <span class="dossier-meta-val" style="color: var(--success);">ONLINE // READY</span>
         </div>
       </div>
 
       <div class="dossier-section">
-        <div class="dossier-section-title">◈ INVESTIGATION PURPOSE:</div>
-        <p class="dossier-findings-text" style="font-size: 0.85rem; line-height: 1.55;">
-          ${details.description}
+        <div class="dossier-section-title">◈ FORENSIC SCOPE & MECHANICS:</div>
+        <p class="dossier-findings-text" style="font-size: 0.84rem; line-height: 1.55;">
+          ${d.overview}
         </p>
       </div>
 
-      <div style="margin-top: 14px;">
+      <div class="dossier-section">
+        <div class="dossier-section-title">◈ DEVELOPER QUESTIONS ANSWERED:</div>
+        <div class="dossier-qa-list">
+          ${d.questionsAnswered.map(q => `
+            <div class="dossier-qa-item">
+              <span style="color: var(--accent-cyan); font-size: 0.7rem; margin-top: 1px;">◈</span>
+              <span>${q}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="dossier-chips">
+        ${d.capabilities.map(cap => `<span class="dossier-chip">${cap}</span>`).join('')}
+      </div>
+
+      <div class="dossier-usecase">
+        <strong style="color: #c084fc;">💡 When to Use:</strong> ${d.useCase}
+      </div>
+
+      <div style="margin-top: 16px;">
         <button class="btn-primary" id="btn-launch-action" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 0.88rem;">
           <span>🚀</span>
-          <span>${details.cta}</span>
+          <span>${d.cta}</span>
         </button>
       </div>
     `;

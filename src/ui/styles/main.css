@@ -901,14 +901,15 @@ body {
 
 .lens-prompt-modal {
   width: 100%;
-  max-width: 580px;
-  background: linear-gradient(145deg, rgba(14, 24, 48, 0.96) 0%, rgba(6, 11, 24, 0.99) 100%);
+  max-width: 660px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: linear-gradient(145deg, rgba(14, 24, 48, 0.98) 0%, rgba(6, 11, 24, 0.99) 100%);
   border: 1px solid rgba(0, 240, 255, 0.5);
   border-radius: 16px;
   box-shadow: 0 0 50px rgba(0, 240, 255, 0.4), 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  padding: 28px 30px;
+  padding: 26px 30px;
   position: relative;
-  overflow: hidden;
   animation: holographicUnfold 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -939,12 +940,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .lens-prompt-title {
   font-family: var(--font-cyber);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 900;
   display: flex;
   align-items: center;
@@ -979,11 +980,78 @@ body {
   gap: 14px;
 }
 
-.lens-prompt-desc {
+.lens-prompt-tagline {
+  font-family: var(--font-display);
   font-size: 0.95rem;
+  font-weight: 600;
+  color: #00f0ff;
+  line-height: 1.45;
+  border-left: 3px solid var(--accent-cyan);
+  padding-left: 10px;
+  background: rgba(0, 240, 255, 0.04);
+  padding: 6px 12px;
+  border-radius: 0 6px 6px 0;
+}
+
+.lens-prompt-desc {
+  font-size: 0.88rem;
   line-height: 1.6;
   color: var(--text-secondary);
   font-family: var(--font-display);
+}
+
+.lens-prompt-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(8, 14, 28, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.lens-prompt-section-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-cyan);
+}
+
+.lens-prompt-qa-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lens-prompt-qa-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.qa-bullet {
+  color: var(--accent-cyan);
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+.lens-prompt-usecase {
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px dashed rgba(124, 58, 237, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  line-height: 1.45;
+}
+
+.lens-prompt-usecase strong {
+  color: #c084fc;
 }
 
 .lens-prompt-chips {
@@ -993,7 +1061,7 @@ body {
 }
 
 .lens-chip {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-family: var(--font-mono);
   font-weight: 700;
   padding: 4px 10px;
@@ -1119,6 +1187,62 @@ body {
   align-items: center;
   gap: 10px;
   letter-spacing: 0.02em;
+}
+
+.dossier-tagline {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #00f0ff;
+  line-height: 1.4;
+  border-left: 2.5px solid var(--accent-cyan);
+  padding-left: 8px;
+  margin-top: 4px;
+}
+
+.dossier-qa-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.dossier-qa-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.dossier-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dossier-chip {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  color: var(--accent-cyan);
+}
+
+.dossier-usecase {
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px dashed rgba(124, 58, 237, 0.35);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: #e2e8f0;
+  line-height: 1.4;
+  margin-top: 8px;
 }
 
 /* High-Voltage Cyber CTA Launch Button */
