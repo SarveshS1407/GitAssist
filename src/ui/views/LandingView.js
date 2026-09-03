@@ -31,106 +31,177 @@ export class LandingView {
     container.innerHTML = `
       ${errorHtml}
 
-      <!-- Original Cyber Hero Section -->
+      <!-- Futuristic Cyber Hero Section -->
       <section class="landing-hero">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-          <span class="brand-badge" style="font-size: 0.72rem; padding: 3px 8px;">LOCAL-FIRST // ZERO-CLOUD // FORENSICS</span>
+        <div class="landing-hero-scanline"></div>
+        <div class="strata-card-corner tl"></div>
+        <div class="strata-card-corner tr"></div>
+        <div class="strata-card-corner bl"></div>
+        <div class="strata-card-corner br"></div>
+
+        <!-- System Status Badges -->
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; width: 100%; max-width: 720px; gap: 8px; z-index: 2;">
+          <span class="brand-badge" style="font-size: 0.72rem; padding: 4px 10px;">
+            ◈ FORENSIC CODEBASE INTELLIGENCE // DEEP REPOSITORY EXCAVATION
+          </span>
+          <span style="font-size: 0.72rem; color: var(--success); font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.05em;">
+            ● 100% AIR-GAPPED // NO API KEYS NEEDED
+          </span>
         </div>
-        <div class="hero-icon">⚡</div>
-        <h1 class="hero-title text-gradient-cyber">GitAssist</h1>
+
+        <!-- Multi-Ring Holographic Hero Emblem -->
+        <div class="hero-icon-container">
+          <div class="hero-icon-ring-outer"></div>
+          <div class="hero-icon-halo"></div>
+          <div class="hero-icon-glyph">⚡</div>
+        </div>
+
+        <!-- Bold Cyber Display Heading -->
+        <h1 class="hero-title">GITASSIST</h1>
+        
+        <!-- High-Impact Description with Highlighted Highlights -->
         <p class="hero-description">
-          Analyze your codebase, understand its architecture, trace AST relationships, explore Git chronology, and uncover structural dependencies—100% offline.
+          Autonomous codebase forensics. Deconstruct <span class="highlight-cyan">architectural boundaries</span>, trace <span class="highlight-magenta">AST dependencies</span>, calculate <span class="highlight-yellow">ripple blast radius</span>, and synthesize <span class="highlight-purple">evolutionary history</span>—100% offline in local memory.
         </p>
 
-        <!-- Direct Ingestion Input & Action -->
-        <div style="width: 100%; max-width: 640px; display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
-          <div style="display: flex; gap: 10px;">
-            <input 
-              type="text" 
-              id="landing-repo-input" 
-              placeholder="Enter local path or Git URL (e.g. /Users/kingpin/Desktop/gitassist)" 
-              value="/Users/kingpin/Desktop/gitassist" 
-              autocomplete="off"
-              spellcheck="false"
-              style="flex: 1; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-holo); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.86rem;"
-            />
-            <button class="btn-primary" id="btn-open-repo">
+        <!-- High-Tech Excavation Console Deck -->
+        <div class="excavation-console-deck">
+          <div class="console-deck-header">
+            <span>TERMINAL INGESTION PROTOCOL // TARGET REPOSITORY</span>
+            <span style="color: var(--success);">● READY</span>
+          </div>
+
+          <div class="console-input-row">
+            <div class="console-input-wrapper">
+              <span class="console-prompt-glyph">PATH //</span>
+              <input 
+                type="text" 
+                id="landing-repo-input" 
+                placeholder="Enter local directory path or Git URL (e.g. /Users/kingpin/Desktop/gitassist)" 
+                value="/Users/kingpin/Desktop/gitassist" 
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <button class="btn-excavate-hero" id="btn-open-repo">
               <span>🚀</span>
-              <span>EXCAVATE</span>
+              <span>EXCAVATE REPOSITORY ❯</span>
             </button>
           </div>
 
           <!-- Inline Validation Feedback -->
           <div id="landing-validation-msg" style="display: none; color: var(--danger); font-size: 0.78rem; font-family: var(--font-mono); text-align: left;"></div>
           
-          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-size: 0.76rem; color: var(--text-muted);">
-            <span>Quick presets:</span>
-            <button type="button" id="btn-preset-current" class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
-              ⚡ GitAssist Repo (<code>/Users/kingpin/Desktop/gitassist</code>)
+          <!-- Quick Preset Chips -->
+          <div class="landing-presets-row">
+            <span style="font-family: var(--font-mono); font-weight: 700;">PRESETS:</span>
+            <button type="button" id="btn-preset-current" class="preset-chip">
+              ⚡ GitAssist Core (<code>/Users/kingpin/Desktop/gitassist</code>)
             </button>
-            <button type="button" id="btn-preset-veritas" class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
-              ⚡ Veritas Mortis (<code>/Users/kingpin/Desktop/veritas-mortis</code>)
+            <button type="button" id="btn-preset-veritas" class="preset-chip">
+              ⚔️ Veritas Mortis (<code>/Users/kingpin/Desktop/veritas-mortis</code>)
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Original Cyber 3-Card Grid -->
-      <section class="landing-grid">
-        <!-- 1. Recent Repositories -->
-        <div class="landing-card">
-          <div class="landing-card-header">
-            <h3 class="landing-card-title">
-              <span>🕒</span>
-              <span>Active Workspace</span>
-            </h3>
-            <span class="landing-card-badge">Local-First</span>
+      <!-- Live Engine Telemetry Strip -->
+      <section class="landing-telemetry-strip">
+        <div class="telemetry-strip-item">
+          <div class="telemetry-strip-icon">🎠</div>
+          <div>
+            <div class="telemetry-strip-val">16 LENSES</div>
+            <div class="telemetry-strip-lbl">3D Holographic Carousel</div>
           </div>
-          <div class="landing-card-content">
-            <ul class="placeholder-list">
-              <li class="placeholder-item">
-                <span>📁</span>
-                <span>Ready to scan local directories or auto-clone public Git repositories into local memory.</span>
-              </li>
-            </ul>
+        </div>
+        <div class="telemetry-strip-item">
+          <div class="telemetry-strip-icon">🕸️</div>
+          <div>
+            <div class="telemetry-strip-val">AST ENGINE</div>
+            <div class="telemetry-strip-lbl">JS, TS, Py, Rust, Go, Java</div>
+          </div>
+        </div>
+        <div class="telemetry-strip-item">
+          <div class="telemetry-strip-icon">🔒</div>
+          <div>
+            <div class="telemetry-strip-val">AIR-GAPPED</div>
+            <div class="telemetry-strip-lbl">Zero-Cloud In-Memory Storage</div>
+          </div>
+        </div>
+        <div class="telemetry-strip-item">
+          <div class="telemetry-strip-icon">💥</div>
+          <div>
+            <div class="telemetry-strip-val">BLAST RADIUS</div>
+            <div class="telemetry-strip-lbl">Transitive Ripple Graph</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Upgraded Holographic Feature Cartridges -->
+      <section class="landing-grid">
+        <!-- 1. Air-Gapped Privacy -->
+        <div class="landing-card-cyber">
+          <div class="strata-card-corner tl"></div>
+          <div class="strata-card-corner tr"></div>
+          <div class="landing-card-cyber-header">
+            <span class="landing-card-sector">SECTOR [01 // PRIVACY]</span>
+            <span class="landing-card-badge neon-badge">Local-First</span>
+          </div>
+          <div class="landing-card-cyber-title">
+            <span>🔒</span>
+            <span class="text-gradient-cyan">Air-Gapped Forensics</span>
+          </div>
+          <p class="landing-card-cyber-desc">
+            Your proprietary source code never leaves this machine. All AST symbol extraction, inverted indexing, and Git velocity queries execute strictly in-memory.
+          </p>
+          <div class="landing-card-chips">
+            <span class="landing-card-chip">🔒 ZERO TOKEN LEAKAGE</span>
+            <span class="landing-card-chip">⚡ SUB-MS LATENCY</span>
+            <span class="landing-card-chip">💾 RAM INDEX ONLY</span>
           </div>
         </div>
 
-        <!-- 2. Archaeological Capabilities -->
-        <div class="landing-card">
-          <div class="landing-card-header">
-            <h3 class="landing-card-title">
-              <span>◈</span>
-              <span>Excavation Engines</span>
-            </h3>
-            <span class="landing-card-badge">16 Lenses</span>
+        <!-- 2. Excavation Engines -->
+        <div class="landing-card-cyber cyber-violet">
+          <div class="strata-card-corner tl"></div>
+          <div class="strata-card-corner tr"></div>
+          <div class="landing-card-cyber-header">
+            <span class="landing-card-sector" style="color: #c084fc;">SECTOR [02 // LENSES]</span>
+            <span class="landing-card-badge neon-badge" style="border-color: rgba(168, 85, 247, 0.5); color: #c084fc;">16 Lenses</span>
           </div>
-          <div class="landing-card-content">
-            <ul class="placeholder-list">
-              <li class="placeholder-item">
-                <span>🔍</span>
-                <span>AST Symbol Indexing, 3D Subsystem Strata, Living Dependency Graphs, and Risk Hotspot Telemetry.</span>
-              </li>
-            </ul>
+          <div class="landing-card-cyber-title">
+            <span>🎠</span>
+            <span class="text-gradient-aurora">Multi-Strata Carousel</span>
+          </div>
+          <p class="landing-card-cyber-desc">
+            Explore living module boundaries, circular dependencies, churn hotspots, and blast radius ripple effects through an interactive 3D merry-go-round carousel.
+          </p>
+          <div class="landing-card-chips">
+            <span class="landing-card-chip chip-violet">🕸️ LIVING TOPOLOGY</span>
+            <span class="landing-card-chip chip-violet">💥 IMPACT RADIUS</span>
+            <span class="landing-card-chip chip-violet">⚡ DRIFT MATRIX</span>
           </div>
         </div>
 
         <!-- 3. Tactical Hotkeys -->
-        <div class="landing-card">
-          <div class="landing-card-header">
-            <h3 class="landing-card-title">
-              <span>⚡</span>
-              <span>Quick Navigation</span>
-            </h3>
-            <span class="landing-card-badge">Hotkeys</span>
+        <div class="landing-card-cyber cyber-amber">
+          <div class="strata-card-corner tl"></div>
+          <div class="strata-card-corner tr"></div>
+          <div class="landing-card-cyber-header">
+            <span class="landing-card-sector" style="color: #fbbf24;">SECTOR [03 // CONTROL]</span>
+            <span class="landing-card-badge neon-badge" style="border-color: rgba(251, 191, 36, 0.5); color: #fbbf24;">Mission Control</span>
           </div>
-          <div class="landing-card-content">
-            <ul class="placeholder-list">
-              <li class="placeholder-item">
-                <span>⌨️</span>
-                <span>Press <code>⌘K</code> for Forensic Search, <code>1-6</code> to switch tactical investigation lenses.</span>
-              </li>
-            </ul>
+          <div class="landing-card-cyber-title">
+            <span>⚡</span>
+            <span style="background: linear-gradient(135deg, #fbbf24, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Rapid Key Navigation</span>
+          </div>
+          <p class="landing-card-cyber-desc">
+            Accelerate code audits with keyboard controls designed for high-efficiency investigation workflows and rapid symbol traversal.
+          </p>
+          <div class="landing-card-chips">
+            <span class="landing-card-chip chip-amber"><kbd>⌘K</kbd> Forensic Search</span>
+            <span class="landing-card-chip chip-amber"><kbd>1 - 6</kbd> Direct Lens Jump</span>
+            <span class="landing-card-chip chip-amber"><kbd>← / →</kbd> Spin 3D Carousel</span>
           </div>
         </div>
       </section>
