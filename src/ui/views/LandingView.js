@@ -52,8 +52,8 @@ export class LandingView {
             <defs>
               <linearGradient id="heroGrad" x1="6.68" y1="4" x2="41.32" y2="44" gradientUnits="userSpaceOnUse">
                 <stop stop-color="#00f0ff" />
-                <stop offset="0.5" stop-color="#38bdf8" />
-                <stop offset="1" stop-color="#818cf8" />
+                <stop offset="0.5" stop-color="#c084fc" />
+                <stop offset="1" stop-color="#f43f5e" />
               </linearGradient>
             </defs>
           </svg>
@@ -147,7 +147,7 @@ export class LandingView {
           </div>
           <div class="landing-card-cyber-title">
             <span>🔒</span>
-            <span>Air-Gapped Forensics</span>
+            <span class="text-gradient-cyan">Air-Gapped Forensics</span>
           </div>
           <p class="landing-card-cyber-desc">
             Your proprietary source code never leaves this workstation. All AST symbol extraction, inverted indexing, and Git velocity queries execute strictly in local RAM.
@@ -167,7 +167,7 @@ export class LandingView {
           </div>
           <div class="landing-card-cyber-title">
             <span>🎠</span>
-            <span>Multi-Strata Carousel</span>
+            <span class="text-gradient-aurora">Multi-Strata Carousel</span>
           </div>
           <p class="landing-card-cyber-desc">
             Explore living module boundaries, circular dependencies, churn hotspots, and blast radius ripple effects through an interactive 3D merry-go-round carousel.
@@ -187,7 +187,7 @@ export class LandingView {
           </div>
           <div class="landing-card-cyber-title">
             <span>⚡</span>
-            <span>Rapid Key Navigation</span>
+            <span style="background: linear-gradient(135deg, #fbbf24, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Rapid Key Navigation</span>
           </div>
           <p class="landing-card-cyber-desc">
             Accelerate code audits with keyboard controls designed for high-efficiency investigation workflows and rapid symbol traversal.
