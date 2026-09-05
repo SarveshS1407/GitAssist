@@ -12,6 +12,7 @@ import { TechDebtCalculator } from '../core/tech-debt-calculator.js';
 import { BusFactorAnalyzer } from '../core/bus-factor-analyzer.js';
 import { ApiExtractor } from '../core/api-extractor.js';
 import { StabilityForecaster } from '../core/stability-forecaster.js';
+import { ReportGenerator } from '../services/report-generator.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -405,6 +406,59 @@ export class ApiRouter {
       const extractor = new ApiExtractor();
       const endpoints = extractor.extract(parsedFiles || []);
       return this.sendJson(res, 200, endpoints);
+    }
+
+    // 16g. Forensic Audit Executive Report (Markdown or JSON)
+    if (req.method === 'GET' && pathname === '/api/report/export') {
+      const format = parsedUrl.searchParams.get('format') || 'markdown';
+      const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
+      const { commits } = await RepositoryService.getGitData(this.activeRepoState);
+      const cycles = await RepositoryService.getCircles(this.activeRepoState);
+      const hotspots = await RepositoryService.getHotspots(this.activeRepoState);
+
+      const securityScanner = new SecurityScanner();
+      const security = securityScanner.scan(parsedFiles || []);
+
+      const dupDetector = new DuplicationDetector({ minLines: 5 });
+      const duplication = dupDetector.detect(parsedFiles || []);
+
+      const techDebtCalc = new TechDebtCalculator();
+      const techDebt = techDebtCalc.calculate({
+        files: this.activeRepoState.files || [],
+        cycles: cycles || [],
+        hotspots: hotspots || [],
+        duplicationLines: duplication.totalDuplicatedLines || 0
+      });
+
+      const busFactorAnalyzer = new BusFactorAnalyzer();
+      const busFactor = busFactorAnalyzer.analyze(commits || [], this.activeRepoState.files || []);
+
+      const apiExtractor = new ApiExtractor();
+      const endpoints = apiExtractor.extract(parsedFiles || []);
+
+      const reportData = {
+        repository: this.activeRepoState.summary?.name || 'GitAssist Core',
+        summary: this.activeRepoState.summary || {},
+        security,
+        techDebt,
+        busFactor,
+        duplication,
+        endpoints,
+        hotspots,
+        cycles
+      };
+
+      if (format === 'json') {
+        return this.sendJson(res, 200, reportData);
+      }
+
+      const markdown = ReportGenerator.generateMarkdown(reportData);
+      res.writeHead(200, {
+        'Content-Type': 'text/markdown; charset=utf-8',
+        'Content-Disposition': 'attachment; filename="gitassist-forensic-report.md"'
+      });
+      res.end(markdown);
+      return;
     }
 
     // 17. Dependency Health & Manifests
