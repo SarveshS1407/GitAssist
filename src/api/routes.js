@@ -5,6 +5,7 @@ import { GitService } from '../services/git-service.js';
 import { MermaidGenerator } from '../core/mermaid-generator.js';
 import { AIContextPackager } from '../ai/context-packager.js';
 import { LocalQueryEngine } from '../ai/query-engine.js';
+import { DuplicationDetector } from '../core/duplication-detector.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -330,6 +331,14 @@ export class ApiRouter {
         isolatedCount: isolated.length,
         candidates: isolated.slice(0, 15)
       });
+    }
+
+    // 16b. Code Duplication Analysis (Lazy)
+    if (req.method === 'GET' && pathname === '/api/analysis/duplication') {
+      const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
+      const detector = new DuplicationDetector({ minLines: 5 });
+      const duplication = detector.detect(parsedFiles || []);
+      return this.sendJson(res, 200, duplication);
     }
 
     // 17. Dependency Health & Manifests
