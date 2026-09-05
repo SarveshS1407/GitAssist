@@ -53,6 +53,7 @@ export class Sidebar {
         items: [
           { id: 'documentation', label: 'Subsystem Docs', icon: '📖' },
           { id: 'contributors', label: 'Contributors', icon: '👥' },
+          { id: 'busfactor', label: 'Bus Factor & Silos', icon: '🚌' },
           { id: 'ai', label: 'Codebase Q&A', icon: '🤖' }
         ]
       }
