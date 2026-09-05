@@ -8,6 +8,7 @@ import { LocalQueryEngine } from '../ai/query-engine.js';
 import { DuplicationDetector } from '../core/duplication-detector.js';
 import { SecurityScanner } from '../core/security-scanner.js';
 import { LicenseDetector } from '../core/license-detector.js';
+import { TechDebtCalculator } from '../core/tech-debt-calculator.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -357,6 +358,26 @@ export class ApiRouter {
       const detector = new LicenseDetector();
       const licenses = detector.detect(parsedFiles || []);
       return this.sendJson(res, 200, licenses);
+    }
+
+    // 16e. Technical Debt & Remediation Cost (Lazy)
+    if (req.method === 'GET' && pathname === '/api/analysis/tech-debt') {
+      const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
+      const cycles = await RepositoryService.getCircles(this.activeRepoState);
+      const hotspots = await RepositoryService.getHotspots(this.activeRepoState);
+      
+      const dupDetector = new DuplicationDetector({ minLines: 5 });
+      const dupResult = dupDetector.detect(parsedFiles || []);
+
+      const calculator = new TechDebtCalculator({ hourlyRate: 100 });
+      const debt = calculator.calculate({
+        files: this.activeRepoState.files || [],
+        cycles: cycles || [],
+        hotspots: hotspots || [],
+        duplicationLines: dupResult.totalDuplicatedLines || 0
+      });
+
+      return this.sendJson(res, 200, debt);
     }
 
     // 17. Dependency Health & Manifests
