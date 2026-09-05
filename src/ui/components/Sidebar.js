@@ -44,6 +44,7 @@ export class Sidebar {
           { id: 'deadcode', label: 'Dead Code Signals', icon: '🍂' },
           { id: 'manifests', label: 'Dependency Health', icon: '📦' },
           { id: 'duplication', label: 'Code Duplication', icon: '👯' },
+          { id: 'security', label: 'Security Audit', icon: '🔒' },
           { id: 'review', label: 'Heuristic Review', icon: '🛡️' }
         ]
       },

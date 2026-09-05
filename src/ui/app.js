@@ -21,6 +21,7 @@ import { DocumentationView } from './views/DocumentationView.js';
 import { ReviewView } from './views/ReviewView.js';
 import { AiView } from './views/AiView.js';
 import { DuplicationView } from './views/DuplicationView.js';
+import { SecurityView } from './views/SecurityView.js';
 
 /**
  * Application Entry Point
@@ -49,7 +50,8 @@ class App {
       documentation: DocumentationView,
       review: ReviewView,
       ai: AiView,
-      duplication: DuplicationView
+      duplication: DuplicationView,
+      security: SecurityView
     };
 
     const initialRoute = window.location.hash.replace('#', '') || 'overview';
