@@ -24,7 +24,8 @@ export class Sidebar {
         items: [
           { id: 'architecture', label: 'Architecture Topology', icon: '🕸️' },
           { id: 'impact', label: 'Impact & Blast Radius', icon: '💥' },
-          { id: 'features', label: 'Feature Mapping', icon: '🗺️' }
+          { id: 'features', label: 'Feature Mapping', icon: '🗺️' },
+          { id: 'endpoints', label: 'API Endpoints', icon: '🌐' }
         ]
       },
       {
