@@ -6,6 +6,7 @@ import { MermaidGenerator } from '../core/mermaid-generator.js';
 import { AIContextPackager } from '../ai/context-packager.js';
 import { LocalQueryEngine } from '../ai/query-engine.js';
 import { DuplicationDetector } from '../core/duplication-detector.js';
+import { SecurityScanner } from '../core/security-scanner.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -339,6 +340,14 @@ export class ApiRouter {
       const detector = new DuplicationDetector({ minLines: 5 });
       const duplication = detector.detect(parsedFiles || []);
       return this.sendJson(res, 200, duplication);
+    }
+
+    // 16c. Security & Secret Vulnerability Audit (Lazy)
+    if (req.method === 'GET' && pathname === '/api/analysis/security') {
+      const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
+      const scanner = new SecurityScanner();
+      const security = scanner.scan(parsedFiles || []);
+      return this.sendJson(res, 200, security);
     }
 
     // 17. Dependency Health & Manifests
