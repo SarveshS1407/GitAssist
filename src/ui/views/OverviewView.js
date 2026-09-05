@@ -158,45 +158,46 @@ export class OverviewView {
       { id: 'manifests', icon: '📦', title: 'Dependencies', meta: 'Manifests & Ecosystem Health', badge: 'Manifests', theme: 'card-blue' },
       { id: 'review', icon: '🛡️', title: 'Code Review', meta: 'Automated Heuristic Health', badge: 'Audit Engine', theme: 'card-teal' },
       { id: 'documentation', icon: '📖', title: 'Documentation', meta: 'Architecture Specs & Markdown', badge: 'Auto-Doc', theme: 'card-purple' },
-      { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine', theme: 'card-magenta' }
+      { id: 'ai', icon: '🤖', title: 'Codebase Q&A', meta: 'Offline Natural Language Q&A', badge: 'Local Engine', theme: 'card-magenta' },
+      { id: 'duplication', icon: '👯', title: 'Duplication', meta: 'Clone Detection & Redundancy', badge: 'Clone Engine', theme: 'card-cyan' },
+      { id: 'security', icon: '🔒', title: 'Security Audit', meta: 'Secrets & CVE Vulnerabilities', badge: 'Zero Leak', theme: 'card-rose' },
+      { id: 'busfactor', icon: '🚌', title: 'Bus Factor', meta: 'Knowledge Silos & Maintainers', badge: 'Resilience', theme: 'card-amber' },
+      { id: 'techdebt', icon: '⏱️', title: 'Technical Debt', meta: 'SQALE Hours & Remediation $', badge: 'SQALE Audit', theme: 'card-violet' },
+      { id: 'endpoints', icon: '🌐', title: 'API Endpoints', meta: 'Route Inventory & Handlers', badge: 'Route Catalog', theme: 'card-emerald' }
     ];
 
-    const angleStep = 360 / actionItems.length; // 22.5 deg per card
-    const cylinderRadius = 490; // Optimal radius for 188px cards without clipping
+    const angleStep = 360 / actionItems.length;
+    const cylinderRadius = Math.round(195 / (2 * Math.tan(Math.PI / actionItems.length))) + 20;
 
     const cardsHtml = actionItems.map((a, idx) => `
       <div class="carousel-card-3d ${a.theme} ${idx === 0 ? 'is-front' : ''}" 
            data-action="${a.id}" 
            data-index="${idx}"
            style="transform: rotateY(${idx * angleStep}deg) translateZ(${cylinderRadius}px);">
-        <div class="strata-card-corner tl"></div>
-        <div class="strata-card-corner tr"></div>
-        
         <div class="card-header-bar">
           <span class="card-sector-tag">${String(idx + 1).padStart(2, '0')}</span>
           <span class="card-badge-pill">${a.badge}</span>
         </div>
 
         <div class="card-core-visual">
-          <div class="card-icon-aura">
-            <span>${a.icon}</span>
-          </div>
-          <div class="card-core-title">${a.title}</div>
-          <div class="card-core-meta">${a.meta}</div>
+          <div class="card-glyph">${a.icon}</div>
+          <div class="card-glyph-reflection">${a.icon}</div>
         </div>
 
-        <div class="card-footer-trigger">
-          <span class="card-trigger-btn">
-            <span style="color: var(--accent-cyan);">◈</span>
-            <span>INSPECT</span>
-            <span style="font-size: 0.6rem; opacity: 0.7;">❯</span>
-          </span>
+        <div class="card-text-block">
+          <h4 class="card-action-title">${a.title}</h4>
+          <p class="card-action-meta">${a.meta}</p>
         </div>
+
+        <button class="btn-card-prompt" data-action="${a.id}">
+          <span>VIEW PROMPT</span>
+          <span class="prompt-arrow">❯</span>
+        </button>
       </div>
     `).join('');
 
     carouselSection.innerHTML = `
-      <div class="holomap-canvas-header">
+      <div class="holomap-header">
         <h3 class="holomap-title">
           <span class="holomap-icon">◈</span>
           <span class="text-gradient-cyber">HOLOGRAPHIC ACTION CAROUSEL // MERRY-GO-ROUND</span>
@@ -205,7 +206,6 @@ export class OverviewView {
       </div>
 
       <div class="carousel-stage-3d" id="carousel-stage">
-        <!-- 3D Holographic Turntable Platform -->
         <div class="carousel-holo-pedestal">
           <div class="carousel-holo-ring-inner"></div>
         </div>
@@ -218,10 +218,9 @@ export class OverviewView {
         </div>
       </div>
 
-      <!-- Orbital Sector Tracker Bar -->
       <div class="carousel-orbital-tracker" id="carousel-orbital-tracker">
         <div style="display: flex; align-items: center;">
-          <span class="tracker-sector-badge">SECTOR <strong id="tracker-current-num">01</strong> / 16</span>
+          <span class="tracker-sector-badge">SECTOR <strong id="tracker-current-num">01</strong> / ${String(actionItems.length).padStart(2, '0')}</span>
           <span class="tracker-lens-title" id="tracker-current-title">ARCHITECTURE</span>
         </div>
         <div class="tracker-dots-bar" id="tracker-dots-bar">
@@ -898,6 +897,106 @@ export class OverviewView {
         ],
         useCase: 'The ultimate assistant for instantly answering repository questions and generating grounded LLM prompts with full context.',
         cta: 'CONSULT CODEBASE Q&A'
+      },
+      duplication: {
+        title: 'Code Duplication & Clones',
+        type: 'Clone Block Detection',
+        icon: '👯',
+        tagline: 'Eliminate copy-paste redundancy and isolate identical AST token clusters.',
+        overview: 'Scans normalized source code lines and hashes rolling token windows to uncover copy-pasted implementation blocks across different modules.',
+        questionsAnswered: [
+          'Where are duplicate implementations copied across files?',
+          'What percentage of the overall codebase is redundant clone code?',
+          'Which clone clusters can be consolidated into shared utilities?'
+        ],
+        capabilities: [
+          'Token Rolling Hashes',
+          'Cross-File Clone Clusters',
+          'Duplication Ratio %',
+          'Refactoring Targets'
+        ],
+        useCase: 'Essential during technical debt sprints, library refactoring, and code deduplication.',
+        cta: 'AUDIT CODE DUPLICATION'
+      },
+      security: {
+        title: 'Security & Secrets Audit',
+        type: 'Vulnerability Detection',
+        icon: '🔒',
+        tagline: 'Air-gapped scanner for hardcoded API keys, private credentials, and dangerous execution sinks.',
+        overview: 'Scans files for unencrypted secrets (AWS, GitHub, Slack tokens, private keys) and high-risk code patterns (eval, raw exec interpolation) without sending a single byte to external clouds.',
+        questionsAnswered: [
+          'Are there any plaintext credentials or API keys checked into Git?',
+          'Does this repository contain insecure eval or shell injection sinks?',
+          'What is the overall security hygiene score and grade?'
+        ],
+        capabilities: [
+          'High-Entropy Key Scanners',
+          'Air-Gapped Local Rulebook',
+          'CVE Sink Inspection',
+          'Triage Severity Grading'
+        ],
+        useCase: 'Run before releasing code, publishing public packages, or completing compliance audits.',
+        cta: 'RUN SECURITY AUDIT'
+      },
+      busfactor: {
+        title: 'Bus Factor & Knowledge Silos',
+        type: 'Organizational Resilience',
+        icon: '🚌',
+        tagline: 'Quantify maintainer concentration risk and identify single-developer knowledge silos.',
+        overview: 'Analyzes Git authorship and commit frequencies across directories to determine if critical modules depend on a single developer.',
+        questionsAnswered: [
+          'Which modules have a single maintainer owning >80% of edits?',
+          'What is the repository-level Bus Factor score?',
+          'Where are critical knowledge silos that threaten operational continuity?'
+        ],
+        capabilities: [
+          'Directory Ownership Maps',
+          'Sole-Maintainer Silo Flags',
+          'Bus Factor Scoring',
+          'Cross-Pollination Guidance'
+        ],
+        useCase: 'Indispensable for engineering leadership, succession planning, and reducing single points of human failure.',
+        cta: 'CALCULATE BUS FACTOR'
+      },
+      techdebt: {
+        title: 'Technical Debt & Remediation',
+        type: 'SQALE Financial Debt',
+        icon: '⏱️',
+        tagline: 'Estimate refactoring debt in engineering hours and calculate financial remediation costs.',
+        overview: 'Uses SQALE-aligned structural heuristics (complexity, cyclomatic density, circular dependencies, and churn volatility) to calculate technical debt.',
+        questionsAnswered: [
+          'How many engineering hours are required to remediate structural debt?',
+          'What is the estimated financial cost of existing technical shortcuts?',
+          'Which files represent the highest-ROI refactoring targets?'
+        ],
+        capabilities: [
+          'SQALE Grade (A-E)',
+          'Hourly Remediation Estimation',
+          'Financial Cost Calculation',
+          'Target Priority Ranking'
+        ],
+        useCase: 'Crucial for sprint planning, justifying refactoring work to stakeholders, and tracking debt reduction over time.',
+        cta: 'CALCULATE TECH DEBT'
+      },
+      endpoints: {
+        title: 'API Endpoints & Route Inventory',
+        type: 'Route Extraction',
+        icon: '🌐',
+        tagline: 'Automatically catalog HTTP endpoints, REST verbs, and route handler locations.',
+        overview: 'Extracts Express, Fastify, Flask, and custom HTTP route definitions across source files to provide an interactive API catalog.',
+        questionsAnswered: [
+          'What HTTP endpoints are exposed by this service?',
+          'Which source files and line numbers handle specific routes?',
+          'What HTTP verbs (GET, POST, etc.) are implemented across subsystems?'
+        ],
+        capabilities: [
+          'Multi-Framework Route AST',
+          'Verb Classification Breakdown',
+          'Line-Numbered Handler Mapping',
+          'Interactive Route Catalog'
+        ],
+        useCase: 'Great for auditing public interfaces, documenting microservices, and verifying route coverage.',
+        cta: 'VIEW API INVENTORY'
       }
     };
 
