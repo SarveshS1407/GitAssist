@@ -10,6 +10,7 @@ import { SecurityScanner } from '../core/security-scanner.js';
 import { LicenseDetector } from '../core/license-detector.js';
 import { TechDebtCalculator } from '../core/tech-debt-calculator.js';
 import { BusFactorAnalyzer } from '../core/bus-factor-analyzer.js';
+import { ApiExtractor } from '../core/api-extractor.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -387,6 +388,14 @@ export class ApiRouter {
       });
 
       return this.sendJson(res, 200, debt);
+    }
+
+    // 16f. API Endpoints & Route Inventory (Lazy)
+    if (req.method === 'GET' && pathname === '/api/analysis/endpoints') {
+      const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
+      const extractor = new ApiExtractor();
+      const endpoints = extractor.extract(parsedFiles || []);
+      return this.sendJson(res, 200, endpoints);
     }
 
     // 17. Dependency Health & Manifests
