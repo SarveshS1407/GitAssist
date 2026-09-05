@@ -11,6 +11,7 @@ import { LicenseDetector } from '../core/license-detector.js';
 import { TechDebtCalculator } from '../core/tech-debt-calculator.js';
 import { BusFactorAnalyzer } from '../core/bus-factor-analyzer.js';
 import { ApiExtractor } from '../core/api-extractor.js';
+import { StabilityForecaster } from '../core/stability-forecaster.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -111,6 +112,14 @@ export class ApiRouter {
       const analyzer = new BusFactorAnalyzer();
       const busFactor = analyzer.analyze(commits || [], this.activeRepoState.files || []);
       return this.sendJson(res, 200, busFactor);
+    }
+
+    // 4d. Code Churn & Stability Forecasting (Lazy)
+    if (req.method === 'GET' && pathname === '/api/repository/git/stability') {
+      const { commits } = await RepositoryService.getGitData(this.activeRepoState);
+      const forecaster = new StabilityForecaster();
+      const stability = forecaster.forecast(commits || [], this.activeRepoState.files || []);
+      return this.sendJson(res, 200, stability);
     }
 
     // 5. Code Search (Lazy)
