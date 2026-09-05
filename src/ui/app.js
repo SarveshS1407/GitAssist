@@ -23,6 +23,7 @@ import { AiView } from './views/AiView.js';
 import { DuplicationView } from './views/DuplicationView.js';
 import { SecurityView } from './views/SecurityView.js';
 import { BusFactorView } from './views/BusFactorView.js';
+import { TechDebtView } from './views/TechDebtView.js';
 
 /**
  * Application Entry Point
@@ -53,7 +54,8 @@ class App {
       ai: AiView,
       duplication: DuplicationView,
       security: SecurityView,
-      busfactor: BusFactorView
+      busfactor: BusFactorView,
+      techdebt: TechDebtView
     };
 
     const initialRoute = window.location.hash.replace('#', '') || 'overview';

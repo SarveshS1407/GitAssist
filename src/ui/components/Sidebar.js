@@ -45,6 +45,7 @@ export class Sidebar {
           { id: 'manifests', label: 'Dependency Health', icon: '📦' },
           { id: 'duplication', label: 'Code Duplication', icon: '👯' },
           { id: 'security', label: 'Security Audit', icon: '🔒' },
+          { id: 'techdebt', label: 'Technical Debt', icon: '⏱️' },
           { id: 'review', label: 'Heuristic Review', icon: '🛡️' }
         ]
       },
