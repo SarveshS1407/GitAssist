@@ -9,6 +9,7 @@ import { DuplicationDetector } from '../core/duplication-detector.js';
 import { SecurityScanner } from '../core/security-scanner.js';
 import { LicenseDetector } from '../core/license-detector.js';
 import { TechDebtCalculator } from '../core/tech-debt-calculator.js';
+import { BusFactorAnalyzer } from '../core/bus-factor-analyzer.js';
 
 export class ApiRouter {
   constructor(rootDir) {
@@ -101,6 +102,14 @@ export class ApiRouter {
         velocity,
         authors
       });
+    }
+
+    // 4c. Git Bus Factor & Knowledge Silos (Lazy)
+    if (req.method === 'GET' && pathname === '/api/repository/git/bus-factor') {
+      const { commits } = await RepositoryService.getGitData(this.activeRepoState);
+      const analyzer = new BusFactorAnalyzer();
+      const busFactor = analyzer.analyze(commits || [], this.activeRepoState.files || []);
+      return this.sendJson(res, 200, busFactor);
     }
 
     // 5. Code Search (Lazy)
