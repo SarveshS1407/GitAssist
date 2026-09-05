@@ -20,6 +20,7 @@ import { ManifestView } from './views/ManifestView.js';
 import { DocumentationView } from './views/DocumentationView.js';
 import { ReviewView } from './views/ReviewView.js';
 import { AiView } from './views/AiView.js';
+import { DuplicationView } from './views/DuplicationView.js';
 
 /**
  * Application Entry Point
@@ -47,7 +48,8 @@ class App {
       manifests: ManifestView,
       documentation: DocumentationView,
       review: ReviewView,
-      ai: AiView
+      ai: AiView,
+      duplication: DuplicationView
     };
 
     const initialRoute = window.location.hash.replace('#', '') || 'overview';

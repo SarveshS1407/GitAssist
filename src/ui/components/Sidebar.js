@@ -43,6 +43,7 @@ export class Sidebar {
           { id: 'tests', label: 'Test Intelligence', icon: '🧪' },
           { id: 'deadcode', label: 'Dead Code Signals', icon: '🍂' },
           { id: 'manifests', label: 'Dependency Health', icon: '📦' },
+          { id: 'duplication', label: 'Code Duplication', icon: '👯' },
           { id: 'review', label: 'Heuristic Review', icon: '🛡️' }
         ]
       },
