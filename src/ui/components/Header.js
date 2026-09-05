@@ -48,6 +48,10 @@ export class Header {
       </div>
 
       <div class="header-right">
+        <button class="header-btn" id="btn-export-report" title="Export Forensic Audit Report (Markdown)">
+          <span>📄</span>
+          <span>Audit Report</span>
+        </button>
         <button class="header-btn" id="btn-settings" title="Settings & Configuration">
           <span>⚙️</span>
           <span>Settings</span>
@@ -75,6 +79,17 @@ export class Header {
     header.querySelector('#btn-settings').addEventListener('click', () => {
       if (this.onSettingsClick) this.onSettingsClick();
     });
+
+    const exportBtn = header.querySelector('#btn-export-report');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        if (!this.repositoryState || !this.repositoryState.isLoaded) {
+          alert('Please open a repository before exporting an audit report.');
+          return;
+        }
+        window.open('/api/report/export?format=markdown', '_blank');
+      });
+    }
 
     this.element = header;
     return header;
