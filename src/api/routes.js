@@ -385,7 +385,7 @@ export class ApiRouter {
     // 16e. Technical Debt & Remediation Cost (Lazy)
     if (req.method === 'GET' && pathname === '/api/analysis/tech-debt') {
       const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
-      const cycles = await RepositoryService.getCircles(this.activeRepoState);
+      const cycles = await RepositoryService.getCycles(this.activeRepoState);
       const hotspots = await RepositoryService.getHotspots(this.activeRepoState);
       
       const dupDetector = new DuplicationDetector({ minLines: 5 });
@@ -415,7 +415,7 @@ export class ApiRouter {
       const format = parsedUrl.searchParams.get('format') || 'markdown';
       const parsedFiles = await RepositoryService.getParsedFiles(this.activeRepoState);
       const { commits } = await RepositoryService.getGitData(this.activeRepoState);
-      const cycles = await RepositoryService.getCircles(this.activeRepoState);
+      const cycles = await RepositoryService.getCycles(this.activeRepoState);
       const hotspots = await RepositoryService.getHotspots(this.activeRepoState);
 
       const securityScanner = new SecurityScanner();

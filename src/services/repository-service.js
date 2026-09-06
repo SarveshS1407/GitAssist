@@ -245,6 +245,10 @@ export class RepositoryService {
     return cycles;
   }
 
+  static async getCircles(repoModel) {
+    return this.getCycles(repoModel);
+  }
+
   /**
    * Lazy Git History & Contributors Extraction
    */
