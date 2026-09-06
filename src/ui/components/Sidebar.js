@@ -14,7 +14,7 @@ export class Sidebar {
       {
         title: 'Central Command',
         items: [
-          { id: 'overview', label: 'Action Carousel', icon: '◈' },
+          { id: 'overview', label: 'Forensic Matrix', icon: '◈' },
           { id: 'explorer', label: 'Source Explorer', icon: '📁' },
           { id: 'search', label: 'Code Search', icon: '🔍' }
         ]
