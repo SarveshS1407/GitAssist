@@ -108,10 +108,10 @@ export class LandingView {
       <!-- Telemetry Strip - Clean & Understated -->
       <section class="landing-telemetry-strip">
         <div class="telemetry-strip-item">
-          <div class="telemetry-strip-icon">🎠</div>
+          <div class="telemetry-strip-icon" style="color: var(--accent-cyan); font-size: 1.25rem;">◈</div>
           <div>
-            <div class="telemetry-strip-val">16 LENSES</div>
-            <div class="telemetry-strip-lbl">Interactive 3D Carousel</div>
+            <div class="telemetry-strip-val">21 LENSES</div>
+            <div class="telemetry-strip-lbl">3D Strata Rotor</div>
           </div>
         </div>
         <div class="telemetry-strip-item">
@@ -163,14 +163,14 @@ export class LandingView {
         <div class="landing-card-cyber">
           <div class="landing-card-cyber-header">
             <span class="landing-card-sector">SECTOR 02</span>
-            <span class="landing-card-badge">16 Lenses</span>
+            <span class="landing-card-badge">21 Lenses</span>
           </div>
           <div class="landing-card-cyber-title">
-            <span>🎠</span>
-            <span class="text-gradient-aurora">Multi-Strata Carousel</span>
+            <span style="color: var(--accent-cyan);">◈</span>
+            <span class="text-gradient-aurora">Forensic Strata Rotor</span>
           </div>
           <p class="landing-card-cyber-desc">
-            Explore living module boundaries, circular dependencies, churn hotspots, and blast radius ripple effects through an interactive 3D merry-go-round carousel.
+            Explore living module boundaries, circular dependencies, churn hotspots, and blast radius ripple effects through an interactive 3D cylindrical forensic turntable.
           </p>
           <div class="landing-card-chips">
             <span class="landing-card-chip">Living Topology</span>
@@ -195,7 +195,7 @@ export class LandingView {
           <div class="landing-card-chips">
             <span class="landing-card-chip"><kbd>⌘K</kbd> Forensic Search</span>
             <span class="landing-card-chip"><kbd>1 - 6</kbd> Direct Lens Jump</span>
-            <span class="landing-card-chip"><kbd>← / →</kbd> Spin Carousel</span>
+            <span class="landing-card-chip"><kbd>← / →</kbd> Rotate Strata Rotor</span>
           </div>
         </div>
       </section>
