@@ -377,8 +377,8 @@ export class SettingsModal {
                 <input type="checkbox" id="set-show-carousel" ${s.appearance.show3DCarousel ? 'checked' : ''} />
                 <span class="settings-toggle-slider"></span>
                 <span class="settings-toggle-label">
-                  <strong>3D Holographic Cylindrical Action Carousel</strong>
-                  <small>Render interactive 21-sector 3D cylinder turntable on Overview dashboard.</small>
+                  <strong>3D Holographic Forensic Strata Rotor</strong>
+                  <small>Render interactive 21-sector 3D cylindrical forensic turntable on Overview dashboard.</small>
                 </span>
               </label>
 

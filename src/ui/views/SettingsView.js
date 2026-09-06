@@ -244,7 +244,7 @@ export class SettingsView {
               <label class="settings-toggle-item">
                 <input type="checkbox" id="page-set-show-carousel" ${s.appearance.show3DCarousel ? 'checked' : ''} />
                 <span class="settings-toggle-slider"></span>
-                <span class="settings-toggle-label"><strong>3D Holographic Cylindrical Action Carousel</strong></span>
+                <span class="settings-toggle-label"><strong>3D Holographic Forensic Strata Rotor</strong></span>
               </label>
               <label class="settings-toggle-item">
                 <input type="checkbox" id="page-set-high-contrast" ${s.appearance.highContrastGlow ? 'checked' : ''} />
