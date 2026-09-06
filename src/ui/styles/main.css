@@ -794,9 +794,9 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--lens-accent-rgb, 0, 240, 255), 0.28) 0%, rgba(var(--lens-accent-rgb, 0, 240, 255), 0.08) 50%, transparent 70%);
-  border: 1.5px solid rgba(var(--lens-accent-rgb, 0, 240, 255), 0.38);
-  box-shadow: 0 0 22px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.3);
+  background: radial-gradient(circle, rgba(var(--lens-accent-rgb, 0, 240, 255), 0.38) 0%, rgba(var(--lens-accent-rgb, 0, 240, 255), 0.16) 55%, rgba(6, 11, 22, 0.65) 85%);
+  border: 1.5px solid rgba(var(--lens-accent-rgb, 0, 240, 255), 0.52);
+  box-shadow: 0 0 26px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.42), inset 0 0 16px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.25);
   transition: all 0.3s ease;
 }
 
@@ -804,7 +804,7 @@ body {
   position: absolute;
   inset: -4px;
   border-radius: 50%;
-  border: 1px dashed rgba(var(--lens-accent-rgb, 0, 240, 255), 0.3);
+  border: 1.2px dashed rgba(var(--lens-accent-rgb, 0, 240, 255), 0.45);
   pointer-events: none;
   animation: orbRingRotate 18s linear infinite;
 }
@@ -817,7 +817,7 @@ body {
 .carousel-card-3d:hover .card-orb-glow {
   transform: scale(1.08);
   border-color: var(--lens-accent, var(--accent-cyan));
-  box-shadow: 0 0 30px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.6);
+  box-shadow: 0 0 34px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.75), inset 0 0 20px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.35);
 }
 
 .card-orb-svg-wrap {
@@ -827,12 +827,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 10px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.6));
-  transition: transform 0.25s ease;
+  opacity: 1;
+  filter: drop-shadow(0 0 14px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.9)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.card-orb-svg-wrap svg {
+  display: block;
+  opacity: 1;
+  stroke-opacity: 1;
+  fill-opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(var(--lens-accent-rgb, 0, 240, 255), 0.85));
 }
 
 .carousel-card-3d:hover .card-orb-svg-wrap {
-  transform: scale(1.12);
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 18px rgba(var(--lens-accent-rgb, 0, 240, 255), 1)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
 }
 
 /* Text Block */
@@ -955,7 +965,15 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--accent-cyan);
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6));
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.85)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.4));
+}
+
+.lens-prompt-svg-badge svg,
+.dossier-svg-badge svg {
+  display: block;
+  opacity: 1;
+  stroke-opacity: 1;
 }
 
 /* Nav Paddles */
