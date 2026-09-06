@@ -25,6 +25,7 @@ import { SecurityView } from './views/SecurityView.js';
 import { BusFactorView } from './views/BusFactorView.js';
 import { TechDebtView } from './views/TechDebtView.js';
 import { EndpointsView } from './views/EndpointsView.js';
+import { SettingsView } from './views/SettingsView.js';
 
 /**
  * Application Entry Point
@@ -57,7 +58,8 @@ class App {
       security: SecurityView,
       busfactor: BusFactorView,
       techdebt: TechDebtView,
-      endpoints: EndpointsView
+      endpoints: EndpointsView,
+      settings: SettingsView
     };
 
     const initialRoute = window.location.hash.replace('#', '') || 'overview';

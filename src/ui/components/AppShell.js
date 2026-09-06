@@ -1,5 +1,6 @@
 import { Header } from './Header.js';
 import { Sidebar } from './Sidebar.js';
+import { SettingsModal } from './SettingsModal.js';
 
 /**
  * AppShell Component
@@ -12,11 +13,12 @@ export class AppShell {
     this.currentPage = initialPage;
     this.element = null;
     this.mainContentEl = null;
+    this.settingsModal = new SettingsModal();
 
     this.header = new Header({
       repositoryState: this.repositoryState,
       onSearchClick: () => this.router.navigate('search'),
-      onSettingsClick: () => alert('Settings panel will be implemented in future step.'),
+      onSettingsClick: () => this.settingsModal.open(),
       onBrandClick: () => this.router.navigate('overview')
     });
 

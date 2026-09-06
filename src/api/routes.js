@@ -13,10 +13,12 @@ import { BusFactorAnalyzer } from '../core/bus-factor-analyzer.js';
 import { ApiExtractor } from '../core/api-extractor.js';
 import { StabilityForecaster } from '../core/stability-forecaster.js';
 import { ReportGenerator } from '../services/report-generator.js';
+import { SettingsService } from '../services/settings-service.js';
 
 export class ApiRouter {
   constructor(rootDir) {
     this.rootDir = rootDir;
+    this.settingsService = new SettingsService(rootDir);
     this.activeRepoState = {
       summary: null,
       files: [],
@@ -603,6 +605,29 @@ export class ApiRouter {
         res.end('Asset not found.');
         return;
       }
+    }
+
+    // 23. Settings Management API
+    if (req.method === 'GET' && pathname === '/api/settings') {
+      const settings = await this.settingsService.getSettings();
+      return this.sendJson(res, 200, { success: true, settings });
+    }
+
+    if (req.method === 'POST' && pathname === '/api/settings') {
+      const body = await this.parseRequestBody(req);
+      const updated = await this.settingsService.updateSettings(body.settings || body);
+      return this.sendJson(res, 200, { success: true, settings: updated });
+    }
+
+    if (req.method === 'POST' && pathname === '/api/settings/reset') {
+      const reset = await this.settingsService.resetSettings();
+      return this.sendJson(res, 200, { success: true, settings: reset });
+    }
+
+    if (req.method === 'POST' && pathname === '/api/settings/test-connection') {
+      const body = await this.parseRequestBody(req);
+      const result = await this.settingsService.testConnection(body);
+      return this.sendJson(res, 200, result);
     }
 
     return this.sendJson(res, 404, { error: 'Not Found' });
