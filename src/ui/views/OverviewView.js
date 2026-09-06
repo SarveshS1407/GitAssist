@@ -167,21 +167,26 @@ export class OverviewView {
     ];
 
     const angleStep = 360 / actionItems.length;
-    const cylinderRadius = Math.round(195 / (2 * Math.tan(Math.PI / actionItems.length))) + 20;
+    const cylinderRadius = Math.round(176 / (2 * Math.tan(Math.PI / actionItems.length))) + 15;
 
     const cardsHtml = actionItems.map((a, idx) => `
       <div class="carousel-card-3d ${a.theme} ${idx === 0 ? 'is-front' : ''}" 
            data-action="${a.id}" 
            data-index="${idx}"
            style="transform: rotateY(${idx * angleStep}deg) translateZ(${cylinderRadius}px);">
+        <div class="cylinder-cap-top"></div>
+
         <div class="card-header-bar">
-          <span class="card-sector-tag">${String(idx + 1).padStart(2, '0')}</span>
+          <span class="card-sector-tag">#${String(idx + 1).padStart(2, '0')}</span>
           <span class="card-badge-pill">${a.badge}</span>
         </div>
 
-        <div class="card-core-visual">
-          <div class="card-glyph">${a.icon}</div>
-          <div class="card-glyph-reflection">${a.icon}</div>
+        <div class="card-orb-chamber">
+          <div class="card-orb-glow"></div>
+          <div class="card-orb-rings"></div>
+          <div class="card-orb-svg-wrap">
+            ${this.getSvgIcon(a.id, 32)}
+          </div>
         </div>
 
         <div class="card-text-block">
@@ -189,10 +194,24 @@ export class OverviewView {
           <p class="card-action-meta">${a.meta}</p>
         </div>
 
+        <div class="card-telemetry-visual">
+          <div class="telemetry-eq-bars">
+            <span class="eq-bar h-1"></span>
+            <span class="eq-bar h-2"></span>
+            <span class="eq-bar h-3"></span>
+            <span class="eq-bar h-4"></span>
+            <span class="eq-bar h-5"></span>
+            <span class="eq-bar h-6"></span>
+          </div>
+          <span class="telemetry-status-tag">LENS ONLINE</span>
+        </div>
+
         <button class="btn-card-prompt" data-action="${a.id}">
           <span>VIEW PROMPT</span>
           <span class="prompt-arrow">❯</span>
         </button>
+
+        <div class="cylinder-cap-bottom"></div>
       </div>
     `).join('');
 
@@ -206,6 +225,9 @@ export class OverviewView {
       </div>
 
       <div class="carousel-stage-3d" id="carousel-stage">
+        <div class="carousel-holo-ceiling">
+          <div class="carousel-holo-ceiling-inner"></div>
+        </div>
         <div class="carousel-holo-pedestal">
           <div class="carousel-holo-ring-inner"></div>
         </div>
@@ -364,7 +386,7 @@ export class OverviewView {
       currentCarouselIndex = targetIndex;
       const normalizedIndex = ((currentCarouselIndex % actionItems.length) + actionItems.length) % actionItems.length;
       
-      cylinderEl.style.transform = `rotateY(${-currentCarouselIndex * angleStep}deg)`;
+      cylinderEl.style.transform = `translateZ(-${cylinderRadius}px) rotateY(${-currentCarouselIndex * angleStep}deg)`;
       updateCardDepths(normalizedIndex);
 
       const item = actionItems[normalizedIndex];
@@ -378,7 +400,8 @@ export class OverviewView {
       }
     };
 
-    // Initial depth and tracker calculation
+    // Initial depth, tracker and transform calculation
+    cylinderEl.style.transform = `translateZ(-${cylinderRadius}px) rotateY(0deg)`;
     updateCardDepths(0);
     updateTracker(0, actionItems[0]);
 
@@ -433,7 +456,7 @@ export class OverviewView {
       if (!isDragging) return;
       const deltaX = e.clientX - dragStartX;
       const currentAngle = dragStartAngle + (deltaX * 0.28);
-      cylinderEl.style.transform = `rotateY(${currentAngle}deg)`;
+      cylinderEl.style.transform = `translateZ(-${cylinderRadius}px) rotateY(${currentAngle}deg)`;
     });
 
     window.addEventListener('mouseup', (e) => {
@@ -511,7 +534,7 @@ export class OverviewView {
         
         <div class="lens-prompt-header">
           <div class="lens-prompt-title">
-            <span>${d.icon}</span>
+            <span class="lens-prompt-svg-badge">${this.getSvgIcon(item.id, 28)}</span>
             <span class="text-gradient-cyber">${d.title}</span>
           </div>
           <button class="lens-prompt-close" id="btn-close-prompt" title="Close Prompt (Esc)">✕</button>
@@ -574,6 +597,107 @@ export class OverviewView {
     });
 
     document.body.appendChild(overlay);
+  }
+
+  getSvgIcon(actionId, size = 28) {
+    const s = size;
+    const icons = {
+      architecture: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="4" r="2.5"/><circle cx="4" cy="20" r="2.5"/><circle cx="20" cy="20" r="2.5"/>
+        <line x1="12" y1="6.5" x2="4" y2="17.5"/><line x1="12" y1="6.5" x2="20" y2="17.5"/><line x1="6.5" y1="20" x2="17.5" y2="20"/>
+      </svg>`,
+      impact: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+        <circle cx="12" cy="12" r="6" stroke-dasharray="2.5 2"/>
+        <circle cx="12" cy="12" r="9.5"/>
+        <path d="M12 1.5v2m0 17v2M1.5 12h2m17 0h2"/>
+      </svg>`,
+      explorer: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
+        <polyline points="9 13 12 16 16 12"/>
+      </svg>`,
+      search: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+        <path d="M11 8v6m-3-3h6" stroke-width="1.5"/>
+      </svg>`,
+      git: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="9" r="2.5"/>
+        <path d="M6 7.5v9m0-4.5a8 8 0 0 0 8-4"/>
+      </svg>`,
+      analysis: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>`,
+      archaeology: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21h18M3 7h18M6 7v14M18 7v14M12 3L2 7h20L12 3zM12 11v6"/>
+      </svg>`,
+      risk: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+      </svg>`,
+      features: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+        <polyline points="2 17 12 22 22 17"/>
+        <polyline points="2 12 12 17 22 12"/>
+      </svg>`,
+      tests: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 2v6.5a4 4 0 0 1-1.2 2.8L4 16.5A3 3 0 0 0 6.2 21h11.6a3 3 0 0 0 2.2-4.5l-3.8-5.2a4 4 0 0 1-1.2-2.8V2"/>
+        <line x1="7" y1="2" x2="17" y2="2"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+      </svg>`,
+      bugs: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="7" y="8" width="10" height="11" rx="4"/>
+        <path d="M12 8V4m-5 9H3m18 0h-4M6 9l-3-2m18 0l-3 2m0 7l3 2m-18 0l3-2"/>
+      </svg>`,
+      deadcode: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/>
+        <line x1="6" y1="8.5" x2="6" y2="21"/><line x1="8" y1="14" x2="16" y2="16" stroke-dasharray="2 2"/>
+        <line x1="18" y1="8" x2="18" y2="15.5"/><line x1="14" y1="3" x2="20" y2="9"/><line x1="20" y1="3" x2="14" y2="9"/>
+      </svg>`,
+      manifests: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>`,
+      review: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>`,
+      documentation: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>
+      </svg>`,
+      ai: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="4" width="16" height="16" rx="3"/>
+        <circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+        <path d="M8 15h8m-4-11V2m-5 20v-2m10 2v-2M2 9h2m-2 6h2m16-6h2m-2 6h2"/>
+      </svg>`,
+      duplication: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="8" width="12" height="12" rx="2"/>
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+        <line x1="11" y1="12" x2="17" y2="12"/><line x1="11" y1="15" x2="15" y2="15"/>
+      </svg>`,
+      security: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+      </svg>`,
+      busfactor: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="3.5"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>`,
+      techdebt: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <polyline points="12 6 12 12 16 14"/>
+        <path d="M12 1.5v2m0 17v2M1.5 12h2m17 0h2" stroke-dasharray="1 3"/>
+      </svg>`,
+      endpoints: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M3.6 9h16.8M3.6 15h16.8"/>
+        <path d="M11.5 3a17 17 0 0 0 0 18m1-18a17 17 0 0 1 0 18"/>
+      </svg>`
+    };
+    return icons[actionId] || `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>`;
   }
 
   getActionDetails(actionId) {
@@ -1009,7 +1133,7 @@ export class OverviewView {
     container.innerHTML = `
       <div class="dossier-blade-header">
         <h4 class="dossier-title">
-          <span>${d.icon}</span>
+          <span class="dossier-svg-badge">${this.getSvgIcon(actionId, 24)}</span>
           <span class="text-gradient-aurora">${d.title}</span>
         </h4>
         <span class="landing-card-badge neon-badge">${d.type}</span>
