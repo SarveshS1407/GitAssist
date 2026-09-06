@@ -346,26 +346,26 @@ export class OverviewView {
           card.style.zIndex = '30';
         } else if (absDiff === 1) {
           card.classList.remove('is-front');
-          card.style.opacity = '0.82';
-          card.style.filter = 'brightness(0.85)';
+          card.style.opacity = '0.94';
+          card.style.filter = 'brightness(0.95)';
           card.style.pointerEvents = 'auto';
           card.style.zIndex = '20';
         } else if (absDiff === 2) {
           card.classList.remove('is-front');
-          card.style.opacity = '0.55';
-          card.style.filter = 'brightness(0.65) blur(0.5px)';
+          card.style.opacity = '0.78';
+          card.style.filter = 'brightness(0.82)';
           card.style.pointerEvents = 'auto';
           card.style.zIndex = '12';
         } else if (absDiff === 3) {
           card.classList.remove('is-front');
-          card.style.opacity = '0.3';
-          card.style.filter = 'brightness(0.4) blur(1.5px)';
+          card.style.opacity = '0.48';
+          card.style.filter = 'brightness(0.60)';
           card.style.pointerEvents = 'auto';
           card.style.zIndex = '6';
         } else {
           card.classList.remove('is-front');
-          card.style.opacity = '0.05';
-          card.style.filter = 'brightness(0.25) blur(3px)';
+          card.style.opacity = '0.15';
+          card.style.filter = 'brightness(0.35) blur(1px)';
           card.style.pointerEvents = 'none';
           card.style.zIndex = '1';
         }
