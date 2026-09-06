@@ -219,9 +219,9 @@ export class OverviewView {
       <div class="holomap-header">
         <h3 class="holomap-title">
           <span class="holomap-icon">◈</span>
-          <span class="text-gradient-cyber">HOLOGRAPHIC ACTION CAROUSEL // MERRY-GO-ROUND</span>
+          <span class="text-gradient-cyber">FORENSIC INVESTIGATION MATRIX // 3D STRATA ROTOR</span>
         </h3>
-        <span class="landing-card-badge neon-badge">[DRAG • ARROWS • CLICK TO PROMPT]</span>
+        <span class="landing-card-badge neon-badge">[ORBITAL ROTOR • ARROWS • SELECT LENS]</span>
       </div>
 
       <div class="carousel-stage-3d" id="carousel-stage">
