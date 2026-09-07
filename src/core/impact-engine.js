@@ -270,8 +270,8 @@ export class AdvancedImpactEngine {
     const score = Math.max(10, Math.min(100, Math.round(rawScore)));
 
     let level = 'LOW';
-    if (score >= 75) level = 'CRITICAL';
-    else if (score >= 50) level = 'HIGH';
+    if (score >= 70) level = 'CRITICAL';
+    else if (score >= 45) level = 'HIGH';
     else if (score >= 25) level = 'MEDIUM';
 
     return {
