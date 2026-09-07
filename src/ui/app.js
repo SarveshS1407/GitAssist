@@ -26,6 +26,7 @@ import { BusFactorView } from './views/BusFactorView.js';
 import { TechDebtView } from './views/TechDebtView.js';
 import { EndpointsView } from './views/EndpointsView.js';
 import { CallGraphView } from './views/CallGraphView.js';
+import { PrRiskView } from './views/PrRiskView.js';
 import { SettingsView } from './views/SettingsView.js';
 
 /**
@@ -42,6 +43,7 @@ class App {
       architecture: ArchitectureView,
       impact: ImpactView,
       callgraph: CallGraphView,
+      prrisk: PrRiskView,
       git: GitView,
       search: SearchView,
       contributors: ContributorsView,

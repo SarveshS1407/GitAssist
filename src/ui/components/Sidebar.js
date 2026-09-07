@@ -55,6 +55,7 @@ export class Sidebar {
         sector: 'SEC 04',
         items: [
           { id: 'risk', label: 'Risk Map', badge: '#08', accent: '#ef4444' },
+          { id: 'prrisk', label: 'PR & Diff Risk', badge: '#08b', accent: '#f59e0b' },
           { id: 'tests', label: 'Test Intelligence', badge: '#10', accent: '#22d3ee' },
           { id: 'deadcode', label: 'Dead Code Signals', badge: '#12', accent: '#94a3b8' },
           { id: 'manifests', label: 'Dependency Health', badge: '#13', accent: '#38bdf8' },
@@ -106,6 +107,7 @@ export class Sidebar {
       archaeology: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M3 7h18M6 7v14M18 7v14M12 3L2 7h20L12 3zM12 11v6"/></svg>`,
       bugs: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="8" width="10" height="11" rx="4"/><path d="M12 8V4m-5 9H3m18 0h-4M6 9l-3-2m18 0l-3 2m0 7l3 2m-18 0l3-2"/></svg>`,
       risk: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>`,
+      prrisk: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6m12 0V9a3 3 0 0 0-3-3H9"/></svg>`,
       tests: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 2v6.5a4 4 0 0 1-1.2 2.8L4 16.5A3 3 0 0 0 6.2 21h11.6a3 3 0 0 0 2.2-4.5l-3.8-5.2a4 4 0 0 1-1.2-2.8V2"/><line x1="7" y1="2" x2="17" y2="2"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>`,
       deadcode: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><line x1="6" y1="8.5" x2="6" y2="21"/><line x1="8" y1="14" x2="16" y2="16" stroke-dasharray="2 2"/><line x1="18" y1="8" x2="18" y2="15.5"/><line x1="14" y1="3" x2="20" y2="9"/><line x1="20" y1="3" x2="14" y2="9"/></svg>`,
       manifests: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
@@ -190,7 +192,7 @@ export class Sidebar {
           <span class="brand-glyph-radar">◈</span>
           <div>
             <div class="brand-text">FORENSIC COMMAND</div>
-            <div class="brand-subtext">21 TACTICAL LENSES</div>
+            <div class="brand-subtext">25 TACTICAL LENSES</div>
           </div>
         </div>
         <div class="sidebar-header-actions">

@@ -3,12 +3,12 @@ import assert from 'node:assert';
 import { Sidebar } from '../src/ui/components/Sidebar.js';
 
 describe('Sidebar Component Suite', () => {
-  test('instantiates with 5 sectors and 23 total lenses', () => {
+  test('instantiates with 5 sectors and 25 total lenses', () => {
     const sidebar = new Sidebar({ activePage: 'overview' });
     assert.strictEqual(sidebar.sections.length, 5, 'Must have 5 sectors');
 
     const totalLenses = sidebar.sections.reduce((acc, sec) => acc + sec.items.length, 0);
-    assert.strictEqual(totalLenses, 24, 'Must have 24 total tactical lenses');
+    assert.strictEqual(totalLenses, 25, 'Must have 25 total tactical lenses');
   });
 
   test('auto-expands sector containing the active page', () => {
