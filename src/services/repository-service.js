@@ -12,6 +12,10 @@ import { SearchIndex } from '../core/search-index.js';
 import { ApiExtractor } from '../core/api-extractor.js';
 import { ContextGraph } from '../core/context-graph.js';
 import { CallGraphEngine } from '../core/call-graph.js';
+import { AdvancedImpactEngine } from '../core/impact-engine.js';
+import { ChangeBriefGenerator } from '../core/change-brief.js';
+import { PRRiskAnalyzer } from '../core/pr-analyzer.js';
+import { TestRecommender } from '../core/test-recommender.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -323,5 +327,91 @@ export class RepositoryService {
     const engine = new CallGraphEngine(contextGraph);
     repoModel.callGraph = engine;
     return engine;
+  }
+
+  /**
+   * Lazy Advanced Impact Engine
+   */
+  static async getImpactEngine(repoModel) {
+    if (repoModel.impactEngine) return repoModel.impactEngine;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const callGraph = await this.getCallGraph(repoModel);
+    const hotspots = await this.getHotspots(repoModel);
+    const { commits } = await this.getGitData(repoModel);
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const extractor = new ApiExtractor();
+    const endpointData = extractor.extract(parsedFiles);
+    const endpoints = endpointData?.endpoints || [];
+
+    const engine = new AdvancedImpactEngine({
+      contextGraph,
+      callGraph,
+      hotspots,
+      commits,
+      endpoints
+    });
+    repoModel.impactEngine = engine;
+    return engine;
+  }
+
+  /**
+   * Lazy Change Brief Generator
+   */
+  static async getChangeBriefGenerator(repoModel) {
+    if (repoModel.changeBriefGenerator) return repoModel.changeBriefGenerator;
+    const impactEngine = await this.getImpactEngine(repoModel);
+    const callGraph = await this.getCallGraph(repoModel);
+    const contextGraph = await this.getContextGraph(repoModel);
+
+    const generator = new ChangeBriefGenerator({
+      impactEngine,
+      callGraph,
+      contextGraph
+    });
+    repoModel.changeBriefGenerator = generator;
+    return generator;
+  }
+
+  /**
+   * Lazy PR Risk Analyzer
+   */
+  static async getPRAnalyzer(repoModel) {
+    if (repoModel.prAnalyzer) return repoModel.prAnalyzer;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const callGraph = await this.getCallGraph(repoModel);
+    const impactEngine = await this.getImpactEngine(repoModel);
+    const hotspots = await this.getHotspots(repoModel);
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const extractor = new ApiExtractor();
+    const endpointData = extractor.extract(parsedFiles);
+    const endpoints = endpointData?.endpoints || [];
+
+    const analyzer = new PRRiskAnalyzer({
+      contextGraph,
+      callGraph,
+      impactEngine,
+      hotspots,
+      endpoints
+    });
+    repoModel.prAnalyzer = analyzer;
+    return analyzer;
+  }
+
+  /**
+   * Lazy Test Recommender
+   */
+  static async getTestRecommender(repoModel) {
+    if (repoModel.testRecommender) return repoModel.testRecommender;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const callGraph = await this.getCallGraph(repoModel);
+    const { commits } = await this.getGitData(repoModel);
+
+    const recommender = new TestRecommender({
+      contextGraph,
+      callGraph,
+      commits
+    });
+    repoModel.testRecommender = recommender;
+    return recommender;
   }
 }

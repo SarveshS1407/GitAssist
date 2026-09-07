@@ -312,6 +312,58 @@ export class ApiRouter {
       });
     }
 
+    // 11b. Multi-Dimensional Impact Analysis Engine (Lazy)
+    if (req.method === 'GET' && pathname === '/api/impact/advanced') {
+      const target = parsedUrl.searchParams.get('target') || (this.activeRepoState.files[0]?.relativePath || '');
+      const depth = parseInt(parsedUrl.searchParams.get('depth') || '3', 10);
+
+      const impactEngine = await RepositoryService.getImpactEngine(this.activeRepoState);
+      const report = impactEngine.analyzeImpact(target, depth);
+
+      return this.sendJson(res, 200, report);
+    }
+
+    // 11c. "Before You Change This" Pre-Modification Change Brief (Lazy)
+    if (req.method === 'GET' && pathname === '/api/change-brief') {
+      const target = parsedUrl.searchParams.get('target') || (this.activeRepoState.files[0]?.relativePath || '');
+      const format = parsedUrl.searchParams.get('format') || 'json';
+
+      const briefGen = await RepositoryService.getChangeBriefGenerator(this.activeRepoState);
+      const brief = briefGen.generateBrief(target);
+
+      if (format === 'markdown' || format === 'md') {
+        const markdown = briefGen.formatMarkdown(brief);
+        return this.sendJson(res, 200, { ...brief, markdown });
+      }
+
+      return this.sendJson(res, 200, brief);
+    }
+
+    // 11d. Pull Request / Diff Risk Analyzer (POST)
+    if (req.method === 'POST' && pathname === '/api/pr/analyze') {
+      const body = await this.parseRequestBody(req);
+      const diffText = body.diff || body.diffText || '';
+
+      if (!diffText.trim()) {
+        return this.sendJson(res, 400, { error: 'diff or diffText is required in request body' });
+      }
+
+      const analyzer = await RepositoryService.getPRAnalyzer(this.activeRepoState);
+      const report = analyzer.analyze(diffText);
+
+      return this.sendJson(res, 200, report);
+    }
+
+    // 11e. Automatic Test Recommendation Engine (Lazy)
+    if (req.method === 'GET' && pathname === '/api/tests/recommend') {
+      const target = parsedUrl.searchParams.get('target') || (this.activeRepoState.files[0]?.relativePath || '');
+
+      const recommender = await RepositoryService.getTestRecommender(this.activeRepoState);
+      const recommendations = recommender.recommend(target);
+
+      return this.sendJson(res, 200, recommendations);
+    }
+
     // 12. Risk Map (Heuristic)
     if (req.method === 'GET' && pathname === '/api/risk') {
       const hotspots = await RepositoryService.getHotspots(this.activeRepoState);

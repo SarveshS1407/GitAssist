@@ -145,4 +145,9 @@ ${testList}
 > ${b.recommendedAction}
     `.trim();
   }
+
+  formatMarkdown(b) {
+    return this.toMarkdown(b);
+  }
 }
+
