@@ -9,6 +9,9 @@ import { CircularDependencyDetector } from '../core/circular-detector.js';
 import { CodeMetrics } from '../core/metrics.js';
 import { HotspotAnalyzer } from '../core/hotspot-analyzer.js';
 import { SearchIndex } from '../core/search-index.js';
+import { ApiExtractor } from '../core/api-extractor.js';
+import { ContextGraph } from '../core/context-graph.js';
+import { CallGraphEngine } from '../core/call-graph.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -294,5 +297,31 @@ export class RepositoryService {
     const index = new SearchIndex(parsedFiles);
     repoModel.searchIndex = index;
     return index;
+  }
+
+  /**
+   * Lazy Unified Context Graph
+   */
+  static async getContextGraph(repoModel) {
+    if (repoModel.contextGraph) return repoModel.contextGraph;
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const depGraph = await this.getDependencyGraph(repoModel);
+    const extractor = new ApiExtractor();
+    const endpointResult = extractor.extract(parsedFiles);
+    const endpoints = endpointResult?.endpoints || [];
+    const graph = ContextGraph.build(parsedFiles, depGraph, endpoints);
+    repoModel.contextGraph = graph;
+    return graph;
+  }
+
+  /**
+   * Lazy Call Graph Engine
+   */
+  static async getCallGraph(repoModel) {
+    if (repoModel.callGraph) return repoModel.callGraph;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const engine = new CallGraphEngine(contextGraph);
+    repoModel.callGraph = engine;
+    return engine;
   }
 }

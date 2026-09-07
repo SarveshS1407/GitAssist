@@ -217,6 +217,76 @@ export class ApiRouter {
       return this.sendJson(res, 200, { type, diagram });
     }
 
+    // 10b. Symbol Code Intelligence Inventory (Lazy)
+    if (req.method === 'GET' && pathname === '/api/symbols') {
+      const query = parsedUrl.searchParams.get('q') || '';
+      const kind = parsedUrl.searchParams.get('kind') || '';
+      const file = parsedUrl.searchParams.get('file') || '';
+      const limit = parseInt(parsedUrl.searchParams.get('limit') || '100', 10);
+
+      const contextGraph = await RepositoryService.getContextGraph(this.activeRepoState);
+      const symbols = contextGraph.searchSymbols(query, { kind: kind || undefined, file: file || undefined });
+
+      return this.sendJson(res, 200, {
+        total: symbols.length,
+        symbols: symbols.slice(0, limit).map(s => ({
+          id: s.id,
+          name: s.name,
+          qualifiedName: s.qualifiedName,
+          kind: s.kind,
+          file: s.file,
+          parentClass: s.parentClass,
+          lineStart: s.lineStart,
+          lineEnd: s.lineEnd,
+          signature: s.signature,
+          callsCount: (s.calls || []).length
+        }))
+      });
+    }
+
+    // 10c. Symbol Call Graph (Lazy)
+    if (req.method === 'GET' && pathname === '/api/call-graph') {
+      const symbolRef = parsedUrl.searchParams.get('symbol');
+      const depth = parseInt(parsedUrl.searchParams.get('depth') || '2', 10);
+      const direction = parsedUrl.searchParams.get('direction') || 'both';
+
+      const callGraph = await RepositoryService.getCallGraph(this.activeRepoState);
+
+      if (!symbolRef) {
+        // Return first available symbol or top central symbol if none provided
+        const metrics = callGraph.getCallMetrics(1);
+        const defaultRef = metrics.topCalled[0]?.symbol?.qualifiedName || 'default';
+        const tree = callGraph.exportCallTree(defaultRef, { depth, direction });
+        return this.sendJson(res, 200, tree);
+      }
+
+      const tree = callGraph.exportCallTree(symbolRef, { depth, direction });
+      return this.sendJson(res, 200, tree);
+    }
+
+    // 10d. Symbol Call Path Trace (Lazy)
+    if (req.method === 'GET' && pathname === '/api/call-graph/trace') {
+      const from = parsedUrl.searchParams.get('from');
+      const to = parsedUrl.searchParams.get('to');
+      const depth = parseInt(parsedUrl.searchParams.get('depth') || '5', 10);
+
+      if (!from || !to) {
+        return this.sendJson(res, 400, { error: 'Both "from" and "to" symbol parameters are required' });
+      }
+
+      const callGraph = await RepositoryService.getCallGraph(this.activeRepoState);
+      const traceResult = callGraph.getCallPath(from, to, depth);
+      return this.sendJson(res, 200, traceResult);
+    }
+
+    // 10e. Call Graph Centrality Metrics (Lazy)
+    if (req.method === 'GET' && pathname === '/api/call-graph/metrics') {
+      const limit = parseInt(parsedUrl.searchParams.get('limit') || '10', 10);
+      const callGraph = await RepositoryService.getCallGraph(this.activeRepoState);
+      const metrics = callGraph.getCallMetrics(limit);
+      return this.sendJson(res, 200, metrics);
+    }
+
     // 11. Impact & Blast Radius Analysis (Lazy)
     if (req.method === 'GET' && pathname === '/api/impact') {
       const relPath = parsedUrl.searchParams.get('path') || (this.activeRepoState.files[0]?.relativePath || '');

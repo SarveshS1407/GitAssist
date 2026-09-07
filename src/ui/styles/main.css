@@ -3521,3 +3521,58 @@ body {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ==========================================================================
+   Symbol Call Graph & Execution Topology Styles
+   ========================================================================== */
+.callgraph-autocomplete {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-blade);
+  border: 1px solid var(--border-holo);
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 100;
+  margin-top: 4px;
+}
+
+.autocomplete-item {
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease;
+}
+
+.autocomplete-item:hover {
+  background: rgba(0, 240, 255, 0.12);
+}
+
+.callgraph-hub-pill:hover {
+  background: rgba(0, 240, 255, 0.2) !important;
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+.callgraph-node-card:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.callgraph-root-node {
+  animation: pulseRootNode 3s infinite ease-in-out;
+}
+
+@keyframes pulseRootNode {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.55), 0 0 15px rgba(176, 38, 255, 0.4);
+  }
+}
+

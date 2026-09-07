@@ -8,7 +8,7 @@ describe('Sidebar Component Suite', () => {
     assert.strictEqual(sidebar.sections.length, 5, 'Must have 5 sectors');
 
     const totalLenses = sidebar.sections.reduce((acc, sec) => acc + sec.items.length, 0);
-    assert.strictEqual(totalLenses, 23, 'Must have 23 total tactical lenses');
+    assert.strictEqual(totalLenses, 24, 'Must have 24 total tactical lenses');
   });
 
   test('auto-expands sector containing the active page', () => {
@@ -18,7 +18,7 @@ describe('Sidebar Component Suite', () => {
 
   test('generates vector SVG markup for lenses without emojis', () => {
     const sidebar = new Sidebar({ activePage: 'overview' });
-    const lensIds = ['overview', 'architecture', 'impact', 'git', 'security', 'techdebt', 'endpoints'];
+    const lensIds = ['overview', 'architecture', 'callgraph', 'impact', 'git', 'security', 'techdebt', 'endpoints'];
 
     for (const id of lensIds) {
       const svg = sidebar.getNavSvg(id, 15);

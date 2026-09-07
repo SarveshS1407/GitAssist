@@ -32,7 +32,8 @@ export class Sidebar {
         sector: 'SEC 02',
         items: [
           { id: 'architecture', label: 'Architecture Topology', badge: '#01', accent: '#00f0ff' },
-          { id: 'impact', label: 'Blast Radius & Impact', badge: '#02', accent: '#f43f5e' },
+          { id: 'callgraph', label: 'Symbol Call Graph', badge: '#02', accent: '#38bdf8' },
+          { id: 'impact', label: 'Blast Radius & Impact', badge: '#02b', accent: '#f43f5e' },
           { id: 'features', label: 'Feature Mapping', badge: '#09', accent: '#c084fc' },
           { id: 'endpoints', label: 'API Endpoints', badge: '#21', accent: '#34d399' }
         ]
@@ -96,6 +97,7 @@ export class Sidebar {
       explorer: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/><polyline points="9 13 12 16 16 12"/></svg>`,
       search: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/><path d="M11 8v6m-3-3h6" stroke-width="1.8"/></svg>`,
       architecture: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="4" r="2.5"/><circle cx="4" cy="20" r="2.5"/><circle cx="20" cy="20" r="2.5"/><line x1="12" y1="6.5" x2="4" y2="17.5"/><line x1="12" y1="6.5" x2="20" y2="17.5"/><line x1="6.5" y1="20" x2="17.5" y2="20"/></svg>`,
+      callgraph: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7 7.5l3.5 8.5m6.5-8.5l-3.5 8.5m-6.5-9h10"/></svg>`,
       impact: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><circle cx="12" cy="12" r="6" stroke-dasharray="2 2"/><circle cx="12" cy="12" r="9.5"/><path d="M12 1.5v2m0 17v2M1.5 12h2m17 0h2"/></svg>`,
       features: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
       endpoints: `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M11.5 3a17 17 0 0 0 0 18m1-18a17 17 0 0 1 0 18"/></svg>`,

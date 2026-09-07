@@ -32,10 +32,48 @@ export class CodeParser {
     }
   }
 
+  static extractCallsFromLine(line, lineNum) {
+    const calls = [];
+    const clean = line.replace(/\/\/.*$/, '').replace(/#.*$/, '');
+    const CONTROL_KEYWORDS = new Set([
+      'if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'throw', 'typeof',
+      'instanceof', 'import', 'export', 'super', 'require', 'class', 'extends', 'const',
+      'let', 'var', 'async', 'await', 'yield', 'delete', 'void', 'new', 'try', 'finally'
+    ]);
+    const regex = /(?:([a-zA-Z0-9_$]+)\.)?([a-zA-Z0-9_$]+)\s*\(/g;
+    let match;
+    while ((match = regex.exec(clean)) !== null) {
+      const receiver = match[1] || null;
+      const name = match[2];
+      if (CONTROL_KEYWORDS.has(name)) continue;
+      if (receiver && CONTROL_KEYWORDS.has(receiver)) continue;
+      calls.push({
+        name,
+        receiver,
+        fullCall: receiver ? `${receiver}.${name}` : name,
+        line: lineNum
+      });
+    }
+    return calls;
+  }
+
   static parseJavaScriptOrTypeScript(lines) {
     const symbols = [];
     const imports = [];
     const exports = [];
+    const fileCalls = [];
+
+    let currentClass = null;
+    let classBraceDepth = 0;
+    let activeSymbol = null;
+    let symbolBraceDepth = 0;
+    let totalBraceDepth = 0;
+
+    const CONTROL_KEYWORDS = new Set([
+      'if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'throw', 'typeof',
+      'instanceof', 'import', 'export', 'super', 'require', 'class', 'extends', 'const',
+      'let', 'var', 'async', 'await', 'yield', 'delete', 'void', 'new', 'try', 'finally'
+    ]);
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
@@ -47,7 +85,6 @@ export class CodeParser {
       }
 
       // Imports
-      // e.g. import { foo, bar } from './module'; or import React from 'react';
       const importMatch = line.match(/^import\s+(?:(?:\*\s+as\s+(\w+))|(?:\{([^}]+)\})|([a-zA-Z0-9_$]+))\s+from\s+['"]([^'"]+)['"]/);
       if (importMatch) {
         const specifiers = (importMatch[2] ? importMatch[2].split(',').map(s => s.trim().split(/\s+as\s+/)[0]) : [importMatch[1] || importMatch[3]]).filter(Boolean);
@@ -92,43 +129,77 @@ export class CodeParser {
         });
       }
 
-      // Functions
-      const fnMatch = line.match(/(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(([^)]*)\)/);
-      if (fnMatch) {
-        symbols.push({
-          name: fnMatch[1],
-          kind: 'function',
-          lineStart: lineNum,
-          lineEnd: lineNum,
-          exported: line.includes('export'),
-          signature: `${fnMatch[1]}(${fnMatch[2].trim()})`
-        });
-      }
-
-      // Arrow functions / const functions
-      const arrowMatch = line.match(/(?:export\s+)?(?:const|let)\s+([a-zA-Z0-9_$]+)\s*=\s*(?:async\s*)?\(([^)]*)\)\s*(?::\s*[^=]+)?\s*=>/);
-      if (arrowMatch) {
-        symbols.push({
-          name: arrowMatch[1],
-          kind: 'function',
-          lineStart: lineNum,
-          lineEnd: lineNum,
-          exported: line.includes('export'),
-          signature: `${arrowMatch[1]}(${arrowMatch[2].trim()})`
-        });
-      }
-
       // Classes
       const classMatch = line.match(/(?:export\s+)?class\s+([a-zA-Z0-9_$]+)(?:\s+extends\s+([a-zA-Z0-9_$]+))?/);
       if (classMatch) {
-        symbols.push({
+        currentClass = classMatch[1];
+        classBraceDepth = totalBraceDepth;
+        const clsSym = {
           name: classMatch[1],
           kind: 'class',
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: line.includes('export'),
-          signature: `class ${classMatch[1]}${classMatch[2] ? ' extends ' + classMatch[2] : ''}`
-        });
+          signature: `class ${classMatch[1]}${classMatch[2] ? ' extends ' + classMatch[2] : ''}`,
+          calls: []
+        };
+        symbols.push(clsSym);
+      }
+
+      // Standalone Functions
+      const fnMatch = line.match(/(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(([^)]*)\)/);
+      if (fnMatch) {
+        const fnSym = {
+          name: fnMatch[1],
+          kind: 'function',
+          lineStart: lineNum,
+          lineEnd: lineNum,
+          exported: line.includes('export'),
+          signature: `${fnMatch[1]}(${fnMatch[2].trim()})`,
+          calls: []
+        };
+        symbols.push(fnSym);
+        activeSymbol = fnSym;
+        symbolBraceDepth = totalBraceDepth;
+      }
+
+      // Arrow functions / const functions
+      const arrowMatch = line.match(/(?:export\s+)?(?:const|let)\s+([a-zA-Z0-9_$]+)\s*=\s*(?:async\s*)?\(([^)]*)\)\s*(?::\s*[^=]+)?\s*=>/);
+      if (arrowMatch) {
+        const arrowSym = {
+          name: arrowMatch[1],
+          kind: 'function',
+          lineStart: lineNum,
+          lineEnd: lineNum,
+          exported: line.includes('export'),
+          signature: `${arrowMatch[1]}(${arrowMatch[2].trim()})`,
+          calls: []
+        };
+        symbols.push(arrowSym);
+        activeSymbol = arrowSym;
+        symbolBraceDepth = totalBraceDepth;
+      }
+
+      // Class Methods (when inside class body)
+      if (currentClass && !fnMatch && !arrowMatch && !classMatch) {
+        const methodMatch = line.match(/^\s*(?:static\s+)?(?:async\s+)?(?:\*\s*)?([a-zA-Z0-9_$]+)\s*\(([^)]*)\)\s*\{?/);
+        if (methodMatch && !CONTROL_KEYWORDS.has(methodMatch[1])) {
+          const methodName = methodMatch[1];
+          const isCtor = methodName === 'constructor';
+          const methodSym = {
+            name: methodName,
+            kind: isCtor ? 'constructor' : 'method',
+            parentClass: currentClass,
+            lineStart: lineNum,
+            lineEnd: lineNum,
+            exported: false,
+            signature: `${currentClass}.${methodName}(${methodMatch[2].trim()})`,
+            calls: []
+          };
+          symbols.push(methodSym);
+          activeSymbol = methodSym;
+          symbolBraceDepth = totalBraceDepth;
+        }
       }
 
       // Interfaces (TypeScript)
@@ -140,7 +211,8 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: line.includes('export'),
-          signature: `interface ${interfaceMatch[1]}`
+          signature: `interface ${interfaceMatch[1]}`,
+          calls: []
         });
       }
 
@@ -153,24 +225,73 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: line.includes('export'),
-          signature: `type ${typeMatch[1]}`
+          signature: `type ${typeMatch[1]}`,
+          calls: []
         });
+      }
+
+      // Extract call expressions on this line
+      const rawCalls = CodeParser.extractCallsFromLine(line, lineNum);
+      const filteredCalls = rawCalls.filter(c => !(c.line === activeSymbol?.lineStart && c.name === activeSymbol?.name));
+
+      if (activeSymbol) {
+        activeSymbol.calls.push(...filteredCalls);
+      } else {
+        fileCalls.push(...filteredCalls);
+      }
+
+      // Track brace depth
+      for (const ch of line) {
+        if (ch === '{') totalBraceDepth++;
+        if (ch === '}') {
+          totalBraceDepth--;
+          if (activeSymbol && totalBraceDepth <= symbolBraceDepth) {
+            activeSymbol.lineEnd = lineNum;
+            activeSymbol = null;
+          }
+          if (currentClass && totalBraceDepth <= classBraceDepth) {
+            const clsSym = symbols.find(s => s.name === currentClass && s.kind === 'class');
+            if (clsSym) clsSym.lineEnd = lineNum;
+            currentClass = null;
+          }
+        }
       }
     });
 
-    return { symbols, imports, exports };
+    return { symbols, imports, exports, calls: fileCalls };
   }
 
   static parsePython(lines) {
     const symbols = [];
     const imports = [];
     const exports = [];
+    const fileCalls = [];
+
+    let currentClass = null;
+    let classIndent = -1;
+    let activeSymbol = null;
+    let activeIndent = -1;
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
       const trimmed = line.trim();
 
       if (trimmed.startsWith('#')) return;
+
+      const leadingSpaces = line.search(/\S|$/);
+
+      if (activeSymbol && leadingSpaces <= activeIndent && trimmed.length > 0) {
+        activeSymbol.lineEnd = Math.max(activeSymbol.lineStart, lineNum - 1);
+        activeSymbol = null;
+        activeIndent = -1;
+      }
+
+      if (currentClass && leadingSpaces <= classIndent && trimmed.length > 0) {
+        const clsSym = symbols.find(s => s.name === currentClass && s.kind === 'class');
+        if (clsSym) clsSym.lineEnd = Math.max(clsSym.lineStart, lineNum - 1);
+        currentClass = null;
+        classIndent = -1;
+      }
 
       // Imports
       const importFrom = line.match(/^from\s+([a-zA-Z0-9_.]+)\s+import\s+(.+)$/);
@@ -195,41 +316,66 @@ export class CodeParser {
         }
       }
 
-      // Functions / Methods
-      const defMatch = line.match(/^(\s*)def\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)/);
-      if (defMatch) {
-        const isMethod = defMatch[1].length > 0;
-        symbols.push({
-          name: defMatch[2],
-          kind: isMethod ? 'method' : 'function',
-          lineStart: lineNum,
-          lineEnd: lineNum,
-          exported: !defMatch[2].startsWith('_'),
-          signature: `def ${defMatch[2]}(${defMatch[3].trim()})`
-        });
-      }
-
       // Classes
-      const classMatch = line.match(/^class\s+([a-zA-Z0-9_]+)(?:\(([^)]*)\))?:/);
+      const classMatch = line.match(/^(\s*)class\s+([a-zA-Z0-9_]+)(?:\(([^)]*)\))?:/);
       if (classMatch) {
-        symbols.push({
-          name: classMatch[1],
+        currentClass = classMatch[2];
+        classIndent = classMatch[1].length;
+        const clsSym = {
+          name: classMatch[2],
           kind: 'class',
           lineStart: lineNum,
           lineEnd: lineNum,
-          exported: !classMatch[1].startsWith('_'),
-          signature: `class ${classMatch[1]}${classMatch[2] ? `(${classMatch[2]})` : ''}`
-        });
+          exported: !classMatch[2].startsWith('_'),
+          signature: `class ${classMatch[2]}${classMatch[3] ? `(${classMatch[3]})` : ''}`,
+          calls: []
+        };
+        symbols.push(clsSym);
+      }
+
+      // Functions / Methods
+      const defMatch = line.match(/^(\s*)def\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)/);
+      if (defMatch) {
+        const isMethod = currentClass !== null && defMatch[1].length > classIndent;
+        const fnSym = {
+          name: defMatch[2],
+          kind: isMethod ? 'method' : 'function',
+          parentClass: isMethod ? currentClass : undefined,
+          lineStart: lineNum,
+          lineEnd: lineNum,
+          exported: !defMatch[2].startsWith('_'),
+          signature: isMethod ? `${currentClass}.${defMatch[2]}(${defMatch[3].trim()})` : `def ${defMatch[2]}(${defMatch[3].trim()})`,
+          calls: []
+        };
+        symbols.push(fnSym);
+        activeSymbol = fnSym;
+        activeIndent = defMatch[1].length;
+      }
+
+      // Extract calls
+      const rawCalls = CodeParser.extractCallsFromLine(line, lineNum);
+      const filteredCalls = rawCalls.filter(c => !(c.line === activeSymbol?.lineStart && c.name === activeSymbol?.name));
+      if (activeSymbol) {
+        activeSymbol.calls.push(...filteredCalls);
+      } else {
+        fileCalls.push(...filteredCalls);
       }
     });
 
-    return { symbols, imports, exports };
+    if (activeSymbol) activeSymbol.lineEnd = lines.length;
+    if (currentClass) {
+      const clsSym = symbols.find(s => s.name === currentClass && s.kind === 'class');
+      if (clsSym) clsSym.lineEnd = lines.length;
+    }
+
+    return { symbols, imports, exports, calls: fileCalls };
   }
 
   static parseGo(lines) {
     const symbols = [];
     const imports = [];
     const exports = [];
+    const fileCalls = [];
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
@@ -251,7 +397,8 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: isExported,
-          signature: `func ${fnMatch[1]}(${fnMatch[2]})`
+          signature: `func ${fnMatch[1]}(${fnMatch[2]})`,
+          calls: []
         });
       }
 
@@ -265,18 +412,23 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: isExported,
-          signature: `type ${typeMatch[1]} ${typeMatch[2]}`
+          signature: `type ${typeMatch[1]} ${typeMatch[2]}`,
+          calls: []
         });
       }
+
+      const rawCalls = CodeParser.extractCallsFromLine(line, lineNum);
+      if (rawCalls.length) fileCalls.push(...rawCalls);
     });
 
-    return { symbols, imports, exports };
+    return { symbols, imports, exports, calls: fileCalls };
   }
 
   static parseRust(lines) {
     const symbols = [];
     const imports = [];
     const exports = [];
+    const fileCalls = [];
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
@@ -296,7 +448,8 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: line.includes('pub '),
-          signature: `fn ${fnMatch[1]}(${fnMatch[2]})`
+          signature: `fn ${fnMatch[1]}(${fnMatch[2]})`,
+          calls: []
         });
       }
 
@@ -309,18 +462,23 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: line.includes('pub '),
-          signature: `${structMatch[1]} ${structMatch[2]}`
+          signature: `${structMatch[1]} ${structMatch[2]}`,
+          calls: []
         });
       }
+
+      const rawCalls = CodeParser.extractCallsFromLine(line, lineNum);
+      if (rawCalls.length) fileCalls.push(...rawCalls);
     });
 
-    return { symbols, imports, exports };
+    return { symbols, imports, exports, calls: fileCalls };
   }
 
   static parseGeneric(lines) {
     const symbols = [];
     const imports = [];
     const exports = [];
+    const fileCalls = [];
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
@@ -333,11 +491,15 @@ export class CodeParser {
           lineStart: lineNum,
           lineEnd: lineNum,
           exported: false,
-          signature: fnMatch[0]
+          signature: fnMatch[0],
+          calls: []
         });
       }
+
+      const rawCalls = CodeParser.extractCallsFromLine(line, lineNum);
+      if (rawCalls.length) fileCalls.push(...rawCalls);
     });
 
-    return { symbols, imports, exports };
+    return { symbols, imports, exports, calls: fileCalls };
   }
 }
