@@ -17,6 +17,7 @@ import { ChangeBriefGenerator } from '../core/change-brief.js';
 import { PRRiskAnalyzer } from '../core/pr-analyzer.js';
 import { TestRecommender } from '../core/test-recommender.js';
 import { AdvancedTestIntelligence } from '../core/test-intelligence.js';
+import { DeadCodeDetector } from '../core/dead-code-detector.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -433,5 +434,24 @@ export class RepositoryService {
     });
     repoModel.testIntelligence = intelligence;
     return intelligence;
+  }
+
+  /**
+   * Lazy Dead Code Detector
+   */
+  static async getDeadCodeDetector(repoModel) {
+    if (repoModel.deadCodeDetector) return repoModel.deadCodeDetector;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const callGraph = await this.getCallGraph(repoModel);
+    const parsedFiles = await this.getParsedFiles(repoModel);
+
+    const detector = new DeadCodeDetector({
+      contextGraph,
+      callGraph,
+      parsedFiles,
+      files: repoModel.files || []
+    });
+    repoModel.deadCodeDetector = detector;
+    return detector;
   }
 }

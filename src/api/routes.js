@@ -458,28 +458,22 @@ export class ApiRouter {
       });
     }
 
-    // 16. Dead Code Signals (Isolated unimported files)
+    // 16. Dead & Isolated Code Detection (Lazy)
     if (req.method === 'GET' && pathname === '/api/deadcode') {
-      const graph = await RepositoryService.getDependencyGraph(this.activeRepoState);
-      const edges = graph.edges || [];
-      const files = this.activeRepoState.files || [];
-
-      const connected = new Set();
-      for (const e of edges) {
-        connected.add(e.source);
-        connected.add(e.target);
-      }
-
-      const isolated = files
-        .filter(f => !connected.has(f.relativePath) && !f.relativePath.includes('index') && !f.relativePath.includes('server'))
-        .map(f => ({
-          file: f.relativePath,
-          reason: 'No detected internal import edges (leaf or isolated module)'
-        }));
+      const detector = await RepositoryService.getDeadCodeDetector(this.activeRepoState);
+      const report = detector.detect();
 
       return this.sendJson(res, 200, {
-        isolatedCount: isolated.length,
-        candidates: isolated.slice(0, 15)
+        isolatedCount: report.summary.orphanModulesCount,
+        candidates: report.orphanModules.map(o => ({
+          file: o.file,
+          reason: o.reason,
+          confidence: o.confidence,
+          lineCount: o.lineCount
+        })),
+        summary: report.summary,
+        orphanModules: report.orphanModules,
+        unusedSymbols: report.unusedSymbols
       });
     }
 
