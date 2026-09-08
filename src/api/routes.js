@@ -364,26 +364,16 @@ export class ApiRouter {
       return this.sendJson(res, 200, recommendations);
     }
 
-    // 12. Risk Map (Heuristic)
+    // 12. Structural Risk Map & Architectural Quadrants (Lazy)
     if (req.method === 'GET' && pathname === '/api/risk') {
-      const hotspots = await RepositoryService.getHotspots(this.activeRepoState);
-      const files = this.activeRepoState.files || [];
-      
-      const riskRanking = files.slice(0, 15).map(f => {
-        const hotspot = hotspots.find(h => h.relativePath === f.relativePath);
-        const churn = hotspot?.churnCount || 1;
-        const loc = f.lineCount || 50;
-        const score = Math.min(100, Math.round(churn * 7 + loc / 15));
-        return {
-          file: f.relativePath,
-          score,
-          level: score >= 70 ? 'HIGH' : score >= 40 ? 'MEDIUM' : 'LOW',
-          churn,
-          loc
-        };
-      }).sort((a, b) => b.score - a.score);
+      const riskEngine = await RepositoryService.getRiskMatrixEngine(this.activeRepoState);
+      const matrix = riskEngine.calculate();
 
-      return this.sendJson(res, 200, { riskRanking });
+      return this.sendJson(res, 200, {
+        riskRanking: matrix.riskRanking,
+        summary: matrix.summary,
+        quadrants: matrix.quadrants
+      });
     }
 
     // 13. Feature Mapping (Heuristic)

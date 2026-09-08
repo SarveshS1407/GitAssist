@@ -19,6 +19,7 @@ import { TestRecommender } from '../core/test-recommender.js';
 import { AdvancedTestIntelligence } from '../core/test-intelligence.js';
 import { DeadCodeDetector } from '../core/dead-code-detector.js';
 import { BugArchaeologyEngine } from '../core/bug-archaeology.js';
+import { RiskMatrixEngine } from '../core/risk-matrix.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -470,6 +471,23 @@ export class RepositoryService {
       files: repoModel.files || []
     });
     repoModel.bugArchaeologyEngine = engine;
+    return engine;
+  }
+
+  /**
+   * Lazy Structural Risk Matrix Engine
+   */
+  static async getRiskMatrixEngine(repoModel) {
+    if (repoModel.riskMatrixEngine) return repoModel.riskMatrixEngine;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const hotspots = await this.getHotspots(repoModel);
+
+    const engine = new RiskMatrixEngine({
+      contextGraph,
+      hotspots,
+      files: repoModel.files || []
+    });
+    repoModel.riskMatrixEngine = engine;
     return engine;
   }
 }
