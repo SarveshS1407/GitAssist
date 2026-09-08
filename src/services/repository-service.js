@@ -20,6 +20,7 @@ import { AdvancedTestIntelligence } from '../core/test-intelligence.js';
 import { DeadCodeDetector } from '../core/dead-code-detector.js';
 import { BugArchaeologyEngine } from '../core/bug-archaeology.js';
 import { RiskMatrixEngine } from '../core/risk-matrix.js';
+import { HeuristicReviewEngine } from '../core/heuristic-review.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -488,6 +489,25 @@ export class RepositoryService {
       files: repoModel.files || []
     });
     repoModel.riskMatrixEngine = engine;
+    return engine;
+  }
+
+  /**
+   * Lazy Heuristic Review Engine
+   */
+  static async getHeuristicReviewEngine(repoModel) {
+    if (repoModel.heuristicReviewEngine) return repoModel.heuristicReviewEngine;
+    const parsedFiles = await this.getParsedFiles(repoModel);
+    const cycles = await this.getCycles(repoModel);
+    const hotspots = await this.getHotspots(repoModel);
+
+    const engine = new HeuristicReviewEngine({
+      files: repoModel.files || [],
+      parsedFiles: parsedFiles || [],
+      cycles: cycles || [],
+      hotspots: hotspots || []
+    });
+    repoModel.heuristicReviewEngine = engine;
     return engine;
   }
 }

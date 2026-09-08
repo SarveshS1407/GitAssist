@@ -593,42 +593,16 @@ export class ApiRouter {
       });
     }
 
-    // 18. Code Review Audit
+    // 18. Automated Heuristic Code Review (Lazy)
     if (req.method === 'GET' && pathname === '/api/review') {
-      const files = this.activeRepoState.files || [];
-      const cycles = await RepositoryService.getCycles(this.activeRepoState);
-      const findings = [];
-
-      if (cycles.length > 0) {
-        findings.push({
-          severity: 'HIGH',
-          category: 'Architectural Coupling',
-          file: `${cycles.length} Circular Loops`,
-          message: `Detected ${cycles.length} cyclic dependencies that impair tree-shaking and isolation.`
-        });
-      } else {
-        findings.push({
-          severity: 'INFO',
-          category: 'Architecture Topology',
-          file: 'Entire Codebase',
-          message: '0 circular dependency loops detected. Subsystem imports form a clean Directed Acyclic Graph (DAG).'
-        });
-      }
-
-      const oversized = files.filter(f => (f.lineCount || 0) > 300);
-      for (const f of oversized.slice(0, 5)) {
-        findings.push({
-          severity: 'MEDIUM',
-          category: 'Oversized Module',
-          file: `${f.relativePath} (${f.lineCount} LOC)`,
-          message: `File exceeds 300 LOC threshold. Consider splitting into focused sub-modules.`
-        });
-      }
+      const reviewEngine = await RepositoryService.getHeuristicReviewEngine(this.activeRepoState);
+      const report = reviewEngine.review();
 
       return this.sendJson(res, 200, {
-        healthScore: Math.max(75, Math.round(this.activeRepoState.summary?.avgMaintainability || 95)),
-        totalFiles: files.length,
-        findings
+        healthScore: report.summary.healthScore,
+        totalFiles: report.summary.totalFilesAudited,
+        summary: report.summary,
+        findings: report.findings
       });
     }
 
