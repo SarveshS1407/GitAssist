@@ -424,18 +424,21 @@ export class ApiRouter {
       return this.sendJson(res, 200, { features });
     }
 
-    // 14. Test Intelligence
+    // 14. Advanced Test Intelligence & Verification Density (Lazy)
     if (req.method === 'GET' && pathname === '/api/tests') {
-      const files = this.activeRepoState.files || [];
-      const testFiles = files.filter(f => f.relativePath.includes('test') || f.relativePath.includes('spec'));
-      const sourceFiles = files.filter(f => !f.relativePath.includes('test') && !f.relativePath.includes('spec'));
+      const intelEngine = await RepositoryService.getTestIntelligence(this.activeRepoState);
+      const analysis = intelEngine.analyze();
 
       return this.sendJson(res, 200, {
-        totalTests: testFiles.length,
-        totalSourceFiles: sourceFiles.length,
-        testRatio: sourceFiles.length > 0 ? `${Math.round((testFiles.length / sourceFiles.length) * 100)}%` : '0%',
-        testFiles: testFiles.map(t => t.relativePath),
-        untestedNotice: 'Static test mapping derived from naming conventions (*.test.*, tests/*).'
+        totalTests: analysis.summary.totalTestFiles,
+        totalSourceFiles: analysis.summary.totalSourceFiles,
+        testRatio: `${analysis.summary.testToSourceRatio}%`,
+        testFiles: analysis.testSuites.map(t => t.file),
+        untestedNotice: 'Verification analysis derived from AST import graphs, naming conventions, and hotspot churn correlation.',
+        summary: analysis.summary,
+        uncoveredHighRiskFiles: analysis.uncoveredHighRiskFiles,
+        moduleCoverage: analysis.moduleCoverage,
+        testSuites: analysis.testSuites
       });
     }
 

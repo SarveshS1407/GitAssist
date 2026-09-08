@@ -16,6 +16,7 @@ import { AdvancedImpactEngine } from '../core/impact-engine.js';
 import { ChangeBriefGenerator } from '../core/change-brief.js';
 import { PRRiskAnalyzer } from '../core/pr-analyzer.js';
 import { TestRecommender } from '../core/test-recommender.js';
+import { AdvancedTestIntelligence } from '../core/test-intelligence.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -413,5 +414,24 @@ export class RepositoryService {
     });
     repoModel.testRecommender = recommender;
     return recommender;
+  }
+
+  /**
+   * Lazy Test Intelligence Engine
+   */
+  static async getTestIntelligence(repoModel) {
+    if (repoModel.testIntelligence) return repoModel.testIntelligence;
+    const contextGraph = await this.getContextGraph(repoModel);
+    const callGraph = await this.getCallGraph(repoModel);
+    const hotspots = await this.getHotspots(repoModel);
+
+    const intelligence = new AdvancedTestIntelligence({
+      contextGraph,
+      callGraph,
+      hotspots,
+      files: repoModel.files || []
+    });
+    repoModel.testIntelligence = intelligence;
+    return intelligence;
   }
 }
