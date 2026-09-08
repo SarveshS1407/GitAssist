@@ -18,6 +18,7 @@ import { PRRiskAnalyzer } from '../core/pr-analyzer.js';
 import { TestRecommender } from '../core/test-recommender.js';
 import { AdvancedTestIntelligence } from '../core/test-intelligence.js';
 import { DeadCodeDetector } from '../core/dead-code-detector.js';
+import { BugArchaeologyEngine } from '../core/bug-archaeology.js';
 import { GitService } from './git-service.js';
 
 const execFileAsync = promisify(execFile);
@@ -453,5 +454,22 @@ export class RepositoryService {
     });
     repoModel.deadCodeDetector = detector;
     return detector;
+  }
+
+  /**
+   * Lazy Bug Archaeology Engine
+   */
+  static async getBugArchaeologyEngine(repoModel) {
+    if (repoModel.bugArchaeologyEngine) return repoModel.bugArchaeologyEngine;
+    const { commits } = await this.getGitData(repoModel);
+    const hotspots = await this.getHotspots(repoModel);
+
+    const engine = new BugArchaeologyEngine({
+      commits: commits || [],
+      hotspots: hotspots || [],
+      files: repoModel.files || []
+    });
+    repoModel.bugArchaeologyEngine = engine;
+    return engine;
   }
 }

@@ -442,19 +442,18 @@ export class ApiRouter {
       });
     }
 
-    // 15. Bug Archaeology (Git commit keyword matching)
+    // 15. Bug Archaeology & Defect Intelligence (Lazy)
     if (req.method === 'GET' && pathname === '/api/bugs') {
-      const { commits } = await RepositoryService.getGitData(this.activeRepoState);
-      const bugKeywords = ['bug', 'fix', 'hotfix', 'patch', 'issue', 'crash', 'error', 'regression'];
-      const bugCommits = (commits || []).filter(c => {
-        const msg = (c.message || '').toLowerCase();
-        return bugKeywords.some(kw => msg.includes(kw));
-      });
+      const bugEngine = await RepositoryService.getBugArchaeologyEngine(this.activeRepoState);
+      const report = bugEngine.analyze();
 
       return this.sendJson(res, 200, {
-        totalBugCommits: bugCommits.length,
-        totalAnalyzedCommits: (commits || []).length,
-        bugCommits: bugCommits.slice(0, 20)
+        totalBugCommits: report.summary.totalDefectCommits,
+        totalAnalyzedCommits: report.summary.totalAnalyzedCommits,
+        bugCommits: report.defectCommits,
+        summary: report.summary,
+        defectHotspots: report.defectHotspots,
+        categories: report.summary.categories
       });
     }
 
